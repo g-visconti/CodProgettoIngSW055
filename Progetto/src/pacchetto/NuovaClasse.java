@@ -1,5 +1,5 @@
 package pacchetto;
 
-private class NuovaClasse {
-	
+public static void main(){
+	System.out.println("Ciao mondo");
 }
