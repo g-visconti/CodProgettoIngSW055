@@ -7,7 +7,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
-import Interfacce.SignIn;
+
 
 import javax.swing.JSplitPane;
 import javax.swing.JButton;
@@ -28,22 +28,8 @@ public class ViewAccesso extends JFrame {
 	private JTextField txtAccediORegistrati;
 	private JTextField txtOppure;
 
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					ViewAccesso frame = new ViewAccesso();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-
+	
+	
 	/**
 	 * Create the frame.
 	 */
