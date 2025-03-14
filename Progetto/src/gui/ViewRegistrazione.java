@@ -87,6 +87,10 @@ public class ViewRegistrazione extends JFrame {
 				// riusciamo ad ottenere il token
 				t.setText(TokenCognito);
 				
+				ViewDashboard frame = new ViewDashboard();
+	               frame.setVisible(true);
+	               dispose();
+				
 			}
 		});
 		btnNewButton.setBounds(260, 316, 120, 23);
