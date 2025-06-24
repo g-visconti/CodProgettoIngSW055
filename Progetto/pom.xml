@@ -1,6 +1,8 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" 
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>CodiceProgettoIngSW055_Progetto</groupId>
@@ -8,6 +10,16 @@
     <version>1.0-SNAPSHOT</version>
 
     <dependencies>
+    	<dependency>
+    		<groupId>org.json</groupId>
+    			<artifactId>json</artifactId>
+    		<version>20250107</version>
+		</dependency>
+        <dependency>
+            <groupId>com.auth0</groupId>
+            <artifactId>java-jwt</artifactId>
+            <version>3.18.1</version> <!-- Assicurati di usare la versione più recente -->
+        </dependency>
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>
             <artifactId>okhttp</artifactId>
@@ -19,6 +31,11 @@
             <version>2.8.9</version>
         </dependency>
     </dependencies>
+
+	<properties>
+    	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+
 
     <build>
         <plugins>
