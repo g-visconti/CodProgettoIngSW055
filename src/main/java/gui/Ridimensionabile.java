@@ -15,6 +15,8 @@ import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JComboBox;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
 
 public class Ridimensionabile extends JFrame {
 
@@ -22,6 +24,7 @@ public class Ridimensionabile extends JFrame {
 	private JPanel contentPane;
 	private JTextField textField;
 	private JButton btnNewButton_1;
+	private JTable table;
 
 	/**
 	 * Launch the application.
@@ -71,14 +74,25 @@ public class Ridimensionabile extends JFrame {
 		
 		JPanel panel = new JPanel();
 		sl_contentPane.putConstraint(SpringLayout.NORTH, panel, 170, SpringLayout.NORTH, contentPane);
-		sl_contentPane.putConstraint(SpringLayout.WEST, panel, 0, SpringLayout.WEST, contentPane);
 		sl_contentPane.putConstraint(SpringLayout.SOUTH, panel, 0, SpringLayout.SOUTH, contentPane);
 		sl_contentPane.putConstraint(SpringLayout.EAST, panel, 0, SpringLayout.EAST, btnNewButton_1);
 		panel.setBackground(new Color(30, 180, 230));
 		contentPane.add(panel);
-		panel.setLayout(new SpringLayout());
+		SpringLayout sl_panel = new SpringLayout();
+		panel.setLayout(sl_panel);
+		
+		JScrollPane scrollPane = new JScrollPane();
+		sl_panel.putConstraint(SpringLayout.NORTH, scrollPane, 58, SpringLayout.NORTH, panel);
+		sl_panel.putConstraint(SpringLayout.WEST, scrollPane, 10, SpringLayout.WEST, panel);
+		sl_panel.putConstraint(SpringLayout.SOUTH, scrollPane, -10, SpringLayout.SOUTH, panel);
+		sl_panel.putConstraint(SpringLayout.EAST, scrollPane, -10, SpringLayout.EAST, panel);
+		panel.add(scrollPane);
+		
+		table = new JTable();
+		scrollPane.setViewportView(table);
 		
 		JLabel lblNewLabel = new JLabel("New label");
+		sl_contentPane.putConstraint(SpringLayout.WEST, panel, 0, SpringLayout.WEST, lblNewLabel);
 		sl_contentPane.putConstraint(SpringLayout.NORTH, lblNewLabel, 0, SpringLayout.NORTH, btnNewButton_1);
 		sl_contentPane.putConstraint(SpringLayout.WEST, lblNewLabel, 0, SpringLayout.WEST, contentPane);
 		contentPane.add(lblNewLabel);
