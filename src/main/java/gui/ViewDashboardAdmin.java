@@ -38,6 +38,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.JButton;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import javax.swing.SpringLayout;
 
 
 public class ViewDashboardAdmin extends JFrame {
@@ -47,23 +48,19 @@ public class ViewDashboardAdmin extends JFrame {
 	private String campoPieno;
 	private String campoVuoto = "";
 	private JTable tableRisultati;
-	private Preferences prefs;
+	private JLabel lblLogout;
 
 	/**
 	 * Create the frame ViewDashboardAdmin.
 	 */
 	@SuppressWarnings("serial")
 	public ViewDashboardAdmin(String emailInserita) {
-		setResizable(true
-				);
-		prefs = Preferences.userNodeForPackage(ViewPreferenze.class);
+		setResizable(true);
+		Preferences.userNodeForPackage(ViewFiltri.class);
 		
 		// Opzioni per le comboBox
 		String[] opAppartamento = {"Vendita", "Affitto"};
-		String[] opPrezzoMin = {"Indifferente", "50000", "60000", "70000", "80000", "90000", "100000", "150000", "200000", "300000", "500000", "1000000"};
-		String[] opPrezzoMax = {"Indifferente", "50000", "60000", "70000", "80000", "90000", "100000", "150000", "200000", "300000", "500000", "1000000"};
-		String[] opSupMin = {"Indifferente", "40", "60", "80", "100", "120", "150", "180", "200", "300", "500"};
-		String[] opSupMax = {"Indifferente", "40", "60", "80", "100", "120", "150", "180", "200", "300", "500"};
+		
 		
 		// Carica l'immagine come icona
 		URL pathIcona = getClass().getClassLoader().getResource("images/DietiEstatesIcona.png");
@@ -82,22 +79,34 @@ public class ViewDashboardAdmin extends JFrame {
 		dashboard.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(dashboard);
 		dashboard.setLayout(null);
-		dashboard.setLayout(null);
+		SpringLayout sl_dashboard = new SpringLayout();
+		dashboard.setLayout(sl_dashboard);
 		
 		JLayeredPane layeredPane = new JLayeredPane();
-		layeredPane.setSize(1251, 576);
-		layeredPane.setLocation(0, 190);
+		sl_dashboard.putConstraint(SpringLayout.NORTH, layeredPane, 190, SpringLayout.NORTH, dashboard);
+		sl_dashboard.putConstraint(SpringLayout.WEST, layeredPane, 0, SpringLayout.WEST, dashboard);
+		sl_dashboard.putConstraint(SpringLayout.SOUTH, layeredPane, 0, SpringLayout.SOUTH, dashboard);
+		sl_dashboard.putConstraint(SpringLayout.EAST, layeredPane, 0, SpringLayout.EAST, dashboard);
 		dashboard.add(layeredPane);
+		SpringLayout sl_layeredPane = new SpringLayout();
+		layeredPane.setLayout(sl_layeredPane);
 		
 		JPanel risultatiDaRicerca = new JPanel();
+		sl_layeredPane.putConstraint(SpringLayout.NORTH, risultatiDaRicerca, 0, SpringLayout.NORTH, layeredPane);
+		sl_layeredPane.putConstraint(SpringLayout.WEST, risultatiDaRicerca, 0, SpringLayout.WEST, layeredPane);
+		sl_layeredPane.putConstraint(SpringLayout.SOUTH, risultatiDaRicerca, 0, SpringLayout.SOUTH, layeredPane);
+		sl_layeredPane.putConstraint(SpringLayout.EAST, risultatiDaRicerca, 0, SpringLayout.EAST, layeredPane);
 		risultatiDaRicerca.setBackground(new Color(50, 133, 177));
-		risultatiDaRicerca.setBounds(0, 0, 1251, 576);
 		layeredPane.add(risultatiDaRicerca);
-		risultatiDaRicerca.setLayout(null);
+		SpringLayout sl_risultatiDaRicerca = new SpringLayout();
+		risultatiDaRicerca.setLayout(sl_risultatiDaRicerca);
 		
 		JScrollPane scrollPane = new JScrollPane();
+		sl_risultatiDaRicerca.putConstraint(SpringLayout.NORTH, scrollPane, 47, SpringLayout.NORTH, risultatiDaRicerca);
+		sl_risultatiDaRicerca.putConstraint(SpringLayout.WEST, scrollPane, 10, SpringLayout.WEST, risultatiDaRicerca);
+		sl_risultatiDaRicerca.putConstraint(SpringLayout.SOUTH, scrollPane, -10, SpringLayout.SOUTH, risultatiDaRicerca);
+		sl_risultatiDaRicerca.putConstraint(SpringLayout.EAST, scrollPane, -10, SpringLayout.EAST, risultatiDaRicerca);
 		scrollPane.setBackground(new Color(255, 255, 255));
-		scrollPane.setBounds(10, 47, 1231, 518);
 		risultatiDaRicerca.add(scrollPane);
 		
 		tableRisultati = new JTable();		
@@ -140,7 +149,7 @@ public class ViewDashboardAdmin extends JFrame {
 				return columnEditables[column];
 			}
 		};
-		tableRisultati.setModel(new DefaultTableModel(
+		DefaultTableModel dataModel = new DefaultTableModel(
 			new Object[][] {
 				{null, "", null, null},
 				{null, "", null, null},
@@ -154,13 +163,16 @@ public class ViewDashboardAdmin extends JFrame {
 				"Foto", "Tipologia", "Descrizione", "Prezzo (\u20AC)"
 			}
 		) {
+			@SuppressWarnings({ "rawtypes" })
 			Class[] columnTypes = new Class[] {
 				Object.class, String.class, String.class, String.class
 			};
+			@SuppressWarnings({ "rawtypes", "unchecked" })
 			public Class getColumnClass(int columnIndex) {
 				return columnTypes[columnIndex];
 			}
-		});
+		};
+		tableRisultati.setModel(dataModel);
 		tableRisultati.getColumnModel().getColumn(0).setResizable(false);
 		tableRisultati.getColumnModel().getColumn(1).setResizable(false);
 		tableRisultati.getColumnModel().getColumn(1).setPreferredWidth(170);
@@ -170,13 +182,17 @@ public class ViewDashboardAdmin extends JFrame {
 		scrollPane.setViewportView(tableRisultati);
 		
 		JLabel lblRisultatiDaRicerca = new JLabel("I tuoi immobili:");
+		sl_risultatiDaRicerca.putConstraint(SpringLayout.NORTH, lblRisultatiDaRicerca, 5, SpringLayout.NORTH, risultatiDaRicerca);
+		sl_risultatiDaRicerca.putConstraint(SpringLayout.WEST, lblRisultatiDaRicerca, 20, SpringLayout.WEST, risultatiDaRicerca);
+		sl_risultatiDaRicerca.putConstraint(SpringLayout.SOUTH, lblRisultatiDaRicerca, -10, SpringLayout.NORTH, scrollPane);
+		sl_risultatiDaRicerca.putConstraint(SpringLayout.EAST, lblRisultatiDaRicerca, 226, SpringLayout.WEST, risultatiDaRicerca);
 		lblRisultatiDaRicerca.setHorizontalAlignment(SwingConstants.LEFT);
 		lblRisultatiDaRicerca.setForeground(Color.WHITE);
 		lblRisultatiDaRicerca.setFont(new Font("Tahoma", Font.BOLD, 20));
-		lblRisultatiDaRicerca.setBounds(20, 9, 206, 25);
 		risultatiDaRicerca.add(lblRisultatiDaRicerca);
 		
-		JButton btnCaricaImmobile = new JButton("Carica immobile");    
+		JButton btnCaricaImmobile = new JButton("Carica immobile");
+		sl_risultatiDaRicerca.putConstraint(SpringLayout.NORTH, btnCaricaImmobile, 8, SpringLayout.NORTH, lblRisultatiDaRicerca);
         btnCaricaImmobile.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -189,10 +205,12 @@ public class ViewDashboardAdmin extends JFrame {
 		btnCaricaImmobile.setToolTipText("Clicca per inserire un nuovo immobile");
 		btnCaricaImmobile.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 11));
 		btnCaricaImmobile.setBackground(Color.WHITE);
-		btnCaricaImmobile.setBounds(943, 13, 138, 23);
 		risultatiDaRicerca.add(btnCaricaImmobile);
 		
 		JButton btnVediOfferteProposte = new JButton("Vedi offerte proposte");
+		sl_risultatiDaRicerca.putConstraint(SpringLayout.NORTH, btnVediOfferteProposte, 13, SpringLayout.NORTH, risultatiDaRicerca);
+		sl_risultatiDaRicerca.putConstraint(SpringLayout.WEST, btnVediOfferteProposte, 267, SpringLayout.WEST, risultatiDaRicerca);
+		sl_risultatiDaRicerca.putConstraint(SpringLayout.EAST, btnVediOfferteProposte, 431, SpringLayout.WEST, risultatiDaRicerca);
 		btnVediOfferteProposte.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				ViewOfferte viewOfferte = new ViewOfferte(emailInserita);
@@ -204,10 +222,12 @@ public class ViewDashboardAdmin extends JFrame {
 		btnVediOfferteProposte.setToolTipText("Clicca per visualizzare tutte le offerte proposte");
 		btnVediOfferteProposte.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 11));
 		btnVediOfferteProposte.setBackground(Color.WHITE);
-		btnVediOfferteProposte.setBounds(267, 13, 164, 23);
 		risultatiDaRicerca.add(btnVediOfferteProposte);
 		
 		JButton btnEliminaImmobile = new JButton("Elimina Immobile");
+		sl_risultatiDaRicerca.putConstraint(SpringLayout.EAST, btnCaricaImmobile, -35, SpringLayout.WEST, btnEliminaImmobile);
+		sl_risultatiDaRicerca.putConstraint(SpringLayout.NORTH, btnEliminaImmobile, -34, SpringLayout.NORTH, scrollPane);
+		sl_risultatiDaRicerca.putConstraint(SpringLayout.EAST, btnEliminaImmobile, -42, SpringLayout.EAST, risultatiDaRicerca);
 		
 		// Disabilita il pulsante inizialmente
 		btnEliminaImmobile.setEnabled(false);
@@ -222,14 +242,16 @@ public class ViewDashboardAdmin extends JFrame {
 		btnEliminaImmobile.setToolTipText("Clicca su uno degli immobili per poterlo eliminare");
 		btnEliminaImmobile.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 11));
 		btnEliminaImmobile.setBackground(Color.WHITE);
-		btnEliminaImmobile.setBounds(1103, 13, 138, 23);
 		risultatiDaRicerca.add(btnEliminaImmobile);
 		
 		
 		JPanel ricerca = new JPanel();
+		sl_dashboard.putConstraint(SpringLayout.NORTH, ricerca, 0, SpringLayout.NORTH, dashboard);
+		sl_dashboard.putConstraint(SpringLayout.WEST, ricerca, 0, SpringLayout.WEST, dashboard);
+		sl_dashboard.putConstraint(SpringLayout.SOUTH, ricerca, 189, SpringLayout.NORTH, dashboard);
+		sl_dashboard.putConstraint(SpringLayout.EAST, ricerca, 0, SpringLayout.EAST, dashboard);
 		ricerca.setAlignmentY(Component.TOP_ALIGNMENT);
 		ricerca.setAlignmentX(Component.RIGHT_ALIGNMENT);
-		ricerca.setBounds(0, 0, 1251, 189);
 		ricerca.setName("");
 		
 		ricerca.setBackground(new Color(255, 255, 255));
@@ -247,7 +269,6 @@ public class ViewDashboardAdmin extends JFrame {
 				}
 			}
 		});
-		campoRicerca.setBounds(363, 51, 538, 29);
 		campoRicerca.setText("Effettua una nuova ricerca inserendo comune o zona");
 		campoRicerca.setFont(new Font("Yu Gothic UI Semibold", Font.ITALIC, 11));
 		campoRicerca.setColumns(10);
@@ -275,21 +296,28 @@ public class ViewDashboardAdmin extends JFrame {
 				}	
 			}
 		});
+		SpringLayout sl_ricerca = new SpringLayout();
+		sl_ricerca.putConstraint(SpringLayout.EAST, campoRicerca, -355, SpringLayout.EAST, ricerca);
+		sl_ricerca.putConstraint(SpringLayout.HORIZONTAL_CENTER, campoRicerca, 0, SpringLayout.HORIZONTAL_CENTER, ricerca);
+		sl_ricerca.putConstraint(SpringLayout.VERTICAL_CENTER, campoRicerca, 0, SpringLayout.VERTICAL_CENTER, ricerca);
+		ricerca.setLayout(sl_ricerca);
 				
 		JComboBox<String> comboBoxAppartamento = new JComboBox<>(opAppartamento);
+		sl_ricerca.putConstraint(SpringLayout.WEST, comboBoxAppartamento, 248, SpringLayout.WEST, ricerca);
+		sl_ricerca.putConstraint(SpringLayout.EAST, comboBoxAppartamento, -23, SpringLayout.WEST, campoRicerca);
+		sl_ricerca.putConstraint(SpringLayout.SOUTH, campoRicerca, 0, SpringLayout.SOUTH, comboBoxAppartamento);
+		sl_ricerca.putConstraint(SpringLayout.SOUTH, comboBoxAppartamento, -70, SpringLayout.SOUTH, ricerca);
 		comboBoxAppartamento.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 11));
 		comboBoxAppartamento.setFocusable(false);
-		comboBoxAppartamento.setBounds(241, 51, 107, 29);
 		comboBoxAppartamento.setForeground(new Color(0, 0, 51));
 		comboBoxAppartamento.setBackground(new Color(255, 255, 255));
 		comboBoxAppartamento.setToolTipText("Seleziona la tipologia di appartamento");
 		
 		ricerca.add(comboBoxAppartamento);
-		ricerca.setLayout(null);
 		ricerca.add(campoRicerca);
 	
 		
-		JLabel lblLogout = new JLabel();
+		lblLogout = new JLabel();
 		lblLogout.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -303,7 +331,6 @@ public class ViewDashboardAdmin extends JFrame {
 			}
 		});
 		lblLogout.setToolTipText("Clicca per uscire da DietiEstates25");
-		lblLogout.setBounds(1201, 11, 28, 39);
 		ricerca.add(lblLogout);
 		
 		URL pathLogout = getClass().getClassLoader().getResource("images/Logout.png");
@@ -314,6 +341,8 @@ public class ViewDashboardAdmin extends JFrame {
 		URL pathCerca = getClass().getClassLoader().getResource("images/Search.png");
 		ImageIcon iconaCerca = new ImageIcon(pathCerca);
 		JButton btnCerca = new JButton(iconaCerca);
+		sl_ricerca.putConstraint(SpringLayout.SOUTH, btnCerca, -70, SpringLayout.SOUTH, ricerca);
+		sl_ricerca.putConstraint(SpringLayout.EAST, btnCerca, -255, SpringLayout.EAST, ricerca);
 		
 		// Bottone predefinito alla pressione del tasto Enter
 		getRootPane().setDefaultButton(btnCerca);
@@ -333,9 +362,6 @@ public class ViewDashboardAdmin extends JFrame {
 				}
 			}
 		});
-		
-		
-		btnCerca.setBounds(967, 51, 28, 28);
 		btnCerca.setToolTipText("Clicca per iniziare una ricerca");
 		btnCerca.setBorderPainted(false);
 		
@@ -359,8 +385,11 @@ public class ViewDashboardAdmin extends JFrame {
 		ricerca.add(btnCerca);
 		
 		JLabel lblUser = new JLabel("");
+		sl_ricerca.putConstraint(SpringLayout.SOUTH, lblLogout, 0, SpringLayout.SOUTH, lblUser);
+		sl_ricerca.putConstraint(SpringLayout.NORTH, lblUser, 8, SpringLayout.NORTH, ricerca);
+		sl_ricerca.putConstraint(SpringLayout.NORTH, lblLogout, 0, SpringLayout.NORTH, lblUser);
+		sl_ricerca.putConstraint(SpringLayout.WEST, lblLogout, 11, SpringLayout.EAST, lblUser);
 		lblUser.setToolTipText("Clicca per vedere altre ozioni sul profilo");
-		lblUser.setBounds(1159, 16, 32, 29);
 		ricerca.add(lblUser);
 		
 		// Creazione del menù a tendina
@@ -387,7 +416,6 @@ public class ViewDashboardAdmin extends JFrame {
 					e1.printStackTrace();
 				};
 				
-				//JOptionPane.showMessageDialog(null, "Qui visualizzerai il tuo profilo", "Avviso", JOptionPane.INFORMATION_MESSAGE);
 				
 			}
 		});
@@ -424,95 +452,42 @@ public class ViewDashboardAdmin extends JFrame {
 		lblUser.setIcon(new ImageIcon(pathUser));
 		
 		JLabel lblTitolo = new JLabel("DietiEstates25");
+		sl_ricerca.putConstraint(SpringLayout.NORTH, lblTitolo, 0, SpringLayout.NORTH, ricerca);
+		sl_ricerca.putConstraint(SpringLayout.WEST, lblTitolo, 10, SpringLayout.WEST, ricerca);
+		sl_ricerca.putConstraint(SpringLayout.SOUTH, lblTitolo, -145, SpringLayout.SOUTH, ricerca);
+		sl_ricerca.putConstraint(SpringLayout.EAST, lblTitolo, -1008, SpringLayout.EAST, ricerca);
 		lblTitolo.setForeground(new Color(27, 99, 142));
 		lblTitolo.setHorizontalAlignment(SwingConstants.LEFT);
 		lblTitolo.setFont(new Font("Tahoma", Font.BOLD, 30));
-		lblTitolo.setBounds(513, 11, 225, 29);
 		ricerca.add(lblTitolo);
 		
-		JLabel lblDEicona = new JLabel("");
-		lblDEicona.setBounds(478, 11, 28, 29);
-		ricerca.add(lblDEicona);
-		
-		URL pathDEicona = getClass().getClassLoader().getResource("images/DietiEstatesicona.png");
-		lblDEicona.setIcon(new ImageIcon(pathDEicona));
-		
 		JLabel lblBenvenuto = new JLabel("Accesso effettuato con:");
+		sl_ricerca.putConstraint(SpringLayout.NORTH, lblBenvenuto, 11, SpringLayout.NORTH, ricerca);
+		sl_ricerca.putConstraint(SpringLayout.WEST, lblBenvenuto, 601, SpringLayout.EAST, lblTitolo);
 		lblBenvenuto.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblBenvenuto.setVerticalAlignment(SwingConstants.TOP);
-		lblBenvenuto.setBounds(924, 11, 225, 14);
 		ricerca.add(lblBenvenuto);
 		
 		JLabel lblEmailAccesso = new JLabel("<email>");
+		sl_ricerca.putConstraint(SpringLayout.NORTH, btnCerca, 50, SpringLayout.SOUTH, lblEmailAccesso);
+		sl_ricerca.putConstraint(SpringLayout.NORTH, campoRicerca, 50, SpringLayout.SOUTH, lblEmailAccesso);
+		sl_ricerca.putConstraint(SpringLayout.NORTH, comboBoxAppartamento, 50, SpringLayout.SOUTH, lblEmailAccesso);
+		sl_ricerca.putConstraint(SpringLayout.NORTH, lblEmailAccesso, 1, SpringLayout.SOUTH, lblBenvenuto);
+		sl_ricerca.putConstraint(SpringLayout.WEST, lblEmailAccesso, 532, SpringLayout.EAST, lblTitolo);
+		sl_ricerca.putConstraint(SpringLayout.SOUTH, lblEmailAccesso, 0, SpringLayout.SOUTH, lblLogout);
+		sl_ricerca.putConstraint(SpringLayout.EAST, lblEmailAccesso, 0, SpringLayout.EAST, lblBenvenuto);
 		lblEmailAccesso.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblEmailAccesso.setText(emailInserita+" ");
 		lblEmailAccesso.setFont(new Font("Yu Gothic UI Semibold", Font.ITALIC, 11));
-		lblEmailAccesso.setBounds(924, 26, 225, 23);
 		ricerca.add(lblEmailAccesso);
-		
-		// Elenco di combobox sulle possibili preferenze
-		JLabel lblPrezzoMinimo = new JLabel("Prezzo minimo (€)");
-		ricerca.add(lblPrezzoMinimo);
-		lblPrezzoMinimo.setHorizontalAlignment(SwingConstants.CENTER);
-		lblPrezzoMinimo.setFont(new Font("Tahoma", Font.BOLD, 11));
-		lblPrezzoMinimo.setBounds(298, 106, 103, 14);
-		
-		JComboBox<String> comboBoxPMin = new JComboBox<>(opPrezzoMin);		
-		comboBoxPMin.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 11));
-		comboBoxPMin.setToolTipText("Seleziona il prezzo di partenza");
-		comboBoxPMin.setBackground(new Color(255, 255, 255));
-		ricerca.add(comboBoxPMin);
-		comboBoxPMin.setMaximumRowCount(12);
-		comboBoxPMin.setBounds(298, 131, 103, 29);
-		comboBoxPMin.setSelectedItem(prefs.get("prezzoMin", "Indifferente"));
-		
-		JLabel lblPrezzoMassimo = new JLabel("Prezzo massimo (€)");
-		ricerca.add(lblPrezzoMassimo);
-		lblPrezzoMassimo.setHorizontalAlignment(SwingConstants.CENTER);
-		lblPrezzoMassimo.setFont(new Font("Tahoma", Font.BOLD, 11));
-		lblPrezzoMassimo.setBounds(436, 106, 112, 14);
-		
-		JComboBox<String> comboBoxPMax = new JComboBox<>(opPrezzoMax);
-		comboBoxPMax.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 11));
-		comboBoxPMax.setToolTipText("Seleziona il prezzo limite");
-		comboBoxPMax.setBackground(new Color(255, 255, 255));
-		ricerca.add(comboBoxPMax);
-		comboBoxPMax.setMaximumRowCount(12);
-		comboBoxPMax.setBounds(440, 131, 103, 29);
-		comboBoxPMax.setSelectedItem(prefs.get("prezzoMax", "Indifferente"));
-		
-		JLabel lblSuperficieMinima = new JLabel("Superficie minima (mq)");
-		ricerca.add(lblSuperficieMinima);
-		lblSuperficieMinima.setHorizontalAlignment(SwingConstants.CENTER);
-		lblSuperficieMinima.setFont(new Font("Tahoma", Font.BOLD, 11));
-		lblSuperficieMinima.setBounds(636, 106, 132, 14);
-		
-		JComboBox<String> comboBoxSMin = new JComboBox<>(opSupMin);
-		comboBoxSMin.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 11));
-		comboBoxSMin.setToolTipText("Seleziona la superficie di partenza");
-		comboBoxSMin.setBackground(new Color(255, 255, 255));
-		ricerca.add(comboBoxSMin);
-		comboBoxSMin.setMaximumRowCount(12);
-		comboBoxSMin.setBounds(657, 131, 103, 29);
-		comboBoxSMin.setSelectedItem(prefs.get("superficieMin", "Indifferente"));
-		
-		JLabel lblSuperficieMassima = new JLabel("Superficie massima (mq)");
-		lblSuperficieMassima.setHorizontalAlignment(SwingConstants.CENTER);
-		ricerca.add(lblSuperficieMassima);
-		lblSuperficieMassima.setFont(new Font("Tahoma", Font.BOLD, 11));
-		lblSuperficieMassima.setBounds(792, 106, 141, 14);
-		
-		JComboBox<String> comboBoxSMax = new JComboBox<>(opSupMax);
-		comboBoxSMax.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 11));
-		comboBoxSMax.setToolTipText("Seleziona la superficie limite");
-		comboBoxSMax.setBackground(new Color(255, 255, 255));
-		ricerca.add(comboBoxSMax);
-		comboBoxSMax.setMaximumRowCount(12);
-		comboBoxSMax.setBounds(813, 131, 103, 29);
-		comboBoxSMax.setSelectedItem(prefs.get("superficieMax", "Indifferente"));
 		
 		// filtri
 		JLabel lblFilters = new JLabel();
+		sl_ricerca.putConstraint(SpringLayout.WEST, lblFilters, 23, SpringLayout.EAST, campoRicerca);
+		sl_ricerca.putConstraint(SpringLayout.EAST, lblFilters, -302, SpringLayout.EAST, ricerca);
+		sl_ricerca.putConstraint(SpringLayout.WEST, btnCerca, 17, SpringLayout.EAST, lblFilters);
+		sl_ricerca.putConstraint(SpringLayout.NORTH, lblFilters, 50, SpringLayout.SOUTH, lblEmailAccesso);
+		sl_ricerca.putConstraint(SpringLayout.SOUTH, lblFilters, -70, SpringLayout.SOUTH, ricerca);
 		lblFilters.setToolTipText("Clicca per impostare preferenze aggiuntive");
 		lblFilters.addMouseListener(new MouseAdapter() {
 			@Override
@@ -522,13 +497,12 @@ public class ViewDashboardAdmin extends JFrame {
 					JOptionPane.showMessageDialog(null, "Scrivere qualcosa prima di impostare i filtri!", "Attenzione", JOptionPane.INFORMATION_MESSAGE);
 				}
 				else {
-					ViewPreferenze viewPreferenze = new ViewPreferenze();
+					ViewFiltri viewPreferenze = new ViewFiltri();
 					viewPreferenze.setLocationRelativeTo(null);
 					viewPreferenze.setVisible(true);
 				}
 			}
 		});
-		lblFilters.setBounds(929, 51, 28, 29);
 		ricerca.add(lblFilters);
 		
 		URL pathFilters = getClass().getClassLoader().getResource("images/Tune.png");
@@ -566,6 +540,10 @@ public class ViewDashboardAdmin extends JFrame {
         
 		
 		JLabel lblAddUser = new JLabel();
+		sl_ricerca.putConstraint(SpringLayout.EAST, lblAddUser, -95, SpringLayout.EAST, ricerca);
+		sl_ricerca.putConstraint(SpringLayout.WEST, lblUser, 6, SpringLayout.EAST, lblAddUser);
+		sl_ricerca.putConstraint(SpringLayout.NORTH, lblAddUser, 11, SpringLayout.NORTH, ricerca);
+		sl_ricerca.putConstraint(SpringLayout.EAST, lblBenvenuto, -49, SpringLayout.WEST, lblAddUser);
 		
 		// Evento per mostrare il menù al clic sull'immagine
 		lblAddUser.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -577,7 +555,6 @@ public class ViewDashboardAdmin extends JFrame {
         });
 		
 		lblAddUser.setToolTipText("Clicca per aggiungere una nuovo agente o amministratore di supporto");
-		lblAddUser.setBounds(23, 11, 28, 29);
 		ricerca.add(lblAddUser);
 		
 		URL pathAddUser = getClass().getClassLoader().getResource("images/AddUser.png");

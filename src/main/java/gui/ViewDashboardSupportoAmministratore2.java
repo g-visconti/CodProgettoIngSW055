@@ -53,7 +53,7 @@ public class ViewDashboardSupportoAmministratore2 extends JFrame {
 	 */
 	public ViewDashboardSupportoAmministratore2() {
 		setResizable(false);
-		prefs = Preferences.userNodeForPackage(ViewPreferenze.class);
+		prefs = Preferences.userNodeForPackage(ViewFiltri.class);
 		
 		// Opzioni per le comboBox
 		String[] opAppartamento = {"Vendita", "Affitto"};
@@ -332,7 +332,7 @@ public class ViewDashboardSupportoAmministratore2 extends JFrame {
 					JOptionPane.showMessageDialog(null, "Scrivere qualcosa prima di impostare i filtri!", "Attenzione", JOptionPane.INFORMATION_MESSAGE);
 				}
 				else {
-					ViewPreferenze viewPreferenze = new ViewPreferenze();
+					ViewFiltri viewPreferenze = new ViewFiltri();
 					viewPreferenze.setLocationRelativeTo(null);
 					viewPreferenze.setVisible(true);
 				}
