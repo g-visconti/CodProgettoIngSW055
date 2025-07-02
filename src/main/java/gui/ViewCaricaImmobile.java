@@ -5,18 +5,14 @@ package gui;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-
 import org.json.JSONObject;
-
 import controller.Controller;
 import model.Immobile;
 import model.ImmobileInAffitto;
 import model.ImmobileInVendita;
-
 import javax.swing.JTextField;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-
 import java.awt.Color;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -25,27 +21,25 @@ import javax.swing.JButton;
 import javax.swing.JSpinner;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class ViewCaricaImmobile extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
-	private JTextField descrizionefield;
-	private JTextField titolofield;
-	private JTextField localitafield;
-	private JTextField dimensionefield;
-	private JTextField indirizzofield;
-	private JTextField prezzofield;
-
-	/**
-	 * Launch the application.
-	 */
+	private JTextField descrizioneField;
+	private JTextField titoloField;
+	private JTextField localitaField;
+	private JTextField dimensioneField;
+	private JTextField indirizzoField;
+	private JTextField prezzoField;
 	
 	/**
 	 * Create the frame.
 	 */
 	public ViewCaricaImmobile() {
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 584, 630);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -53,10 +47,10 @@ public class ViewCaricaImmobile extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 		
-		descrizionefield = new JTextField();
-		descrizionefield.setBounds(89, 371, 376, 92);
-		contentPane.add(descrizionefield);
-		descrizionefield.setColumns(10);
+		descrizioneField = new JTextField();
+		descrizioneField.setBounds(89, 371, 376, 92);
+		contentPane.add(descrizioneField);
+		descrizioneField.setColumns(10);
 		
 		JLabel lblNewLabel = new JLabel("New label");
 		lblNewLabel.setOpaque(true);
@@ -64,10 +58,10 @@ public class ViewCaricaImmobile extends JFrame {
 		lblNewLabel.setBounds(8, 10, 132, 157);
 		contentPane.add(lblNewLabel);
 		
-		titolofield = new JTextField();
-		titolofield.setBounds(259, 78, 101, 20);
-		contentPane.add(titolofield);
-		titolofield.setColumns(10);
+		titoloField = new JTextField();
+		titoloField.setBounds(259, 78, 101, 20);
+		contentPane.add(titoloField);
+		titoloField.setColumns(10);
 		
 		JLabel labeltitolo = new JLabel("Titolo");
 		labeltitolo.setBounds(260, 47, 85, 20);
@@ -77,27 +71,31 @@ public class ViewCaricaImmobile extends JFrame {
 		lblNewLabel_2.setBounds(236, 345, 109, 20);
 		contentPane.add(lblNewLabel_2);
 		
-		JCheckBox ascensorefield = new JCheckBox("Ascensore");
-		ascensorefield.setBounds(18, 204, 97, 23);
-		contentPane.add(ascensorefield);
+		JCheckBox ascensoreField = new JCheckBox("Ascensore");
+		ascensoreField.setBounds(18, 204, 97, 23);
+		contentPane.add(ascensoreField);
 		
-		JCheckBox portineriafield = new JCheckBox("Portineria");
-		portineriafield.setBounds(117, 205, 97, 20);
-		contentPane.add(portineriafield);
+		JCheckBox portineriaField = new JCheckBox("Portineria");
+		portineriaField.setBounds(117, 205, 97, 20);
+		contentPane.add(portineriaField);
 		
-		JCheckBox climatizzazionefield = new JCheckBox("Climatizzazione");
-		climatizzazionefield.setBounds(17, 242, 98, 23);
-		contentPane.add(climatizzazionefield);
+		JCheckBox climatizzazioneField = new JCheckBox("Climatizzazione");
+		climatizzazioneField.setBounds(17, 242, 98, 23);
+		contentPane.add(climatizzazioneField);
 		
-		JComboBox<String> tipologiafield = new JComboBox<>();
-		tipologiafield.setModel(new DefaultComboBoxModel<>(new String[] { "-", "Vendita", "Affitto" }));
-		tipologiafield.setBounds(380, 78, 103, 20);
-		contentPane.add(tipologiafield);
+		JCheckBox postoAutoField = new JCheckBox("Posto auto");
+		postoAutoField.setBounds(115, 242, 99, 23);
+		contentPane.add(postoAutoField);
 		
-		localitafield = new JTextField();
-		localitafield.setBounds(259, 148, 101, 20);
-		contentPane.add(localitafield);
-		localitafield.setColumns(10);
+		JComboBox<String> tipologiaField = new JComboBox<>();
+		tipologiaField.setModel(new DefaultComboBoxModel<>(new String[] { "-", "Vendita", "Affitto" }));
+		tipologiaField.setBounds(380, 78, 103, 20);
+		contentPane.add(tipologiaField);
+		
+		localitaField = new JTextField();
+		localitaField.setBounds(259, 148, 101, 20);
+		contentPane.add(localitaField);
+		localitaField.setColumns(10);
 		
 		JLabel lblNewLabel_3 = new JLabel("mq");
 		lblNewLabel_3.setBounds(340, 207, 20, 17);
@@ -107,10 +105,10 @@ public class ViewCaricaImmobile extends JFrame {
 		labellocalita.setBounds(259, 120, 69, 17);
 		contentPane.add(labellocalita);
 		
-		dimensionefield = new JTextField();
-		dimensionefield.setBounds(259, 205, 73, 19);
-		contentPane.add(dimensionefield);
-		dimensionefield.setColumns(10);
+		dimensioneField = new JTextField();
+		dimensioneField.setBounds(259, 205, 73, 19);
+		contentPane.add(dimensioneField);
+		dimensioneField.setColumns(10);
 		
 		JLabel labeldimensione = new JLabel("Dimensione");
 		labeldimensione.setBounds(259, 179, 73, 14);
@@ -124,15 +122,15 @@ public class ViewCaricaImmobile extends JFrame {
 		labelindirizzo.setBounds(380, 120, 101, 17);
 		contentPane.add(labelindirizzo);
 		
-		indirizzofield = new JTextField();
-		indirizzofield.setColumns(10);
-		indirizzofield.setBounds(380, 148, 103, 20);
-		contentPane.add(indirizzofield);
+		indirizzoField = new JTextField();
+		indirizzoField.setColumns(10);
+		indirizzoField.setBounds(380, 148, 103, 20);
+		contentPane.add(indirizzoField);
 		
 		String[] piani = { "-", "Terra", "1°", "2°", "3°", "4°", "5°", "6°", "7°" };
-		JComboBox<String> pianofield = new JComboBox<>(piani);
-		pianofield.setBounds(380, 205, 103, 19);
-		contentPane.add(pianofield);
+		JComboBox<String> pianoField = new JComboBox<>(piani);
+		pianoField.setBounds(380, 205, 103, 19);
+		contentPane.add(pianoField);
 		
 		JLabel labelpiano = new JLabel("Piano");
 		labelpiano.setBounds(380, 179, 73, 14);
@@ -145,20 +143,21 @@ public class ViewCaricaImmobile extends JFrame {
 		        try {
 		            Controller con = new Controller();
 
-		            String titolo = titolofield.getText();
-		            String indirizzo = indirizzofield.getText();
-		            String localita = localitafield.getText();
-		            int dimensione = Integer.parseInt(dimensionefield.getText()); // attenzione NumberFormatException
-		            String descrizione = descrizionefield.getText();
-		            String tipologia = (String) tipologiafield.getSelectedItem();
+		            String titolo = titoloField.getText();
+		            String indirizzo = indirizzoField.getText();
+		            String localita = localitaField.getText();
+		            int dimensione = Integer.parseInt(dimensioneField.getText()); // attenzione NumberFormatException
+		            String descrizione = descrizioneField.getText();
+		            String tipologia = (String) tipologiaField.getSelectedItem();
 
 		            JSONObject filtri = new JSONObject();
-		            filtri.put("ascensore", ascensorefield.isSelected());
-		            filtri.put("portineria", portineriafield.isSelected());
-		            filtri.put("climatizzazione", climatizzazionefield.isSelected());
+		            filtri.put("ascensore", ascensoreField.isSelected());
+		            filtri.put("portineria", portineriaField.isSelected());
+		            filtri.put("climatizzazione", climatizzazioneField.isSelected());
+		            filtri.put("postoAuto", postoAutoField.isSelected());
 
-		            // Prendi il prezzo dal campo prezzo (dovresti avere un prezzofield)
-		            double prezzo = Double.parseDouble(prezzofield.getText());
+		            // Prendi il prezzo dal campo prezzo (dovresti avere un prezzoField)
+		            int prezzo = Integer.parseInt(prezzoField.getText());
 
 		            Immobile immobile;
 
@@ -195,18 +194,18 @@ public class ViewCaricaImmobile extends JFrame {
 		labelbagni.setBounds(380, 237, 63, 14);
 		contentPane.add(labelbagni);
 		
-		JSpinner localifield = new JSpinner();
-		localifield.setBounds(259, 261, 101, 20);
-		contentPane.add(localifield);
+		JSpinner localiField = new JSpinner();
+		localiField.setBounds(259, 261, 101, 20);
+		contentPane.add(localiField);
 		
-		JSpinner bagnifield = new JSpinner();
-		bagnifield.setBounds(382, 262, 101, 20);
-		contentPane.add(bagnifield);
+		JSpinner bagniField = new JSpinner();
+		bagniField.setBounds(382, 262, 101, 20);
+		contentPane.add(bagniField);
 		
-		prezzofield = new JTextField();
-		prezzofield.setBounds(259, 314, 86, 20);
-		contentPane.add(prezzofield);
-		prezzofield.setColumns(10);
+		prezzoField = new JTextField();
+		prezzoField.setBounds(259, 314, 86, 20);
+		contentPane.add(prezzoField);
+		prezzoField.setColumns(10);
 		
 		JLabel labelprezzo = new JLabel("Prezzo");
 		labelprezzo.setBounds(259, 289, 69, 14);
@@ -217,7 +216,14 @@ public class ViewCaricaImmobile extends JFrame {
 		contentPane.add(lblmeseototale);
 		
 		JButton btnNewButton_1 = new JButton("Annulla");
+		btnNewButton_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				dispose();
+			}
+		});
 		btnNewButton_1.setBounds(18, 513, 114, 37);
 		contentPane.add(btnNewButton_1);
+		
+		
 	}
 }

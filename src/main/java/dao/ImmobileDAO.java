@@ -1,26 +1,27 @@
 package dao;
 
-import java.awt.Component;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
+import javax.swing.ImageIcon;
 import javax.swing.JTable;
-import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
-
 import org.json.JSONObject;
 import org.postgresql.util.PGobject;
-
+import model.Filtri;
 import model.Immobile;
 import model.ImmobileInAffitto;
 import model.ImmobileInVendita;
+import util.TextAreaRenderer;
 
 public class ImmobileDAO {
 	// ATTRIBUTI
@@ -103,143 +104,115 @@ public class ImmobileDAO {
 		        }
 		    }
 		}
-	 
-	@SuppressWarnings("serial")
-	static class TextAreaRenderer extends JTextArea implements TableCellRenderer {
-        public TextAreaRenderer() {
-            setLineWrap(true);
-            setWrapStyleWord(true);
-            setOpaque(true);
-        }
 
-        @Override
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-            setText(value == null ? "" : value.toString());
-            if (isSelected) {
-                setBackground(table.getSelectionBackground());
-                setForeground(table.getSelectionForeground());
-            } else {
-                setBackground(table.getBackground());
-                setForeground(table.getForeground());
-            }
-            setFont(table.getFont());
-            return this;
-        }
-    }
 	
 	// riempie la tabella principale coi risultati ottenuti dalla ricerca con tipologia 'Vendita'
-	public void riempiTableRisultatiVenditaDAO(JTable tableRisultati, String campoPieno) {
+	public List<ImmobileInVendita> getImmobiliVendita(String campoPieno, Filtri filtri) {
+		List<ImmobileInVendita> immobili = new ArrayList<>();
 	    String query = 
-	        " SELECT i.\"idImmobile\", i.\"foto\" \"Foto\", i.\"titolo\" \"Tipologia\", i.\"descrizione\" \"Descrizione\", v.\"prezzoTotale\" \"Prezzo Totale (€)\" " +
+	        " SELECT i.\"idImmobile\", i.\"immagini\" \"Immagini\", i.\"titolo\" \"Tipologia\", i.\"descrizione\" \"Descrizione\", v.\"prezzoTotale\" \"Prezzo Totale (€)\" " +
 	        " FROM \"Immobile\" i JOIN \"ImmobileinVendita\" v " +
 	        " ON i.\"idImmobile\" = v.\"idImmobile\" " +
 	        " WHERE i.localita = ? AND i.tipologia = 'Vendita'";
 	    
-	    try (PreparedStatement stmt = connection.prepareStatement(query)) {
-	        stmt.setString(1, campoPieno);
-	        ResultSet rs = stmt.executeQuery();
-	        ResultSetMetaData metaData = rs.getMetaData();
-
-	        int colonne = 5; // Inclusa ID
-	        String[] nomiColonne = new String[] { "ID", "Foto", "Tipologia", "Descrizione", "Prezzo Totale (€)" };
-
-	        DefaultTableModel model = new DefaultTableModel(nomiColonne, 0);
+		    if (filtri.prezzoMin != null) query += " AND v.\"prezzoTotale\" >= ?";
+		    if (filtri.prezzoMax != null) query += " AND v.\"prezzoTotale\" <= ?";
+		    if (filtri.superficieMin != null) query += " AND i.\"dimensione\" >= ?";
+		    if (filtri.superficieMax != null) query += " AND i.\"dimensione\" <= ?";
+		    if (filtri.piano != null && !filtri.piano.equals("Indifferente")) query += " AND (i.\"filtri\"->>'piano')::int = ?";
+		    if (filtri.numLocali != null) query += " AND (i.\"filtri\"->>'numeroLocali')::int = ?";
+		    if (filtri.numBagni != null) query += " AND (i.\"filtri\"->>'numeroBagni')::int = ?";
+		    if (filtri.ascensore != null) query += " AND (i.\"filtri\"->>'ascensore')::boolean = ?";
+		    if (filtri.portineria != null) query += " AND (i.\"filtri\"->>'portineria')::boolean = ?";
+		    if (filtri.postoAuto != null) query += " AND (i.\"filtri\"->>'postoAuto')::boolean = ?";
+		    if (filtri.climatizzazione != null) query += " AND (i.\"filtri\"->>'climatizzazione')::boolean = ?";
+	    
+	    try (PreparedStatement ps = connection.prepareStatement(query)) {
+	        int i=1;
+	    	ps.setString(i++, campoPieno);
+	    	if (filtri.prezzoMin != null) ps.setInt(i++, filtri.prezzoMin);
+	        if (filtri.prezzoMax != null) ps.setInt(i++, filtri.prezzoMax);
+	        if (filtri.superficieMin != null) ps.setInt(i++, filtri.superficieMin);
+	        if (filtri.superficieMax != null) ps.setInt(i++, filtri.superficieMax);
+	        if (filtri.piano != null && !filtri.piano.equals("Indifferente")) ps.setInt(i++, Integer.parseInt(filtri.piano));
+	        if (filtri.numLocali != null) ps.setInt(i++, filtri.numLocali);
+	        if (filtri.numBagni != null) ps.setInt(i++, filtri.numBagni);
+	        if (filtri.ascensore != null) ps.setBoolean(i++, filtri.ascensore);
+	        if (filtri.portineria != null) ps.setBoolean(i++, filtri.portineria);
+	        if (filtri.postoAuto != null) ps.setBoolean(i++, filtri.postoAuto);
+	        if (filtri.climatizzazione != null) ps.setBoolean(i++, filtri.climatizzazione);
+	  
+	        ResultSet rs = ps.executeQuery();
 
 	        while (rs.next()) {
-	            Object[] riga = new Object[colonne];
-	            for (int i = 0; i < colonne; i++) {
-	                riga[i] = rs.getObject(i + 1); // colonne da 1 a 5
-	            }
-	            model.addRow(riga);
+	            ImmobileInVendita imm = new ImmobileInVendita();
+	            imm.setId(rs.getInt(1));
+	            imm.setImmagini(rs.getString(2));
+	            imm.setTitolo(rs.getString(3));
+	            imm.setDescrizione(rs.getString(4));
+	            imm.setPrezzoTotale(rs.getInt(5));
+	            immobili.add(imm);
 	        }
-
-	        tableRisultati.setModel(model);
-
-	        TableColumnModel columnModel = tableRisultati.getColumnModel();
-
-	        // Nascondi colonna ID (indice 0)
-	        columnModel.getColumn(0).setMinWidth(0);
-	        columnModel.getColumn(0).setMaxWidth(0);
-	        columnModel.getColumn(0).setWidth(0);
-	        columnModel.getColumn(0).setPreferredWidth(0);
-
-	        // Impostazioni colonne visibili
-	        columnModel.getColumn(1).setPreferredWidth(75);  // Foto
-	        columnModel.getColumn(2).setPreferredWidth(170); // Tipologia
-	        columnModel.getColumn(3).setPreferredWidth(450); // Descrizione
-	        columnModel.getColumn(4).setPreferredWidth(75);  // Prezzo
-
-	        // Renderer centrato per Prezzo
-	        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
-	        centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
-	        columnModel.getColumn(4).setCellRenderer(centerRenderer);
-
-	        // Renderer multilinea per Descrizione
-	        columnModel.getColumn(3).setCellRenderer(new TextAreaRenderer());
-
-	        // Altezza righe
-	        tableRisultati.setRowHeight(100);
+	        return immobili;
 
 	    } catch (SQLException e) {
 	        e.printStackTrace();
+	        return Collections.emptyList();
 	    }
 	}
 	
 	// riempie la tabella principale coi risultati ottenuti dalla ricerca con tipologia 'Affitto'
-	public void riempiTableRisultatiAffittoDAO(JTable tableRisultati, String campoPieno) {
+	public List<ImmobileInAffitto> getImmobiliAffitto(String campoPieno, Filtri filtri) {
+		List<ImmobileInAffitto> immobili = new ArrayList<>();
 	    String query = 
-	        " SELECT i.\"idImmobile\", i.\"foto\" \"Foto\", i.\"titolo\" \"Tipologia\", i.\"descrizione\" \"Descrizione\", a.\"prezzoMensile\" \"Prezzo Totale (€)\" " +
+	        " SELECT i.\"idImmobile\", i.\"immagini\" \"Immagini\", i.\"titolo\" \"Tipologia\", i.\"descrizione\" \"Descrizione\", a.\"prezzoMensile\" \"Prezzo Totale (€)\" " +
 	        " FROM \"Immobile\" i JOIN \"ImmobileinAffitto\" a " +
 	        " ON i.\"idImmobile\" = a.\"idImmobile\" " +
 	        " WHERE i.localita = ? AND i.tipologia = 'Affitto'";
 	    
-	    try (PreparedStatement stmt = connection.prepareStatement(query)) {
-	        stmt.setString(1, campoPieno);
-	        ResultSet rs = stmt.executeQuery();
-	        ResultSetMetaData metaData = rs.getMetaData();
-
-	        int colonne = 5; // Inclusa ID
-	        String[] nomiColonne = new String[] { "ID", "Foto", "Tipologia", "Descrizione", "Prezzo Totale (€)" };
-
-	        DefaultTableModel model = new DefaultTableModel(nomiColonne, 0);
-
+		    if (filtri.prezzoMin != null) query += " AND a.\"prezzoMensile\" >= ?";
+		    if (filtri.prezzoMax != null) query += " AND a.\"prezzoMensile\" <= ?";
+		    if (filtri.superficieMin != null) query += " AND i.\"dimensione\" >= ?";
+		    if (filtri.superficieMax != null) query += " AND i.\"dimensione\" <= ?";
+		    if (filtri.piano != null && !filtri.piano.equals("Indifferente")) query += " AND (i.\"filtri\"->>'piano')::int = ?";
+		    if (filtri.numLocali != null) query += " AND (i.\"filtri\"->>'numeroLocali')::int = ?";
+		    if (filtri.numBagni != null) query += " AND (i.\"filtri\"->>'numeroBagni')::int = ?";
+		    if (filtri.ascensore != null) query += " AND (i.\"filtri\"->>'ascensore')::boolean = ?";
+		    if (filtri.portineria != null) query += " AND (i.\"filtri\"->>'portineria')::boolean = ?";
+		    if (filtri.postoAuto != null) query += " AND (i.\"filtri\"->>'postoAuto')::boolean = ?";
+		    if (filtri.climatizzazione != null) query += " AND (i.\"filtri\"->>'climatizzazione')::boolean = ?";
+	    
+	    try (PreparedStatement ps = connection.prepareStatement(query)) {
+	        int i=1;
+	    	ps.setString(i++, campoPieno);
+	    	if (filtri.prezzoMin != null) ps.setInt(i++, filtri.prezzoMin);
+	        if (filtri.prezzoMax != null) ps.setInt(i++, filtri.prezzoMax);
+	        if (filtri.superficieMin != null) ps.setInt(i++, filtri.superficieMin);
+	        if (filtri.superficieMax != null) ps.setInt(i++, filtri.superficieMax);
+	        if (filtri.piano != null && !filtri.piano.equals("Indifferente")) ps.setInt(i++, Integer.parseInt(filtri.piano));
+	        if (filtri.numLocali != null) ps.setInt(i++, filtri.numLocali);
+	        if (filtri.numBagni != null) ps.setInt(i++, filtri.numBagni);
+	        if (filtri.ascensore != null) ps.setBoolean(i++, filtri.ascensore);
+	        if (filtri.portineria != null) ps.setBoolean(i++, filtri.portineria);
+	        if (filtri.postoAuto != null) ps.setBoolean(i++, filtri.postoAuto);
+	        if (filtri.climatizzazione != null) ps.setBoolean(i++, filtri.climatizzazione);
+	  
+	        ResultSet rs = ps.executeQuery();
+	
 	        while (rs.next()) {
-	            Object[] riga = new Object[colonne];
-	            for (int i = 0; i < colonne; i++) {
-	                riga[i] = rs.getObject(i + 1); // colonne da 1 a 5
-	            }
-	            model.addRow(riga);
+	            ImmobileInAffitto imm = new ImmobileInAffitto();
+	            imm.setId(rs.getInt(1));
+	            imm.setImmagini(rs.getString(2));
+	            imm.setTitolo(rs.getString(3));
+	            imm.setDescrizione(rs.getString(4));
+	            imm.setPrezzoMensile(rs.getInt(5));
+	            immobili.add(imm);
 	        }
-
-	        tableRisultati.setModel(model);
-
-	        TableColumnModel columnModel = tableRisultati.getColumnModel();
-
-	        // Nascondi colonna ID (indice 0)
-	        columnModel.getColumn(0).setMinWidth(0);
-	        columnModel.getColumn(0).setMaxWidth(0);
-	        columnModel.getColumn(0).setWidth(0);
-	        columnModel.getColumn(0).setPreferredWidth(0);
-
-	        // Impostazioni colonne visibili
-	        columnModel.getColumn(1).setPreferredWidth(75);  // Foto
-	        columnModel.getColumn(2).setPreferredWidth(170); // Tipologia
-	        columnModel.getColumn(3).setPreferredWidth(450); // Descrizione
-	        columnModel.getColumn(4).setPreferredWidth(75);  // Prezzo
-
-	        // Renderer centrato per Prezzo
-	        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
-	        centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
-	        columnModel.getColumn(4).setCellRenderer(centerRenderer);
-
-	        // Renderer multilinea per Descrizione
-	        columnModel.getColumn(3).setCellRenderer(new TextAreaRenderer());
-
-	        // Altezza righe
-	        tableRisultati.setRowHeight(100);
-
+	        return immobili;
+	
 	    } catch (SQLException e) {
 	        e.printStackTrace();
+	        return Collections.emptyList();
 	    }
 	}
 	
@@ -248,7 +221,7 @@ public class ImmobileDAO {
 		String query = 
 				" SELECT " +
 				"'Vendita' AS \"Categoria\", " +
-			    "i.\"foto\" AS \"Foto\", " +   
+			    "i.\"immagini\" AS \"Immagini\", " +   
 			    "i.\"titolo\" AS \"Tipologia\", " + 
 			    "i.\"descrizione\" AS \"Descrizione\", " +
 			    "v.\"prezzoTotale\" AS \"Prezzo (€)\", " +
@@ -258,7 +231,7 @@ public class ImmobileDAO {
 			    " UNION " +
 			    " SELECT " +
 				" 'Affitto' AS \"Categoria\", " +
-			    " i.\"foto\" AS \"Foto\", " +
+			    " i.\"immagini\" AS \"Immagini\", " +
 			    "i.\"titolo\" AS \"Tipologia\", " +
 			    " i.\"descrizione\" AS \"Descrizione\", " +
 			    " a.\"prezzoMensile\" AS \"Prezzo (€)\", " +
@@ -282,7 +255,26 @@ public class ImmobileDAO {
             nomiColonne[4] = metaData.getColumnName(5);
             
             // Modello della tabella
-            DefaultTableModel model = new DefaultTableModel(nomiColonne, 0);
+            @SuppressWarnings("serial")
+            DefaultTableModel model = new DefaultTableModel(nomiColonne, 0) {
+                @Override
+                public Class<?> getColumnClass(int columnIndex) {
+                    switch (columnIndex) {
+                        case 0: return String.class;       // Categoria
+                        case 1: return ImageIcon.class;    // Immagini
+                        case 2: return String.class;       // Tipologia
+                        case 3: return String.class;       // Descrizione
+                        case 4: return String.class;       // Prezzo
+                        case 5: return Integer.class;      // idOrdine
+                        default: return Object.class;
+                    }
+                };
+
+                @Override
+                public boolean isCellEditable(int row, int column) {
+                    return false;
+                }
+            };
 
             // Riempimento delle righe
             while (rs.next()) {
@@ -380,7 +372,7 @@ public class ImmobileDAO {
 	                    psPrezzo.setLong(1, idimmobile);
 	                    ResultSet rsPrezzo = psPrezzo.executeQuery();
 	                    if (rsPrezzo.next()) {
-	                        ((ImmobileInAffitto) immobile).setPrezzoMensile(rsPrezzo.getDouble("prezzoMensile"));
+	                        ((ImmobileInAffitto) immobile).setPrezzoMensile(rsPrezzo.getInt("prezzoMensile"));
 	                    }
 	                }
 	            } else if (immobile instanceof ImmobileInVendita) {
@@ -389,7 +381,7 @@ public class ImmobileDAO {
 	                    psPrezzo.setLong(1, idimmobile);
 	                    ResultSet rsPrezzo = psPrezzo.executeQuery();
 	                    if (rsPrezzo.next()) {
-	                        ((ImmobileInVendita) immobile).setPrezzoTotale(rsPrezzo.getDouble("prezzoTotale"));
+	                        ((ImmobileInVendita) immobile).setPrezzoTotale(rsPrezzo.getInt("prezzoTotale"));
 	                    }
 	                }
 	            }

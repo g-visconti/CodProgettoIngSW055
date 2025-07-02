@@ -2,18 +2,23 @@ package controller;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.text.NumberFormat;
+import java.util.Locale;
 
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JTable;
-
-import dao.AccountDAO;
-import dao.ImmobileDAO;
-import dao.OffertaDAO;
+import javax.swing.SwingConstants;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumnModel;
 import database.ConnessioneDatabase;
-import model.Account;
-import model.Immobile;
-import model.ImmobileInAffitto;
-import model.ImmobileInVendita;
-import model.Offerta;
+import dao.*;
+import model.*;
+import util.ImageUtils;
+import util.TableUtils;
+import util.TextAreaRenderer;
 
 public class Controller {
     
@@ -104,11 +109,12 @@ public class Controller {
 	
 	// recupera le informazioni del profilo
 	public String[] getInfoProfilo(String emailUtente) throws SQLException {
-		Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
-	   	AccountDAO accountDAO = new AccountDAO(connAWS);
-	   	String[] tupla = accountDAO.getInfoProfiloDAO(emailUtente);
-	   	return tupla;		
+	    try (Connection connAWS = ConnessioneDatabase.getInstance().getConnection()) {
+	        AccountDAO accountDAO = new AccountDAO(connAWS);
+	        return accountDAO.getInfoProfiloDAO(emailUtente);
+	    }
 	}
+
 	
 	// Metodi per ImmobileDAO
 	// Aggiungi un nuovo immobile all'interno del DB
@@ -137,30 +143,98 @@ public class Controller {
         }
     }
 
-	// recupera dal DB i dati relativi ad un immobile
-	public void riempiTableRisultati(JTable tableRisultati, String campoPieno, String tipologia) {
-		 Connection connAWS;
-		try {
-			connAWS = ConnessioneDatabase.getInstance().getConnection();
-			ImmobileDAO immobileDAO = new ImmobileDAO(connAWS);
-			
-			// vendita o affitto
-			switch (tipologia) {
-				case "Affitto":
-					immobileDAO.riempiTableRisultatiAffittoDAO(tableRisultati, campoPieno);
-					break;
-				case "Vendita":
-					immobileDAO.riempiTableRisultatiVenditaDAO(tableRisultati, campoPieno);
-					break;
-			}
-			
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	   	 
-		
+	
+	
+	
+	public int riempiTableRisultati(JTable tableRisultati, String campoPieno, String tipologia, Filtri filtri) {
+	    try {
+	        Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
+	        ImmobileDAO immobileDAO = new ImmobileDAO(connAWS);
+
+	        NumberFormat format = NumberFormat.getNumberInstance(Locale.ITALY);
+	        format.setGroupingUsed(true);
+	        format.setMaximumFractionDigits(0);
+	        format.setMinimumFractionDigits(0);
+
+	        String[] colonne = { "ID", "Immagini", "Tipologia", "Descrizione", tipologia.equals("Vendita") ? "Prezzo Totale" : "Prezzo Mensile" };
+	        @SuppressWarnings("serial")
+			DefaultTableModel model = new DefaultTableModel(colonne, 0) {
+	            @Override
+	            public Class<?> getColumnClass(int columnIndex) {
+	                switch (columnIndex) {
+	                    case 0: return Integer.class;          // ID
+	                    case 1: return ImageIcon.class;        // Immagini
+	                    case 2: return String.class;           // Tipologia
+	                    case 3: return String.class;           // Descrizione
+	                    case 4: return String.class;           // Prezzo
+	                    default: return Object.class;
+	                }
+	            }
+
+	            @Override
+	            public boolean isCellEditable(int row, int column) {
+	                return false; // tutte le celle non editabili
+	            }
+	        };
+
+
+	        if (tipologia.equals("Affitto")) {
+	            for (ImmobileInAffitto imm : immobileDAO.getImmobiliAffitto(campoPieno, filtri)) {
+	            	ImageIcon immagine = ImageUtils.decodeToIcon(imm.getImmagini(), 60, 60);
+	            	
+	                model.addRow(new Object[] {
+	                    imm.getId(),
+	                    immagine,
+	                    imm.getTitolo(),
+	                    imm.getDescrizione(),
+	                    "€ " + format.format(imm.getPrezzoMensile())
+	                });
+	            }
+	        } else if (tipologia.equals("Vendita")) {
+	            for (ImmobileInVendita imm : immobileDAO.getImmobiliVendita(campoPieno, filtri)) {
+	            	ImageIcon immagine = ImageUtils.decodeToIcon(imm.getImmagini(), 60, 60);
+	            	
+	                model.addRow(new Object[] {
+	                    imm.getId(),
+	                    immagine,
+	                    imm.getTitolo(),
+	                    imm.getDescrizione(),
+	                    "€ " + format.format(imm.getPrezzoTotale())
+	                });
+	            }
+	        }
+
+	        tableRisultati.setModel(model);
+	        
+
+	        // Configura colonne
+	        TableColumnModel columnModel = tableRisultati.getColumnModel();
+	        columnModel.getColumn(0).setMinWidth(0);
+	        columnModel.getColumn(0).setMaxWidth(0);
+	        columnModel.getColumn(0).setWidth(0);
+	        columnModel.getColumn(0).setPreferredWidth(0);
+	        columnModel.getColumn(1).setPreferredWidth(75);
+	        columnModel.getColumn(2).setPreferredWidth(170);
+	        columnModel.getColumn(3).setPreferredWidth(450);
+	        columnModel.getColumn(4).setPreferredWidth(75);
+
+	        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+	        centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+	        columnModel.getColumn(4).setCellRenderer(centerRenderer);
+
+	        columnModel.getColumn(3).setCellRenderer(new TextAreaRenderer());
+
+	        tableRisultati.setRowHeight(100);
+	        
+	        TableUtils.setImageRenderer(tableRisultati, 1);
+	        return model.getRowCount();
+
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+		return 0;
 	}
+
 	
 	public void riempiTableRisultati(JTable tableRisultati) {
 		 Connection connAWS;

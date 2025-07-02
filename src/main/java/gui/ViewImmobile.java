@@ -191,7 +191,7 @@ public class ViewImmobile extends JFrame {
 		        lblNumBagni.setText("n. bagni: " + immobile.getNumeroBagni());
 		        lblNumPiano.setText("n. piano: " + immobile.getPiano());
 		        lblAscensore.setText("ascensore: " + (immobile.isAscensore() ? "Sì" : "No"));
-		        lblRiscaldamento.setText("riscaldamento: " + immobile.getClimatizzazione());
+		        lblRiscaldamento.setText("riscaldamento: " + immobile.isClimatizzazione());
 		        lblPortineria.setText("portineria: " + (immobile.isPortineria() ? "Sì" : "No"));
 
 		        if (immobile instanceof ImmobileInAffitto) {

@@ -118,32 +118,30 @@ public class AccountDAO {
 	}
 	
 	// recupera le informazione sull'account utente
-	public String[] getInfoProfiloDAO(String emailUtente) {
-        String query = "SELECT * FROM \"Account\" WHERE email = ?";
+	public String[] getInfoProfiloDAO(String emailUtente) throws SQLException {
+	    String query = "SELECT * FROM \"Account\" WHERE email = ?";
 
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setString(1, emailUtente);
-            ResultSet rs = stmt.executeQuery();
+	    try (PreparedStatement stmt = connection.prepareStatement(query)) {
+	        stmt.setString(1, emailUtente);
+	        try (ResultSet rs = stmt.executeQuery()) {
 
-            if (rs.next()) {
-                ResultSetMetaData metaData = rs.getMetaData();
-                int columnCount = metaData.getColumnCount();
-                String[] result = new String[columnCount];
+	            if (rs.next()) {
+	                ResultSetMetaData metaData = rs.getMetaData();
+	                int columnCount = metaData.getColumnCount();
+	                String[] result = new String[columnCount];
 
-                for (int i = 0; i < columnCount; i++) {
-                    result[i] = rs.getString(i + 1);
-                }
+	                for (int i = 0; i < columnCount; i++) {
+	                    result[i] = rs.getString(i + 1);
+	                }
 
-                return result;
-            } else {
-                return null; // Nessuna riga trovata
-            }
+	                return result;
+	            } else {
+	                return null; // Nessuna riga trovata
+	            }
+	        }
+	    }
+	}
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
 
 	
 	public String getSession(String email) throws SQLException {

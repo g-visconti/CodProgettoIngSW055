@@ -1,31 +1,30 @@
 package gui;
 
-import java.awt.EventQueue;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
 import controller.Controller;
+import util.GuiUtils;
 
 import java.awt.Color;
 import javax.swing.JLabel;
 import java.awt.Font;
-import java.awt.Image;
+
 
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
-import javax.swing.ImageIcon;
+
 import javax.swing.JButton;
 import java.awt.SystemColor;
-import java.net.URL;
+
 import java.sql.SQLException;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 
-public class ViewProfilo extends JFrame {
+
+public class ViewAccount extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
@@ -35,19 +34,14 @@ public class ViewProfilo extends JFrame {
 	 * Create the frame.
 	 * @throws SQLException 
 	 */
-	public ViewProfilo(String emailUtente) throws SQLException {
+	public ViewAccount(String emailUtente) {
+		setTitle("DietiEstates25 - Informazioni sull'account");		
+		// Imposta l'icona di DietiEstates25 alla finestra in uso
+		GuiUtils.setIconaFinestra(this);
 		setResizable(false);
-		// Carica l'immagine come icona
-		URL pathIcona = getClass().getClassLoader().getResource("images/DietiEstatesIcona.png");
-        ImageIcon icon = new ImageIcon(pathIcona);
-        Image img = icon.getImage();
-        
-        // Imposta l'icona nella finestra
-        setIconImage(img);
-		
-		setTitle("DietiEstates25 - Informazioni sul profilo");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 497, 589);
+		
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 
@@ -61,7 +55,7 @@ public class ViewProfilo extends JFrame {
 		panel.setLayout(null);
 		
 		
-		JLabel lblInfoProfilo = new JLabel("Informazioni sul profilo");
+		JLabel lblInfoProfilo = new JLabel("Informazioni sull'account");
 		lblInfoProfilo.setHorizontalAlignment(SwingConstants.CENTER);
 		lblInfoProfilo.setFont(new Font("Tahoma", Font.BOLD, 18));
 		lblInfoProfilo.setBounds(116, 23, 253, 22);
@@ -131,8 +125,13 @@ public class ViewProfilo extends JFrame {
 		panel.add(lblIndirizzoRes);
 		
 		// codice per il riempimento dell'interfaccia
-		Controller con = new Controller();
-		infoProfilo = con.getInfoProfilo(emailUtente);
+		Controller controller = new Controller();
+		try {
+			infoProfilo = controller.getInfoProfilo(emailUtente);
+		} catch (SQLException e) {
+			System.out.println("Non sono riuscito a recuperare le info per il profilo: "+emailUtente);
+			e.printStackTrace();
+		}
 		if(infoProfilo != null) {
 			lblNomeUtenteRes.setText(infoProfilo[2]);
 			lblRuoloRes.setText(infoProfilo[8]);

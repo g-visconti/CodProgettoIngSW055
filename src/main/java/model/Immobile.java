@@ -4,23 +4,25 @@ import org.json.JSONObject;
 
 public class Immobile {
 	
-		
+		// ATTRIBUTI
 		private long id;
 		private String titolo;
+		private String immagini;
 	    private String indirizzo;
 	    private String localita;
 	    private int dimensione;
-	    private JSONObject filtri;
 	    private String descrizione;
 	    private String tipologia;
-	 // Campi estratti dal JSON "filtri"
+	    // Campi estratti dal JSON "filtri"
 	    private int numeroLocali;
 	    private int numeroBagni;
 	    private int piano;
 	    private boolean ascensore;
-	    private String climatizzazione;
 	    private boolean portineria;
-	    // Costruttori, getter e setter
+	    private boolean postoAuto;
+	    private boolean climatizzazione;
+	    
+	    // COSTRUTTORI
 
 	    // esempio di costruttore
 	    public Immobile(String titolo, String indirizzo, String localita, int dimensione, String descrizione, String tipologia, JSONObject filtri) {
@@ -39,6 +41,7 @@ public class Immobile {
 	    }
 	    
 
+	    // GETTER E SETTER per gli attributi sopra definiti
 		public String getTitolo() {
 			return titolo;
 		}
@@ -47,6 +50,14 @@ public class Immobile {
 			this.titolo = titolo;
 		}
 
+		public String getImmagini() {
+		    return immagini;
+		}
+
+		public void setImmagini(String immagini) {
+		    this.immagini = immagini;
+		}
+		
 		public String getIndirizzo() {
 			return indirizzo;
 		}
@@ -71,10 +82,6 @@ public class Immobile {
 			this.dimensione = dimensione;
 		}
 
-	
-
-	
-
 		public String getDescrizione() {
 			return descrizione;
 		}
@@ -91,22 +98,13 @@ public class Immobile {
 			this.tipologia = tipologia;
 		}
 
-
-
-
-
 		public long getId() {
 			return id;
 		}
 
-
-
-
-
 		public void setId(long id) {
 			this.id = id;
 		}
-		
 		
 		public int getNumeroLocali() {
 		    return numeroLocali;
@@ -131,7 +129,9 @@ public class Immobile {
 		public void setPiano(int piano) {
 		    this.piano = piano;
 		}
-
+		
+		
+		// Checkbox
 		public boolean isAscensore() {
 		    return ascensore;
 		}
@@ -139,15 +139,7 @@ public class Immobile {
 		public void setAscensore(boolean ascensore) {
 		    this.ascensore = ascensore;
 		}
-
-		public String getClimatizzazione() {
-		    return climatizzazione;
-		}
-
-		public void setClimatizzazione(String climatizzazione) {
-		    this.climatizzazione = climatizzazione;
-		}
-
+		
 		public boolean isPortineria() {
 		    return portineria;
 		}
@@ -155,6 +147,24 @@ public class Immobile {
 		public void setPortineria(boolean portineria) {
 		    this.portineria = portineria;
 		}
+		
+		public boolean isPostoAuto() {
+		    return postoAuto;
+		}
+
+		public void setPostoAuto(boolean postoAuto) {
+		    this.postoAuto = postoAuto;
+		}
+		
+		public boolean isClimatizzazione() {
+		    return climatizzazione;
+		}
+
+		public void setClimatizzazione(boolean climatizzazione) {
+		    this.climatizzazione = climatizzazione;
+		}
+
+		
 		
 		
 		public JSONObject getFiltriAsJson() {
@@ -167,8 +177,8 @@ public class Immobile {
 		    filtriJson.put("riscaldamento", this.climatizzazione); // o "climatizzazione", se preferisci mantenerlo così nel DB
 		    return filtriJson;
 		}
+		
 		public void setFiltriFromJson(JSONObject filtri) {
-		    this.filtri = filtri;
 
 		    if (filtri.has("numeroLocali")) {
 		        this.numeroLocali = filtri.getInt("numeroLocali");
@@ -191,7 +201,11 @@ public class Immobile {
 		    }
 
 		    if (filtri.has("riscaldamento")) {
-		        this.climatizzazione = filtri.getString("riscaldamento");
+		        this.climatizzazione = filtri.getBoolean("riscaldamento");
+		    }
+		   
+	        if (filtri.has("postoAuto")) {
+		        this.postoAuto = filtri.getBoolean("postoAuto");
 		    }
 		}
 

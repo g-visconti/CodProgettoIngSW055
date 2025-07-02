@@ -4,7 +4,7 @@ import org.json.JSONObject;
 
 public class ImmobileInVendita extends Immobile {
 
-    private double prezzoTotale;
+    private int prezzoTotale;
 
     // Costruttore completo
     public ImmobileInVendita(
@@ -15,7 +15,7 @@ public class ImmobileInVendita extends Immobile {
         String descrizione,
         String tipologia,
         JSONObject filtri,
-        double prezzoTotale
+        int prezzoTotale
     ) {
         super(titolo, indirizzo, localita, dimensione, descrizione, tipologia, filtri);
         this.prezzoTotale = prezzoTotale;
@@ -31,7 +31,7 @@ public class ImmobileInVendita extends Immobile {
         return prezzoTotale;
     }
 
-    public void setPrezzoTotale(double prezzoTotale) {
+    public void setPrezzoTotale(int prezzoTotale) {
         this.prezzoTotale = prezzoTotale;
     }
 }

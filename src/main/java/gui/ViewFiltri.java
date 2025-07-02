@@ -1,17 +1,12 @@
 package gui;
 
+import util.GuiUtils;
 import util.InputUtils;
-import java.awt.Image;
-
-import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-
 import model.Filtri;
-
 import java.awt.Color;
-import java.net.URL;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import javax.swing.JLabel;
@@ -29,14 +24,30 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 public class ViewFiltri extends JFrame {
-	// Attributi della classe ViewPrefereze
+	// Attributi della classe ViewFiltri
 	private Preferences prefs;
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
-
+	// attributi che serviranno per settare gli input ricevuti all'interno della classe Filtri
+	private JComboBox<String> comboBoxPMin;
+	private JComboBox<String> comboBoxPMax;
+	private JComboBox<String> comboBoxSMin;
+	private JComboBox<String> comboBoxSMax;
+	private JComboBox<String> comboBoxNumLocali;
+	private JComboBox<String> comboBoxPiano;
+	private JComboBox<String> comboBoxNumBagni;
+	private JCheckBox chckbxAscensore;
+	private JCheckBox chckbxPostoAuto;
+	private JCheckBox chckbxPortineria;
+	private JCheckBox chckbxClimatizzazione;
 	
 	// Costruttore che crea il frame
 	public ViewFiltri() {
+		// Imposta l'icona di DietiEstates25 alla finestra in uso
+		GuiUtils.setIconaFinestra(this);
+		setTitle("DietiEstates25 - Filtri di ricerca");
+		setResizable(false);
+		
 		prefs = Preferences.userNodeForPackage(ViewFiltri.class);
 		
 		addMouseListener(new MouseAdapter() {
@@ -58,19 +69,8 @@ public class ViewFiltri extends JFrame {
 		String[] opSupMax = {"Indifferente", "40", "60", "80", "100", "120", "150", "180", "200", "300", "500"};
 		String[] opNumLocali = {"Indifferente", "1", "2", "3", "4", "5"};
 		String[] opNumBagni = {"Indifferente", "1", "2", "3", "4"};
-		String[] opPiano = {"Indifferente", "Piano terra", "Piani intermedi", "Ultimo piano"};
-		
-		
-		setResizable(false);
-		// Carica l'immagine come icona
-		URL pathIcona = getClass().getClassLoader().getResource("images/DietiEstatesIcona.png");
-        ImageIcon icon = new ImageIcon(pathIcona);
-        Image img = icon.getImage();
-        
-        // Imposta l'icona nella finestra
-        setIconImage(img);
+		String[] opPiano = {"Indifferente", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"};
 
-		setTitle("DietiEstates25 - Filtri di ricerca");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 937, 454);
 		contentPane = new JPanel();
@@ -99,7 +99,7 @@ public class ViewFiltri extends JFrame {
 		lblPrezzoMinimo.setBounds(145, 92, 122, 14);
 		panelTitolo.add(lblPrezzoMinimo);
 		
-		JComboBox<String> comboBoxPMin = new JComboBox<>(opPrezzoMin);
+		comboBoxPMin = new JComboBox<>(opPrezzoMin);
 		comboBoxPMin.setToolTipText("Seleziona il prezzo di partenza");
 		comboBoxPMin.setMaximumRowCount(12);
 		comboBoxPMin.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 11));
@@ -114,7 +114,7 @@ public class ViewFiltri extends JFrame {
 		lblPrezzoMassimo.setBounds(313, 92, 122, 14);
 		panelTitolo.add(lblPrezzoMassimo);
 		
-		JComboBox<String> comboBoxPMax = new JComboBox<>(opPrezzoMax);
+		comboBoxPMax = new JComboBox<>(opPrezzoMax);
 		comboBoxPMax.setToolTipText("Seleziona il prezzo limite");
 		comboBoxPMax.setMaximumRowCount(12);
 		comboBoxPMax.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 11));
@@ -129,7 +129,7 @@ public class ViewFiltri extends JFrame {
 		lblSuperficieMinima.setBounds(478, 92, 141, 14);
 		panelTitolo.add(lblSuperficieMinima);
 		
-		JComboBox<String> comboBoxSMin = new JComboBox<>(opSupMin);
+		comboBoxSMin = new JComboBox<>(opSupMin);
 		comboBoxSMin.setToolTipText("Seleziona la superficie di partenza");
 		comboBoxSMin.setMaximumRowCount(12);
 		comboBoxSMin.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 11));
@@ -144,7 +144,7 @@ public class ViewFiltri extends JFrame {
 		lblSuperficieMassima.setBounds(638, 92, 148, 14);
 		panelTitolo.add(lblSuperficieMassima);
 		
-		JComboBox<String> comboBoxSMax = new JComboBox<>(opSupMax);
+		comboBoxSMax = new JComboBox<>(opSupMax);
 		comboBoxSMax.setToolTipText("Seleziona la superficie limite");
 		comboBoxSMax.setMaximumRowCount(12);
 		comboBoxSMax.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 11));
@@ -159,7 +159,7 @@ public class ViewFiltri extends JFrame {
 		lblNumeroLocali.setBounds(170, 219, 97, 14);
 		panelTitolo.add(lblNumeroLocali);
 		
-		JComboBox<String> comboBoxNumLocali = new JComboBox<>(opNumLocali);
+		comboBoxNumLocali = new JComboBox<>(opNumLocali);
 		comboBoxNumLocali.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 11));
 		comboBoxNumLocali.setBackground(new Color(255, 255, 255));
 		comboBoxNumLocali.setBounds(277, 215, 115, 22);
@@ -172,7 +172,7 @@ public class ViewFiltri extends JFrame {
 		lblPiano.setBounds(170, 300, 97, 14);
 		panelTitolo.add(lblPiano);
 		
-		JComboBox<String> comboBoxPiano = new JComboBox<>(opPiano);
+		comboBoxPiano = new JComboBox<>(opPiano);
 		comboBoxPiano.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 11));
 		comboBoxPiano.setBackground(new Color(255, 255, 255));
 		comboBoxPiano.setBounds(277, 296, 115, 22);
@@ -185,7 +185,7 @@ public class ViewFiltri extends JFrame {
 		lblNumeroBagni.setBounds(170, 259, 97, 14);
 		panelTitolo.add(lblNumeroBagni);
 		
-		JComboBox<String> comboBoxNumBagni = new JComboBox<>(opNumBagni);
+		comboBoxNumBagni = new JComboBox<>(opNumBagni);
 		comboBoxNumBagni.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 11));
 		comboBoxNumBagni.setBackground(new Color(255, 255, 255));
 		comboBoxNumBagni.setBounds(277, 255, 115, 22);
@@ -193,30 +193,36 @@ public class ViewFiltri extends JFrame {
 		comboBoxNumBagni.setSelectedItem(prefs.get("numBagni", "Indifferente"));
 		
 		// Elenco di checkbox sulle possibili preferenze
-		JCheckBox chckbxAscensore = new JCheckBox("Ascensore");
+		chckbxAscensore = new JCheckBox("Ascensore");
 		chckbxAscensore.setFont(new Font("Tahoma", Font.BOLD, 11));
 		chckbxAscensore.setBounds(523, 215, 97, 23);
 		panelTitolo.add(chckbxAscensore);
-		chckbxAscensore.setSelected(false);
-		//chckbxAscensore.setSelected(prefs.getBoolean("ascensore", false));
+		//chckbxAscensore.setSelected(false);
+		chckbxAscensore.setSelected(prefs.getBoolean("ascensore", false));
+
 		
-		JCheckBox chckbxPostoAuto = new JCheckBox("Posto auto");
+		chckbxPostoAuto = new JCheckBox("Posto auto");
 		chckbxPostoAuto.setFont(new Font("Tahoma", Font.BOLD, 11));
 		chckbxPostoAuto.setBounds(523, 255, 97, 23);
 		panelTitolo.add(chckbxPostoAuto);
+		chckbxPostoAuto.setSelected(prefs.getBoolean("postoAuto", false));
+
 		
-		JCheckBox chckbxPortineria = new JCheckBox("Portineria");
+		chckbxPortineria = new JCheckBox("Portineria");
 		chckbxPortineria.setFont(new Font("Tahoma", Font.BOLD, 11));
 		chckbxPortineria.setBounds(648, 215, 97, 23);
 		panelTitolo.add(chckbxPortineria);
+		chckbxPortineria.setSelected(prefs.getBoolean("portineria", false));
 		
-		JCheckBox chckbxClimatizzazione = new JCheckBox("Climatizzazione");
+		chckbxClimatizzazione = new JCheckBox("Climatizzazione");
 		chckbxClimatizzazione.setFont(new Font("Tahoma", Font.BOLD, 11));
 		chckbxClimatizzazione.setBounds(648, 255, 115, 23);
 		panelTitolo.add(chckbxClimatizzazione);
+		chckbxClimatizzazione.setSelected(prefs.getBoolean("climatizzazione", false));
+
 		
 		// Bottoni di gestione della finestra
-		JButton btnSalvaFiltri = new JButton("Cerca con questi filtri");
+		JButton btnSalvaFiltri = new JButton("Salva");
 		
 		getRootPane().setDefaultButton(btnSalvaFiltri);
 		btnSalvaFiltri.addActionListener(new ActionListener() {
@@ -265,13 +271,17 @@ public class ViewFiltri extends JFrame {
 
 		        // Se l'utente ha cliccato "Sì", esegue il reset
 		        if (scelta == JOptionPane.YES_OPTION) {
+		        	prefs.put("prezzoMin", "Indifferente");
+		        	prefs.put("prezzoMax", "Indifferente");
+		        	prefs.put("supMin", "Indifferente");
+		        	prefs.put("supMax", "Indifferente");
 		            prefs.put("numLocali", "Indifferente");
 		            prefs.put("piano", "Indifferente");
 		            prefs.put("numBagni", "Indifferente");
-		            chckbxAscensore.setSelected(false);
-		            chckbxPostoAuto.setSelected(false);
-		            chckbxPortineria.setSelected(false);
-		            chckbxClimatizzazione.setSelected(false);
+		            prefs.putBoolean("ascensore", false);
+		            prefs.putBoolean("postoAuto", false);
+		            prefs.putBoolean("portineria", false);
+		            prefs.putBoolean("climatizzazione", false);
 
 		            JOptionPane.showMessageDialog(null, "Reset avvenuto con successo!", "Reset", JOptionPane.INFORMATION_MESSAGE);
 
@@ -291,9 +301,28 @@ public class ViewFiltri extends JFrame {
 		
 		
 	}
-	/*
-	private Filtri filtriImpostati() {
-		Integer prezzoMin = parseInteger(prefs.put("prezzoMin", (String) comboBoxPMin.getSelectedItem());
-	//			.getText());
-	}*/
+	
+	private Filtri creaFiltriDaInput() {
+		// Legge e converte i valori dalle combobox
+	    Integer prezzoMin = InputUtils.parseComboInteger(comboBoxPMin);
+	    Integer prezzoMax = InputUtils.parseComboInteger(comboBoxPMax);
+	    Integer supMin = InputUtils.parseComboInteger(comboBoxSMin);
+	    Integer supMax = InputUtils.parseComboInteger(comboBoxSMax);
+	    String piano = comboBoxPiano.getSelectedItem().toString();
+	    Integer numLocali = InputUtils.parseComboInteger(comboBoxNumLocali);
+	    Integer numBagni = InputUtils.parseComboInteger(comboBoxNumBagni);
+	    Boolean ascensore = chckbxAscensore.isSelected() ? Boolean.TRUE : null;
+	    Boolean portineria = chckbxPortineria.isSelected() ? Boolean.TRUE : null;
+	    Boolean postoAuto = chckbxPostoAuto.isSelected() ? Boolean.TRUE : null;
+	    Boolean climatizzazione = chckbxClimatizzazione.isSelected() ? Boolean.TRUE : null;
+	    
+		return new Filtri(prezzoMin, prezzoMax, supMin, supMax, piano, numLocali, numBagni, ascensore, portineria, postoAuto, climatizzazione);
+	
+	}
+
+	public Filtri getFiltriSelezionati() {
+	    return creaFiltriDaInput();
+	}
+
+
 }

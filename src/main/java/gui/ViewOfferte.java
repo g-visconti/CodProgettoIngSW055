@@ -2,9 +2,12 @@ package gui;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+//import javax.swing.table.DefaultTableModel;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
 
 import controller.Controller;
+import util.GuiUtils;
 
 import java.awt.*;
 import java.net.URL;
@@ -21,13 +24,10 @@ public class ViewOfferte extends JFrame {
 	 * Create the frame ViewOfferte.
 	 */
 	public ViewOfferte(String emailUtente) {
-		// Carica l'immagine come icona
-		URL pathIcona = getClass().getClassLoader().getResource("images/DietiEstatesIcona.png");
-		if (pathIcona != null) {
-			setIconImage(new ImageIcon(pathIcona).getImage());
-		}
-
+		// Imposta l'icona di DietiEstates25 alla finestra in uso
+		GuiUtils.setIconaFinestra(this);
 		setTitle("DietiEstates25 - Visualizza le offerte ricevute sui tuoi immobili");
+		
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 1248, 946);
 
@@ -67,25 +67,24 @@ public class ViewOfferte extends JFrame {
 		lblDescrizione.setFont(new Font("Tahoma", Font.PLAIN, 18));
 		panelComandi.add(lblDescrizione);
 
-		URL pathBack = getClass().getClassLoader().getResource("images/Back.png");
-		ImageIcon iconaBack = new ImageIcon(pathBack);
-		JButton btnBack = new JButton(iconaBack);
-		sl_panelComandi.putConstraint(SpringLayout.NORTH, btnBack, 11, SpringLayout.NORTH, panelComandi);
-		sl_panelComandi.putConstraint(SpringLayout.WEST, btnBack, 10, SpringLayout.WEST, panelComandi);
-		sl_panelComandi.putConstraint(SpringLayout.SOUTH, btnBack, 39, SpringLayout.NORTH, panelComandi);
-		sl_panelComandi.putConstraint(SpringLayout.EAST, btnBack, 38, SpringLayout.WEST, panelComandi);
-		btnBack.addActionListener(new ActionListener() {
+		JButton btnTornaIndietro = new JButton();
+		GuiUtils.setIconaButton(btnTornaIndietro, "Back");
+		sl_panelComandi.putConstraint(SpringLayout.NORTH, btnTornaIndietro, 11, SpringLayout.NORTH, panelComandi);
+		sl_panelComandi.putConstraint(SpringLayout.WEST, btnTornaIndietro, 10, SpringLayout.WEST, panelComandi);
+		sl_panelComandi.putConstraint(SpringLayout.SOUTH, btnTornaIndietro, 39, SpringLayout.NORTH, panelComandi);
+		sl_panelComandi.putConstraint(SpringLayout.EAST, btnTornaIndietro, 38, SpringLayout.WEST, panelComandi);
+		btnTornaIndietro.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				dispose();
 			}
 		});
-		btnBack.setToolTipText("Clicca qui per tornare alla dashboard");
-		btnBack.setBorderPainted(false);
-		panelComandi.add(btnBack);
+		btnTornaIndietro.setToolTipText("Clicca qui per tornare alla dashboard");
+		btnTornaIndietro.setBorderPainted(false);
+		panelComandi.add(btnTornaIndietro);
 		
 		JLabel lblBenvenuto = new JLabel("Accesso effettuato con:");
-		sl_panelComandi.putConstraint(SpringLayout.NORTH, lblBenvenuto, 0, SpringLayout.NORTH, btnBack);
-		sl_panelComandi.putConstraint(SpringLayout.WEST, lblBenvenuto, 951, SpringLayout.EAST, btnBack);
+		sl_panelComandi.putConstraint(SpringLayout.NORTH, lblBenvenuto, 0, SpringLayout.NORTH, btnTornaIndietro);
+		sl_panelComandi.putConstraint(SpringLayout.WEST, lblBenvenuto, 951, SpringLayout.EAST, btnTornaIndietro);
 		sl_panelComandi.putConstraint(SpringLayout.EAST, lblBenvenuto, -10, SpringLayout.EAST, panelComandi);
 		lblBenvenuto.setVerticalAlignment(SwingConstants.TOP);
 		lblBenvenuto.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -94,7 +93,7 @@ public class ViewOfferte extends JFrame {
 		JLabel lblEmailAccesso = new JLabel(emailUtente + " ");
 		sl_panelComandi.putConstraint(SpringLayout.SOUTH, lblEmailAccesso, -52, SpringLayout.NORTH, lblDescrizione);
 		sl_panelComandi.putConstraint(SpringLayout.NORTH, lblEmailAccesso, 6, SpringLayout.SOUTH, lblBenvenuto);
-		sl_panelComandi.putConstraint(SpringLayout.WEST, lblEmailAccesso, 951, SpringLayout.EAST, btnBack);
+		sl_panelComandi.putConstraint(SpringLayout.WEST, lblEmailAccesso, 951, SpringLayout.EAST, btnTornaIndietro);
 		sl_panelComandi.putConstraint(SpringLayout.EAST, lblEmailAccesso, -10, SpringLayout.EAST, panelComandi);
 		lblEmailAccesso.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblEmailAccesso.setFont(new Font("Yu Gothic UI Semibold", Font.ITALIC, 11));
@@ -120,55 +119,49 @@ public class ViewOfferte extends JFrame {
 		scrollPane.setBackground(Color.WHITE);
 		panelRisultati.add(scrollPane);
 
-		tableRisultati = new JTable();
-		tableRisultati.setShowVerticalLines(false);
-		tableRisultati.setSelectionBackground(new Color(226, 226, 226));
-		tableRisultati.setRowHeight(100);
-		tableRisultati.setShowGrid(false);
-		tableRisultati.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
-
-		// Modello della tabella
+		// Crea il modello dati della tabella
 		DefaultTableModel model = new DefaultTableModel(
-			new Object[][] {
-				{null, "", "", ""},
-				{null, "", "", ""},
-				{null, "", "", ""},
-				{null, "", "", ""},
-				{null, "", "", ""},
-				{null, "", "", ""},
-				{null, "", "", ""},
-			},
-			new String[] {
-				"Foto", "Tipologia", "Descrizione", "Prezzo (€)"
-			}
+		    new Object[][]{},
+		    new String[] {"Categoria", "Immagini", "Tipologia", "Descrizione", "Prezzo (€)"}
 		) {
-			private static final long serialVersionUID = 1L;
-			@SuppressWarnings("rawtypes")
-			Class[] columnTypes = new Class[] {
-				Object.class, String.class, String.class, String.class
-			};
-			public Class<?> getColumnClass(int columnIndex) {
-				return columnTypes[columnIndex];
-			}
-			public boolean isCellEditable(int row, int column) {
-				return false; // tutte le celle non editabili
-			}
+		    private static final long serialVersionUID = 1L;
+		    Class<?>[] columnTypes = new Class[] {
+		        Object.class, String.class, String.class, String.class
+		    };
+
+		    @Override
+		    public Class<?> getColumnClass(int columnIndex) {
+		        return columnTypes[columnIndex];
+		    }
+
+		    @Override
+		    public boolean isCellEditable(int row, int column) {
+		        return false;
+		    }
 		};
 
-		tableRisultati.setModel(model);
+		// Crea e configura la JTable
+		tableRisultati = new JTable(model);
+		tableRisultati.setRowHeight(100);
+		tableRisultati.setShowGrid(false);
+		tableRisultati.setShowVerticalLines(false);
+		tableRisultati.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		tableRisultati.setSelectionBackground(new Color(226, 226, 226));
 
 		// Configura larghezze colonne
-		tableRisultati.getColumnModel().getColumn(0).setResizable(false);
-		tableRisultati.getColumnModel().getColumn(1).setResizable(false);
-		tableRisultati.getColumnModel().getColumn(1).setPreferredWidth(170);
-		tableRisultati.getColumnModel().getColumn(2).setResizable(false);
-		tableRisultati.getColumnModel().getColumn(2).setPreferredWidth(450);
-		tableRisultati.getColumnModel().getColumn(3).setResizable(false);
+		int[] preferredWidths = {100, 100, 170, 450, 100};
+		for (int i = 0; i < preferredWidths.length; i++) {
+		    TableColumn col = tableRisultati.getColumnModel().getColumn(i);
+		    col.setPreferredWidth(preferredWidths[i]);
+		    col.setResizable(false);
+		}
 
+		// Inserisci la tabella nello scroll pane
 		scrollPane.setViewportView(tableRisultati);
-		
-		// riempio la tabella
-		Controller con = new Controller();
-		con.riempiTableRisultati(tableRisultati);
+
+		// Popola la tabella con i dati tramite il controller
+		Controller controller = new Controller();
+		controller.riempiTableRisultati(tableRisultati);
+
 	}
 }

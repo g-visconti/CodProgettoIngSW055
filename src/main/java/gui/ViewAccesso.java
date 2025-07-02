@@ -67,6 +67,7 @@ public class ViewAccesso extends JFrame {
 	 * Create the frame.
 	 */
 	public ViewAccesso() {
+		setResizable(false);
 		// Carica l'immagine come icona
 		URL pathIcona = getClass().getClassLoader().getResource("images/DietiEstatesIcona.png");
         ImageIcon icon = new ImageIcon(pathIcona);
