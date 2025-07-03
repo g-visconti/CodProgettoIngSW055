@@ -5,9 +5,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 import javax.swing.ImageIcon;
 import javax.swing.JTable;
@@ -113,7 +115,13 @@ public class ImmobileDAO {
 	        " SELECT i.\"idImmobile\", i.\"immagini\" \"Immagini\", i.\"titolo\" \"Tipologia\", i.\"descrizione\" \"Descrizione\", v.\"prezzoTotale\" \"Prezzo Totale (€)\" " +
 	        " FROM \"Immobile\" i JOIN \"ImmobileinVendita\" v " +
 	        " ON i.\"idImmobile\" = v.\"idImmobile\" " +
-	        " WHERE i.localita = ? AND i.tipologia = 'Vendita'";
+	        " WHERE ( " +
+                " i.\"titolo\" ILIKE '%' || ? || '%' OR " +
+                " i.\"localita\" ILIKE '%' || ? || '%' OR " +
+                " i.\"descrizione\" ILIKE '%' || ? || '%' " +
+            " ) " +
+            " AND i.\"tipologia\" = 'Vendita' ";
+
 	    
 		    if (filtri.prezzoMin != null) query += " AND v.\"prezzoTotale\" >= ?";
 		    if (filtri.prezzoMax != null) query += " AND v.\"prezzoTotale\" <= ?";
@@ -129,6 +137,8 @@ public class ImmobileDAO {
 	    
 	    try (PreparedStatement ps = connection.prepareStatement(query)) {
 	        int i=1;
+	    	ps.setString(i++, campoPieno);
+	    	ps.setString(i++, campoPieno);
 	    	ps.setString(i++, campoPieno);
 	    	if (filtri.prezzoMin != null) ps.setInt(i++, filtri.prezzoMin);
 	        if (filtri.prezzoMax != null) ps.setInt(i++, filtri.prezzoMax);
@@ -168,7 +178,12 @@ public class ImmobileDAO {
 	        " SELECT i.\"idImmobile\", i.\"immagini\" \"Immagini\", i.\"titolo\" \"Tipologia\", i.\"descrizione\" \"Descrizione\", a.\"prezzoMensile\" \"Prezzo Totale (€)\" " +
 	        " FROM \"Immobile\" i JOIN \"ImmobileinAffitto\" a " +
 	        " ON i.\"idImmobile\" = a.\"idImmobile\" " +
-	        " WHERE i.localita = ? AND i.tipologia = 'Affitto'";
+	        " WHERE ( " +
+	            " i.\"titolo\" ILIKE '%' || ? || '%' OR " +
+	            " i.\"localita\" ILIKE '%' || ? || '%' OR " +
+	            " i.\"descrizione\" ILIKE '%' || ? || '%' " +
+	        " ) " +
+	        " AND i.\"tipologia\" = 'Affitto' ";
 	    
 		    if (filtri.prezzoMin != null) query += " AND a.\"prezzoMensile\" >= ?";
 		    if (filtri.prezzoMax != null) query += " AND a.\"prezzoMensile\" <= ?";
@@ -184,6 +199,8 @@ public class ImmobileDAO {
 	    
 	    try (PreparedStatement ps = connection.prepareStatement(query)) {
 	        int i=1;
+	    	ps.setString(i++, campoPieno);
+	    	ps.setString(i++, campoPieno);
 	    	ps.setString(i++, campoPieno);
 	    	if (filtri.prezzoMin != null) ps.setInt(i++, filtri.prezzoMin);
 	        if (filtri.prezzoMax != null) ps.setInt(i++, filtri.prezzoMax);
@@ -222,7 +239,7 @@ public class ImmobileDAO {
 				" SELECT " +
 				"'Vendita' AS \"Categoria\", " +
 			    "i.\"immagini\" AS \"Immagini\", " +   
-			    "i.\"titolo\" AS \"Tipologia\", " + 
+			    "i.\"titolo\" AS \"Titolo dell'annuncio\", " + 
 			    "i.\"descrizione\" AS \"Descrizione\", " +
 			    "v.\"prezzoTotale\" AS \"Prezzo (€)\", " +
 			    "i.\"idImmobile\" AS \"idOrdine\" " +
@@ -232,7 +249,7 @@ public class ImmobileDAO {
 			    " SELECT " +
 				" 'Affitto' AS \"Categoria\", " +
 			    " i.\"immagini\" AS \"Immagini\", " +
-			    "i.\"titolo\" AS \"Tipologia\", " +
+			    "i.\"titolo\" AS \"Titolo dell'annuncio\", " +
 			    " i.\"descrizione\" AS \"Descrizione\", " +
 			    " a.\"prezzoMensile\" AS \"Prezzo (€)\", " +
 			    " i.\"idImmobile\" AS \"idOrdine\" " +
@@ -276,6 +293,11 @@ public class ImmobileDAO {
                 }
             };
 
+            NumberFormat format = NumberFormat.getNumberInstance(Locale.ITALY);
+	        format.setGroupingUsed(true);
+	        format.setMaximumFractionDigits(0);
+	        format.setMinimumFractionDigits(0);
+            
             // Riempimento delle righe
             while (rs.next()) {
                 Object[] riga = new Object[colonne];
@@ -284,7 +306,8 @@ public class ImmobileDAO {
                 riga[1] = rs.getObject(2);
                 riga[2] = rs.getObject(3);
                 riga[3] = rs.getObject(4);
-                riga[4] = rs.getObject(5);
+                riga[4] = "€ " + format.format(rs.getObject(5));
+                
                 
                 model.addRow(riga);
             }

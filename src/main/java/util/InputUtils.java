@@ -27,5 +27,25 @@ public class InputUtils {
         }
     }
     
-    
+    // Ogni iniziale di una parola è posta in maiuscolo
+    public static String capitalizzaParole(String input) {
+    	// Converto l'input tutto in lettere minuscole
+    	// divido in stringhe rimuovendo una o più occorenze degli spazi bianchi
+    	String[] parole = input.toLowerCase().split("\\s+");
+    	// Alternativa per costruire stringhe come concatenazione di parole
+        StringBuilder risultato = new StringBuilder();
+
+        for (String parola : parole) {
+            if (!parola.isEmpty()) {
+                risultato.append(Character.toUpperCase(parola.charAt(0)))
+                         .append(parola.substring(1))
+                         .append(" ");
+            }
+        }
+        
+        // Prima di ritornare al chiamante
+        // Converto l'oggetto risultato (che è una seq. di caratteri) StringBuilder
+        // in una stringa, infine rimuovo eventuali spazi bianchi ad inizio e fine stringa
+        return risultato.toString().trim();
+    }
 }

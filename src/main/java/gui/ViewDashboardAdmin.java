@@ -27,6 +27,8 @@ import javax.swing.table.DefaultTableModel;
 import controller.Controller;
 import model.Filtri;
 import util.GuiUtils;
+import util.InputUtils;
+
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.JButton;
@@ -54,7 +56,7 @@ public class ViewDashboardAdmin extends JFrame {
 	public ViewDashboardAdmin(String emailInserita) {
 		// Imposta l'icona di DietiEstates25 alla finestra in uso
 		GuiUtils.setIconaFinestra(this);
-		setTitle("DietiEstates25 - Dashboard amministratore di agenzia");
+		setTitle("DietiEstates25 - Dashboard per l'amministratore di agenzia");
 		
 		setResizable(true);
 		Preferences.userNodeForPackage(ViewFiltri.class);
@@ -109,7 +111,7 @@ public class ViewDashboardAdmin extends JFrame {
 
 		// Crea il modello della tabella (con colonne: immagine, tipologia, descrizione, prezzo)
 		DefaultTableModel model = new DefaultTableModel(
-		    new String[] { "Immagini", "Tipologia", "Descrizione", "Prezzo (€)" }, 0 // 0 righe iniziali
+		    new String[] { "", "Titolo dell'annuncio", "Descrizione", "Prezzo (€)" }, 0 // 0 righe iniziali
 		) {
 		    private static final long serialVersionUID = 1L;
 
@@ -222,7 +224,7 @@ public class ViewDashboardAdmin extends JFrame {
 		// campo dove scrivere la località o zona nella quale si ha intenzione di effettuare una ricerca
 		campoRicerca = new JTextField();
 		
-		campoRicerca.setText("Effettua una nuova ricerca inserendo comune o zona");
+		campoRicerca.setText("Cerca scrivendo una via, una zona o una parola chiave");
 		campoRicerca.setFont(new Font("Yu Gothic UI Semibold", Font.ITALIC, 11));
 		campoRicerca.setColumns(10);
 		
@@ -304,11 +306,11 @@ public class ViewDashboardAdmin extends JFrame {
 		btnEseguiRicerca.setBorderPainted(false);
         
 		
-		btnEseguiRicerca.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				ricercaImmobili();
-			}
+		btnEseguiRicerca.addActionListener(new ActionListener() {
+		    @Override
+		    public void actionPerformed(ActionEvent e) {
+		        ricercaImmobili();
+		    }
 		});
 		
 		ricerca.add(btnEseguiRicerca);
@@ -412,11 +414,11 @@ public class ViewDashboardAdmin extends JFrame {
 		sl_ricerca.putConstraint(SpringLayout.SOUTH, lblFiltri, -70, SpringLayout.SOUTH, ricerca);
 		lblFiltri.setToolTipText("Clicca per impostare preferenze aggiuntive");
 		
-		
 		lblFiltri.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				viewFiltri = new ViewFiltri();
+				String tipologiaAppartamento = (String) comboBoxAppartamento.getSelectedItem();	
+				viewFiltri = new ViewFiltri(tipologiaAppartamento);
 				viewFiltri.setLocationRelativeTo(null);
 				viewFiltri.setVisible(true);
 
@@ -484,16 +486,20 @@ public class ViewDashboardAdmin extends JFrame {
 	// tale metodo serve a ricercare immobili per poi riempire la tabella con i risultati trovati
 	private void ricercaImmobili() {
 		Controller controller = new Controller();
-		String tipologia = (String) comboBoxAppartamento.getSelectedItem();				
+		String tipologiaAppartamento = (String) comboBoxAppartamento.getSelectedItem();				
 		campoPieno = campoRicerca.getText();
-		if(campoPieno.equals("Effettua una nuova ricerca inserendo comune o zona") || campoPieno.equals(campoVuoto)) {
+		if(campoPieno.equals("Cerca scrivendo una via, una zona o una parola chiave") || campoPieno.equals(campoVuoto)) {
 			JOptionPane.showMessageDialog(null, "Scrivere qualcosa prima di iniziare la ricerca!", "Attenzione", JOptionPane.INFORMATION_MESSAGE);
 		}
 		else{
 			// effettuo la ricerca e riempio la tabella
-			ViewFiltri viewFiltri = new ViewFiltri();
+			
+			// capitolizzo la parola (o stringa) che l'utente ha inserito da tastiera
+			campoPieno = InputUtils.capitalizzaParole(campoPieno);
+			
+			ViewFiltri viewFiltri = new ViewFiltri(tipologiaAppartamento);
 			Filtri filtri = viewFiltri.getFiltriSelezionati();
-			numeroRisultatiTrovati = controller.riempiTableRisultati(tableRisultati, campoPieno, tipologia, filtri);
+			numeroRisultatiTrovati = controller.riempiTableRisultati(tableRisultati, campoPieno, tipologiaAppartamento, filtri);
 			lblRisultati.setText("Immobili trovati: " + numeroRisultatiTrovati);
 		}
 	}
@@ -501,7 +507,7 @@ public class ViewDashboardAdmin extends JFrame {
 	// metodo che serve a sostituire il campo di ricerca in un campo vuoto
 	private void setCampoDiTestoIn() {
 		campoPieno = campoRicerca.getText();
-		if(campoPieno.equals("Effettua una nuova ricerca inserendo comune o zona")) {
+		if(campoPieno.equals("Cerca scrivendo una via, una zona o una parola chiave")) {
 			campoRicerca.setText(campoVuoto);
 			campoRicerca.setFont(new Font("Yu Gothic UI Semibold", Font.CENTER_BASELINE, 11));
 		}
@@ -511,7 +517,7 @@ public class ViewDashboardAdmin extends JFrame {
 	private void setCampoDiTestoOut() {
 		campoPieno = campoRicerca.getText();
 		if(campoPieno.equals(campoVuoto)) {
-			campoRicerca.setText("Effettua una nuova ricerca inserendo comune o zona");	
+			campoRicerca.setText("Cerca scrivendo una via, una zona o una parola chiave");	
 			campoRicerca.setFont(new Font("Yu Gothic UI Semibold", Font.ITALIC, 11));
 		}
 		

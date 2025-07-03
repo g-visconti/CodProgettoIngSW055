@@ -6,8 +6,6 @@ import java.text.NumberFormat;
 import java.util.Locale;
 
 import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -156,7 +154,7 @@ public class Controller {
 	        format.setMaximumFractionDigits(0);
 	        format.setMinimumFractionDigits(0);
 
-	        String[] colonne = { "ID", "Immagini", "Tipologia", "Descrizione", tipologia.equals("Vendita") ? "Prezzo Totale" : "Prezzo Mensile" };
+	        String[] colonne = { "ID", "Immagini", "Titolo dell'annuncio", "Descrizione", tipologia.equals("Vendita") ? "Prezzo Totale" : "Prezzo Mensile" };
 	        @SuppressWarnings("serial")
 			DefaultTableModel model = new DefaultTableModel(colonne, 0) {
 	            @Override
@@ -164,7 +162,7 @@ public class Controller {
 	                switch (columnIndex) {
 	                    case 0: return Integer.class;          // ID
 	                    case 1: return ImageIcon.class;        // Immagini
-	                    case 2: return String.class;           // Tipologia
+	                    case 2: return String.class;           // Titolo dell'annuncio
 	                    case 3: return String.class;           // Descrizione
 	                    case 4: return String.class;           // Prezzo
 	                    default: return Object.class;
@@ -226,6 +224,7 @@ public class Controller {
 
 	        tableRisultati.setRowHeight(100);
 	        
+	        // Imposto il render nella tabella, sulla colonna delle immagini 
 	        TableUtils.setImageRenderer(tableRisultati, 1);
 	        return model.getRowCount();
 

@@ -42,7 +42,7 @@ public class ViewFiltri extends JFrame {
 	private JCheckBox chckbxClimatizzazione;
 	
 	// Costruttore che crea il frame
-	public ViewFiltri() {
+	public ViewFiltri(String tipologiaAppartamento) {
 		// Imposta l'icona di DietiEstates25 alla finestra in uso
 		GuiUtils.setIconaFinestra(this);
 		setTitle("DietiEstates25 - Filtri di ricerca");
@@ -63,8 +63,19 @@ public class ViewFiltri extends JFrame {
 		});
 		
 		// Opzioni per le comboBox
-		String[] opPrezzoMin = {"Indifferente", "50000", "60000", "70000", "80000", "90000", "100000", "150000", "200000", "300000", "500000", "1000000"};
-		String[] opPrezzoMax = {"Indifferente", "50000", "60000", "70000", "80000", "90000", "100000", "150000", "200000", "300000", "500000", "1000000"};
+		String[] opPrezzoMin = null;
+		String[] opPrezzoMax = null;
+		switch(tipologiaAppartamento) {
+			case "Vendita":
+				opPrezzoMin = new String[]{"Indifferente", "50000", "60000", "70000", "80000", "90000", "100000", "150000", "200000", "300000", "500000", "1000000"};
+				opPrezzoMax = new String[]{"Indifferente", "50000", "60000", "70000", "80000", "90000", "100000", "150000", "200000", "300000", "500000", "1000000"};
+				break;
+			case "Affitto":
+				opPrezzoMin = new String[]{"Indifferente", "200", "300", "400", "500", "600", "700", "800", "900", "1000", "1500", "2000", "2500", "3000", "3500", "4000"};
+				opPrezzoMax = new String[]{"Indifferente", "200", "300", "400", "500", "600", "700", "800", "900", "1000", "1500", "2000", "2500", "3000", "3500", "4000"};
+				break;
+		}
+		
 		String[] opSupMin = {"Indifferente", "40", "60", "80", "100", "120", "150", "180", "200", "300", "500"};
 		String[] opSupMax = {"Indifferente", "40", "60", "80", "100", "120", "150", "180", "200", "300", "500"};
 		String[] opNumLocali = {"Indifferente", "1", "2", "3", "4", "5"};
