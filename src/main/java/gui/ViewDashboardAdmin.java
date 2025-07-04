@@ -17,6 +17,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.sql.SQLException;
 import java.util.prefs.Preferences;
 import java.awt.Component;
 import javax.swing.JComboBox;
@@ -25,6 +26,7 @@ import javax.swing.JLayeredPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import controller.Controller;
+import database.ConnessioneDatabase;
 import model.Filtri;
 import util.GuiUtils;
 import util.InputUtils;
@@ -275,16 +277,33 @@ public class ViewDashboardAdmin extends JFrame {
 		// Effettua la disconnessione
 		lblLogout = new JLabel();
 		lblLogout.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				// operazioni di disconnessione dell'account
-				//connection.closeConnection();
-				JOptionPane.showMessageDialog(null, "Disconnessione avvenuta con successo", "Avviso", JOptionPane.INFORMATION_MESSAGE);
-				ViewAccesso viewAccesso = new ViewAccesso();
-				viewAccesso.setLocationRelativeTo(null);
-				viewAccesso.setVisible(true);
-				dispose();
-			}
+		    @Override
+		    public void mouseClicked(MouseEvent e) {
+		        // Mostra una finestra di conferma
+		        int scelta = JOptionPane.showConfirmDialog(null,"Sei sicuro di voler fare logout?","Conferma logout",JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE);
+
+		        // Se l'utente sceglie "Sì"
+		        if (scelta == JOptionPane.YES_OPTION) {
+		            try {
+		                // Chiusura della connessione al database
+		                ConnessioneDatabase.getInstance().closeConnection();
+		                // Successo
+		                JOptionPane.showMessageDialog(null,"Disconnessione avvenuta con successo","Avviso",JOptionPane.INFORMATION_MESSAGE);
+		            } catch (SQLException ex) {
+		                // Errore
+		                JOptionPane.showMessageDialog(null,"Errore durante la chiusura della connessione: " + ex.getMessage(),"Errore",JOptionPane.ERROR_MESSAGE);
+		                return; // esce dal metodo se c'è stato un errore
+		            }
+
+		            // Vado a ViewAccesso
+		            ViewAccesso viewAccesso = new ViewAccesso();
+		            viewAccesso.setLocationRelativeTo(null);
+		            viewAccesso.setVisible(true);
+
+		            // Chiudo la View attuale
+		            dispose();
+		        }
+		    }
 		});
 		lblLogout.setToolTipText("Clicca per uscire da DietiEstates25");
 		ricerca.add(lblLogout);
