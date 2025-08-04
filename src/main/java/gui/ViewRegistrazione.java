@@ -1,14 +1,14 @@
 package gui;
 
 
-import java.awt.BorderLayout;
-import model.CognitoApp;
-import java.awt.EventQueue;
 
+import model.CognitoApp;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-import java.awt.Point;
+
+import controller.Controller;
+
 import javax.swing.JTextField;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -45,12 +45,12 @@ public class ViewRegistrazione extends JFrame {
 	private JLabel lblDietiEstatesmini;
 	private JLabel lblNewLabel_2;
 	private JTextField Cap_Utente;
-	private JLabel lblregistrati;
 	private JLabel lblCognomeError;
 	private JLabel lblCittaError;
 	private JLabel lblTelefonoError;
 	private JLabel lblCapError;
 	private JLabel lblIndirizzoError;
+	private String ruolo="Cliente";
 
 	
 	/**
@@ -271,27 +271,31 @@ public class ViewRegistrazione extends JFrame {
 				    lblIndirizzoError.setVisible(true);
 				    Indirizzo_Utente.setText("Indirizzo");
 				} else {
+					
 				    lblIndirizzoError.setVisible(false);
+				    
 				}
 				
 				char[] passwordChar = Password_Utente.getPassword();
 				String passwordUtente = new String(passwordChar);
 				
 				
-				 boolean success = CognitoApp.registerUser(nome, passwordUtente, Email_Utente);
+				 boolean success = CognitoApp.registerUser(Email_Utente, passwordUtente, Email_Utente);
 
 				 if (success) {
-			            
+			            Controller cont1= new Controller();
+			            cont1.registraNuovoUtente(Email_Utente, passwordUtente, nome, cognome, citta, telefono,cap,indirizzo, ruolo);
 			            ViewDashboard viewDashboard = new ViewDashboard(Email_Utente);
-			            viewDashboard.setLocationRelativeTo(null);
 			            viewDashboard.setVisible(true);
 			            dispose();
 			        } else {
+			        	
 			        	JOptionPane.showMessageDialog(null, "La registrazione � fallita. Riprova con i dati corretti.", 
                                 "Errore nella registrazione", JOptionPane.ERROR_MESSAGE);
+			        	
 			        }
 				
-				ViewDashboardAdmin schermata = new ViewDashboardAdmin(Email_Utente);
+				ViewDashboard schermata = new ViewDashboard(Email_Utente);
 				schermata.setVisible(true);
 
 			}
