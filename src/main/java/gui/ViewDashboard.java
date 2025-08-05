@@ -32,6 +32,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 
 import controller.Controller;
+import model.Filtri;
 
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
@@ -260,7 +261,7 @@ public class ViewDashboard extends JFrame {
 		JPanel ricerca = new JPanel();
 		ricerca.setAlignmentY(Component.TOP_ALIGNMENT);
 		ricerca.setAlignmentX(Component.RIGHT_ALIGNMENT);
-		ricerca.setBounds(0, 11, 1251, 189);
+		ricerca.setBounds(0, 0, 1251, 189);
 		ricerca.setName("");
 		
 		ricerca.setBackground(new Color(255, 255, 255));
@@ -355,7 +356,9 @@ public class ViewDashboard extends JFrame {
                 else{
                     // effettuo la ricerca e riempio la tabella
                     Controller con = new Controller();
-                    con.riempiTableRisultati(tableRisultati, campoPieno, tipologia);
+                    ViewFiltri viewFiltri = new ViewFiltri(tipologia);
+                    Filtri filtri = viewFiltri.getFiltriSelezionati();
+                    con.riempiTableRisultati(tableRisultati, campoPieno, tipologia, filtri);
                     risultatiIniziali.setVisible(false);
                     risultatiDaRicerca.setVisible(true);
                   
@@ -373,14 +376,15 @@ public class ViewDashboard extends JFrame {
 		lblFilters.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
+				String tipologia = (String) comboBoxAppartamento.getSelectedItem();
 				campoPieno = campoRicerca.getText();
 				if(campoPieno.equals("Clicca qui per iniziare a cercare") || campoPieno.equals(campoVuoto)) {
 					JOptionPane.showMessageDialog(null, "Scrivere qualcosa prima di impostare i filtri!", "Attenzione", JOptionPane.INFORMATION_MESSAGE);
 				}
 				else {
-					ViewFiltri viewPreferenze = new ViewFiltri();
-					viewPreferenze.setLocationRelativeTo(null);
-					viewPreferenze.setVisible(true);
+					ViewFiltri viewFiltri = new ViewFiltri(tipologia);
+					viewFiltri.setLocationRelativeTo(null);
+					viewFiltri.setVisible(true);
 				}
 			}
 		});
