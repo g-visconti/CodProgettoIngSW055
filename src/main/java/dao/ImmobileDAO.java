@@ -1,5 +1,6 @@
-package dao;
+package DAO;
 
+import java.awt.Component;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -7,38 +8,68 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
 import javax.swing.ImageIcon;
 import javax.swing.JTable;
+import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
+
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.postgresql.util.PGobject;
+
+import database.ConnessioneDatabase;
 import model.Filtri;
 import model.Immobile;
 import model.ImmobileInAffitto;
 import model.ImmobileInVendita;
-import util.TextAreaRenderer;
 
 public class ImmobileDAO {
-	// ATTRIBUTI
-	private Connection connection;
+	 private Connection connection;
 	 
 	 
-	// COSTRUTTORI
-	public ImmobileDAO(Connection connection) {
+	 
+	 public ImmobileDAO(Connection connection) {
          this.connection = connection;
      }
 	 
-	// METODI
-	// riempie la classe sugli immobili in affitto
-	public void caricaImmobileInAffitto(ImmobileInAffitto immobile) throws SQLException {
-		    String query1 = "INSERT INTO \"Immobile\" (titolo, indirizzo, localita, dimensione, descrizione, tipologia, filtri) VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING \"idImmobile\"";
+	 
+	 @SuppressWarnings("serial")
+	 static class TextAreaRenderer extends JTextArea implements TableCellRenderer {
+	         public TextAreaRenderer() {
+	             setLineWrap(true);
+	             setWrapStyleWord(true);
+	             setOpaque(true);
+	         }
+
+	         @Override
+	         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+	             setText(value == null ? "" : value.toString());
+	             if (isSelected) {
+	                 setBackground(table.getSelectionBackground());
+	                 setForeground(table.getSelectionForeground());
+	             } else {
+	                 setBackground(table.getBackground());
+	                 setForeground(table.getForeground());
+	             }
+	             setFont(table.getFont());
+	             return this;
+	         }
+	     }
+	 
+	 
+	
+	 public void caricaImmobileInAffitto(ImmobileInAffitto immobile) throws SQLException {
+		    String query1 = "INSERT INTO \"Immobile\" (titolo, indirizzo, localita, dimensione, descrizione, tipologia, filtri, immagini) VALUES (?, ?, ?, ?, ?, ?, ?, ?) RETURNING \"idImmobile\"";
+
 		    try (PreparedStatement stmt = connection.prepareStatement(query1)) {
 		        stmt.setString(1, immobile.getTitolo());
 		        stmt.setString(2, immobile.getIndirizzo());
@@ -47,10 +78,25 @@ public class ImmobileDAO {
 		        stmt.setString(5, immobile.getDescrizione());
 		        stmt.setString(6, immobile.getTipologia());
 
+		        // Filtri JSON
 		        PGobject jsonObject = new PGobject();
 		        jsonObject.setType("jsonb");
 		        jsonObject.setValue(immobile.getFiltriAsJson().toString());
 		        stmt.setObject(7, jsonObject);
+
+		        // Converti immagini in Base64
+		        List<String> immaginiBase64 = new ArrayList<>();
+		        if (immobile.getImmagini() != null) {
+		            for (byte[] img : immobile.getImmagini()) {
+		                immaginiBase64.add(Base64.getEncoder().encodeToString(img));
+		            }
+		        }
+
+		        // Inserisci immagini come JSONB
+		        PGobject immaginiJson = new PGobject();
+		        immaginiJson.setType("jsonb");
+		        immaginiJson.setValue(new org.json.JSONArray(immaginiBase64).toString());
+		        stmt.setObject(8, immaginiJson);
 
 		        ResultSet rs = stmt.executeQuery();
 		        int generatedId = -1;
@@ -61,7 +107,7 @@ public class ImmobileDAO {
 		        rs.close();
 		        stmt.close();
 
-		        // Ora inserisci in ImmobileInAffitto
+		        // Inserimento specifico per affitto
 		        String query2 = "INSERT INTO \"ImmobileinAffitto\" (\"idImmobile\", \"prezzoMensile\") VALUES (?, ?)";
 		        try (PreparedStatement stmt2 = connection.prepareStatement(query2)) {
 		            stmt2.setInt(1, generatedId);
@@ -70,11 +116,12 @@ public class ImmobileDAO {
 		        }
 		    }
 		}
+
 	 
-	// riempie la classe sugli immobili in vendita
-	public void caricaImmobileInVendita(ImmobileInVendita immobile) throws SQLException {
-		    String query1 = "INSERT INTO \"Immobile\" (titolo, indirizzo, localita, dimensione, descrizione, tipologia, filtri) VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING \"idImmobile\"";
-		    
+	 
+	 public void caricaImmobileInVendita(ImmobileInVendita immobile) throws SQLException {
+		    String query1 = "INSERT INTO \"Immobile\" (titolo, indirizzo, localita, dimensione, descrizione, tipologia, filtri, immagini) VALUES (?, ?, ?, ?, ?, ?, ?, ?) RETURNING \"idImmobile\"";
+
 		    try (PreparedStatement stmt = connection.prepareStatement(query1)) {
 		        stmt.setString(1, immobile.getTitolo());
 		        stmt.setString(2, immobile.getIndirizzo());
@@ -83,10 +130,23 @@ public class ImmobileDAO {
 		        stmt.setString(5, immobile.getDescrizione());
 		        stmt.setString(6, immobile.getTipologia());
 
+		        // Filtri JSONB
 		        PGobject jsonObject = new PGobject();
 		        jsonObject.setType("jsonb");
 		        jsonObject.setValue(immobile.getFiltriAsJson().toString());
 		        stmt.setObject(7, jsonObject);
+
+		        // Converti immagini in Base64 e inserisci come JSONB
+		        List<String> immaginiBase64 = new ArrayList<>();
+		        if (immobile.getImmagini() != null) {
+		            for (byte[] img : immobile.getImmagini()) {
+		                immaginiBase64.add(Base64.getEncoder().encodeToString(img));
+		            }
+		        }
+		        PGobject immaginiJson = new PGobject();
+		        immaginiJson.setType("jsonb");
+		        immaginiJson.setValue(new org.json.JSONArray(immaginiBase64).toString());
+		        stmt.setObject(8, immaginiJson);
 
 		        ResultSet rs = stmt.executeQuery();
 		        int generatedId = -1;
@@ -97,7 +157,7 @@ public class ImmobileDAO {
 		        rs.close();
 		        stmt.close();
 
-		        // Ora inserimento in ImmobileInVendita
+		        // Inserimento specifico per vendita
 		        String query2 = "INSERT INTO \"ImmobileinVendita\" (\"idImmobile\", \"prezzoTotale\") VALUES (?, ?)";
 		        try (PreparedStatement stmt2 = connection.prepareStatement(query2)) {
 		            stmt2.setInt(1, generatedId);
@@ -107,7 +167,10 @@ public class ImmobileDAO {
 		    }
 		}
 
+	 
 	
+	 
+	 	
 	// riempie la tabella principale coi risultati ottenuti dalla ricerca con tipologia 'Vendita'
 	public List<ImmobileInVendita> getImmobiliVendita(String campoPieno, Filtri filtri) {
 		List<ImmobileInVendita> immobili = new ArrayList<>();
@@ -353,65 +416,86 @@ public class ImmobileDAO {
         }
 		
 	}
-	
-	public Immobile getImmobileById(long idimmobile) throws SQLException {
-	    String sqlBase = "SELECT * FROM \"Immobile\" WHERE \"idImmobile\" = ?";
-	    Immobile immobile = null;
+		
+	 
+	 public Immobile getImmobileById(long idimmobile) throws SQLException {
+		    String sqlBase = "SELECT * FROM \"Immobile\" WHERE \"idImmobile\" = ?";
+		    Immobile immobile = null;
 
-	    try (PreparedStatement stmt = connection.prepareStatement(sqlBase)) {
-	        stmt.setLong(1, idimmobile);
-	        ResultSet rs = stmt.executeQuery();
+		    try (PreparedStatement stmt = connection.prepareStatement(sqlBase)) {
+		        stmt.setLong(1, idimmobile);
+		        ResultSet rs = stmt.executeQuery();
 
-	        if (rs.next()) {
-	            String tipo = rs.getString("tipologia"); // tipo: "Affitto" o "Vendita"
-	            
-	            if ("Affitto".equalsIgnoreCase(tipo)) {
-	                immobile = new ImmobileInAffitto();
-	            } else if ("Vendita".equalsIgnoreCase(tipo)) {
-	                immobile = new ImmobileInVendita();
-	            } else {
-	                immobile = new Immobile(); // fallback
-	            }
+		        if (rs.next()) {
+		            String tipo = rs.getString("tipologia"); // tipo: "Affitto" o "Vendita"
+		            
+		            if ("Affitto".equalsIgnoreCase(tipo)) {
+		                immobile = new ImmobileInAffitto();
+		            } else if ("Vendita".equalsIgnoreCase(tipo)) {
+		                immobile = new ImmobileInVendita();
+		            } else {
+		                immobile = new Immobile(); // fallback
+		            }
 
-	            immobile.setId(rs.getLong("idImmobile"));
-	            immobile.setTitolo(rs.getString("titolo"));
-	            immobile.setIndirizzo(rs.getString("indirizzo"));
-	            immobile.setDimensione(rs.getInt("dimensione"));
-	            immobile.setDescrizione(rs.getString("descrizione"));
-	            immobile.setLocalita(rs.getString("localita"));
-	            immobile.setTipologia(rs.getString("tipologia"));
+		            immobile.setId(rs.getLong("idImmobile"));
+		            immobile.setTitolo(rs.getString("titolo"));
+		            immobile.setIndirizzo(rs.getString("indirizzo"));
+		            immobile.setDimensione(rs.getInt("dimensione"));
+		            immobile.setDescrizione(rs.getString("descrizione"));
+		            immobile.setLocalita(rs.getString("localita"));
+		            immobile.setTipologia(rs.getString("tipologia"));
 
-	            String filtriJsonString = rs.getString("filtri");
-	            if (filtriJsonString != null && !filtriJsonString.isEmpty()) {
-	                JSONObject filtri = new JSONObject(filtriJsonString);
-	                immobile.setFiltriFromJson(filtri);
-	            }
+		            String filtriJsonString = rs.getString("filtri");
+		            if (filtriJsonString != null && !filtriJsonString.isEmpty()) {
+		                JSONObject filtri = new JSONObject(filtriJsonString);
+		                immobile.setFiltriFromJson(filtri);
+		            }
+
+		            // *** Recupero immagini da JSONB (array di stringhe Base64) ***
+		            String immaginiJson = rs.getString("immagini");
+		            if (immaginiJson != null && !immaginiJson.isEmpty()) {
+		                JSONArray jsonArray = new JSONArray(immaginiJson);
+		                List<byte[]> immaginiBytes = new ArrayList<>();
+		                for (int i = 0; i < jsonArray.length(); i++) {
+		                    String base64img = jsonArray.getString(i);
+		                    byte[] bytes = Base64.getDecoder().decode(base64img);
+		                    immaginiBytes.add(bytes);
+		                }
+		                immobile.setImmagini(immaginiBytes);
+		            } else {
+		                immobile.setImmagini(new ArrayList<>());
+		            }
+
+		            // Recupera prezzo specifico
+		            if (immobile instanceof ImmobileInAffitto) {
+		                String sqlPrezzoAffitto = "SELECT \"prezzoMensile\" FROM \"ImmobileinAffitto\" WHERE \"idImmobile\" = ?";
+		                try (PreparedStatement psPrezzo = connection.prepareStatement(sqlPrezzoAffitto)) {
+		                    psPrezzo.setLong(1, idimmobile);
+		                    ResultSet rsPrezzo = psPrezzo.executeQuery();
+		                    if (rsPrezzo.next()) {
+		                        ((ImmobileInAffitto) immobile).setPrezzoMensile(rsPrezzo.getDouble("prezzoMensile"));
+		                    }
+		                }
+		            } else if (immobile instanceof ImmobileInVendita) {
+		                String sqlPrezzoVendita = "SELECT \"prezzoTotale\" FROM \"ImmobileinVendita\" WHERE \"idImmobile\" = ?";
+		                try (PreparedStatement psPrezzo = connection.prepareStatement(sqlPrezzoVendita)) {
+		                    psPrezzo.setLong(1, idimmobile);
+		                    ResultSet rsPrezzo = psPrezzo.executeQuery();
+		                    if (rsPrezzo.next()) {
+		                        ((ImmobileInVendita) immobile).setPrezzoTotale(rsPrezzo.getDouble("prezzoTotale"));
+		                    }
+		                }
+		            }
+		        }
+		    }
+		    return immobile;
+		}
 
 
-	            // Recupera prezzo specifico
-	            if (immobile instanceof ImmobileInAffitto) {
-	                String sqlPrezzoAffitto = "SELECT \"prezzoMensile\" FROM \"ImmobileinAffitto\" WHERE \"idImmobile\" = ?";
-	                try (PreparedStatement psPrezzo = connection.prepareStatement(sqlPrezzoAffitto)) {
-	                    psPrezzo.setLong(1, idimmobile);
-	                    ResultSet rsPrezzo = psPrezzo.executeQuery();
-	                    if (rsPrezzo.next()) {
-	                        ((ImmobileInAffitto) immobile).setPrezzoMensile(rsPrezzo.getInt("prezzoMensile"));
-	                    }
-	                }
-	            } else if (immobile instanceof ImmobileInVendita) {
-	                String sqlPrezzoVendita = "SELECT \"prezzoTotale\" FROM \"ImmobileinVendita\" WHERE \"idImmobile\" = ?";
-	                try (PreparedStatement psPrezzo = connection.prepareStatement(sqlPrezzoVendita)) {
-	                    psPrezzo.setLong(1, idimmobile);
-	                    ResultSet rsPrezzo = psPrezzo.executeQuery();
-	                    if (rsPrezzo.next()) {
-	                        ((ImmobileInVendita) immobile).setPrezzoTotale(rsPrezzo.getInt("prezzoTotale"));
-	                    }
-	                }
-	            }
-	        }
-	    }
-	    return immobile;
 	}
 
+	 
+	 
+	
 
-}
+
