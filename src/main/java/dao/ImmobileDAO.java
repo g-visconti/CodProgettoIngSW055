@@ -1,4 +1,4 @@
-package DAO;
+package dao;
 
 import java.awt.Component;
 import java.sql.Connection;
@@ -220,7 +220,22 @@ public class ImmobileDAO {
 	        while (rs.next()) {
 	            ImmobileInVendita imm = new ImmobileInVendita();
 	            imm.setId(rs.getInt(1));
-	            imm.setImmagini(rs.getString(2));
+
+	            String immaginiJson = rs.getString(2);
+	            if (immaginiJson != null && !immaginiJson.isEmpty()) {
+	                JSONArray jsonArray = new JSONArray(immaginiJson);
+	                List<byte[]> immagini = new ArrayList<>();
+	                for (int i1 = 0; i1 < jsonArray.length(); i1++) {
+	                    String base64img = jsonArray.getString(i1);
+	                    byte[] imgBytes = Base64.getDecoder().decode(base64img);
+	                    immagini.add(imgBytes);
+	                }
+	                imm.setImmagini(immagini);
+	                if (!immagini.isEmpty()) {
+	                    imm.setIcon(jsonArray.getString(0));
+	                }
+	            }
+
 	            imm.setTitolo(rs.getString(3));
 	            imm.setDescrizione(rs.getString(4));
 	            imm.setPrezzoTotale(rs.getInt(5));
@@ -282,12 +297,28 @@ public class ImmobileDAO {
 	        while (rs.next()) {
 	            ImmobileInAffitto imm = new ImmobileInAffitto();
 	            imm.setId(rs.getInt(1));
-	            imm.setImmagini(rs.getString(2));
+
+	            String immaginiJson = rs.getString(2);
+	            if (immaginiJson != null && !immaginiJson.isEmpty()) {
+	                JSONArray jsonArray = new JSONArray(immaginiJson);
+	                List<byte[]> immagini = new ArrayList<>();
+	                for (int i1 = 0; i1 < jsonArray.length(); i1++) {
+	                    String base64img = jsonArray.getString(i1);
+	                    byte[] imgBytes = Base64.getDecoder().decode(base64img);
+	                    immagini.add(imgBytes);
+	                }
+	                imm.setImmagini(immagini);
+	                if (!immagini.isEmpty()) {
+	                    imm.setIcon(jsonArray.getString(0));
+	                }
+	            }
+
 	            imm.setTitolo(rs.getString(3));
 	            imm.setDescrizione(rs.getString(4));
 	            imm.setPrezzoMensile(rs.getInt(5));
 	            immobili.add(imm);
 	        }
+
 	        return immobili;
 	
 	    } catch (SQLException e) {
@@ -473,7 +504,7 @@ public class ImmobileDAO {
 		                    psPrezzo.setLong(1, idimmobile);
 		                    ResultSet rsPrezzo = psPrezzo.executeQuery();
 		                    if (rsPrezzo.next()) {
-		                        ((ImmobileInAffitto) immobile).setPrezzoMensile(rsPrezzo.getDouble("prezzoMensile"));
+		                        ((ImmobileInAffitto) immobile).setPrezzoMensile(rsPrezzo.getInt("prezzoMensile"));
 		                    }
 		                }
 		            } else if (immobile instanceof ImmobileInVendita) {
@@ -482,7 +513,7 @@ public class ImmobileDAO {
 		                    psPrezzo.setLong(1, idimmobile);
 		                    ResultSet rsPrezzo = psPrezzo.executeQuery();
 		                    if (rsPrezzo.next()) {
-		                        ((ImmobileInVendita) immobile).setPrezzoTotale(rsPrezzo.getDouble("prezzoTotale"));
+		                        ((ImmobileInVendita) immobile).setPrezzoTotale(rsPrezzo.getInt("prezzoTotale"));
 		                    }
 		                }
 		            }
