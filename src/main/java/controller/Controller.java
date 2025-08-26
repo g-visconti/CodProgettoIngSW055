@@ -3,6 +3,7 @@ package controller;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.text.NumberFormat;
+import java.util.Base64;
 import java.util.Locale;
 
 import javax.swing.ImageIcon;
@@ -234,8 +235,9 @@ public class Controller {
 
     	        if (tipologia.equals("Affitto")) {
     	            for (ImmobileInAffitto imm : immobileDAO.getImmobiliAffitto(campoPieno, filtri)) {
-    	            ImageIcon immagine = ImageUtils.decodeToIcon(imm.getImmagini(), 60, 60);
-    	            
+    	            ImageIcon immagine = ImageUtils.decodeToIcon(imm.getIcon(), 60, 60);
+    	           
+    	   	            
     	                model.addRow(new Object[] {
     	                    imm.getId(),
     	                    immagine,
@@ -246,7 +248,11 @@ public class Controller {
     	            }
     	        } else if (tipologia.equals("Vendita")) {
     	            for (ImmobileInVendita imm : immobileDAO.getImmobiliVendita(campoPieno, filtri)) {
-    	            ImageIcon immagine = ImageUtils.decodeToIcon(imm.getImmagini(), 60, 60);
+    	            ImageIcon immagine = ImageUtils.decodeToIcon(imm.getIcon(), 60, 60);
+    	            
+    	            
+    	            
+    	            
     	            
     	                model.addRow(new Object[] {
     	                    imm.getId(),
@@ -267,7 +273,7 @@ public class Controller {
     	        columnModel.getColumn(0).setMaxWidth(0);
     	        columnModel.getColumn(0).setWidth(0);
     	        columnModel.getColumn(0).setPreferredWidth(0);
-    	        columnModel.getColumn(1).setPreferredWidth(75);
+    	        columnModel.getColumn(1).setPreferredWidth(150);
     	        columnModel.getColumn(2).setPreferredWidth(170);
     	        columnModel.getColumn(3).setPreferredWidth(450);
     	        columnModel.getColumn(4).setPreferredWidth(75);
@@ -280,9 +286,14 @@ public class Controller {
 
     	        tableRisultati.setRowHeight(100);
     	        
+    	        
+    	        
     	        // Imposto il render nella tabella, sulla colonna delle immagini 
     	        TableUtils.setImageRenderer(tableRisultati, 1);
+    	        
     	        return model.getRowCount();
+    	        
+    	      
 
     	    } catch (SQLException e) {
     	        e.printStackTrace();
