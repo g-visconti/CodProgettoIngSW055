@@ -1,5 +1,7 @@
 package model;
 
+import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 import org.json.JSONObject;
@@ -43,15 +45,37 @@ public class Immobile {
 	        // costruttore vuoto necessario per l’ereditarietà e per creare oggetti senza parametri
 	    }
 	    
+	    public void setImmagini(List<byte[]> immagini) {
+	        this.foto = immagini;
+	    }
 
 	    public List<byte[]> getImmagini() {
 	        return foto;
 	    }
 
-	    public void setImmagini(List<byte[]> immagini) {
-	        this.foto = immagini;
+	    // l'icona è la prima immagine della lista, codificata in base64
+	    public String getIcon() {
+	        if (foto != null && !foto.isEmpty()) {
+	            byte[] img = foto.get(0);
+	            System.out.println("Lunghezza immagine: " + img.length);
+	            if (img.length < 100) {
+	                System.out.println("⚠️ Attenzione: immagine troppo piccola, probabilmente non valida.");
+	            }
+	            return Base64.getEncoder().encodeToString(img);
+	        }
+	        return null;
 	    }
-	    
+
+
+	    // imposta direttamente l'icona come prima immagine,
+	    // sovrascrivendo la lista con una sola immagine decodificata da base64
+	    public void setIcon(String base64) {
+	        if (base64 != null && !base64.isEmpty()) {
+	            byte[] imageBytes = Base64.getDecoder().decode(base64);
+	            foto = new ArrayList<>();
+	            foto.add(imageBytes);
+	        }
+	    }
 	    
 		public String getTitolo() {
 			return titolo;
