@@ -474,7 +474,9 @@ public class ViewAccesso extends JFrame {
                 emailtest= account.getEmail();
                 Controller con = new Controller();
                 con.registraNuovoUtente(emailtest, token);
-	            new ViewDashboard(emailtest).setVisible(true);
+                ViewDashboard viewDashboard = new ViewDashboard(emailtest);
+	            viewDashboard.setVisible(true);
+	            viewDashboard.setLocationRelativeTo(null);
 	        } else {
 	            JOptionPane.showMessageDialog(null, "Autenticazione fallita.");
 	        }
@@ -518,7 +520,9 @@ public class ViewAccesso extends JFrame {
 		                emailtest= account.getEmail();
 		                Controller con = new Controller();
 		                con.registraNuovoUtente(emailtest, authCode);
-			            new ViewDashboard(emailtest).setVisible(true);
+			            ViewDashboard viewDashboard = new ViewDashboard(emailtest);
+			            viewDashboard.setVisible(true);
+			            viewDashboard.setLocationRelativeTo(null);
 			        } else {
 			            JOptionPane.showMessageDialog(null, "Autenticazione fallita.");
 			        }
@@ -562,8 +566,9 @@ public class ViewAccesso extends JFrame {
 
 		            if (success) {
 		                // Se il login ha avuto successo, apri la dashboard
-		                ViewDashboard home = new ViewDashboard(emailtest);
-		                home.setVisible(true);
+		            	ViewDashboard viewDashboard = new ViewDashboard(emailtest);
+			            viewDashboard.setVisible(true);
+			            viewDashboard.setLocationRelativeTo(null);
 		            } else {
 		                JOptionPane.showMessageDialog(this, "Errore nell'autenticazione con GitHub.");
 		            }

@@ -431,7 +431,7 @@ public class ViewDashboardAdmin extends JFrame {
 		sl_ricerca.putConstraint(SpringLayout.WEST, btnEseguiRicerca, 17, SpringLayout.EAST, lblFiltri);
 		sl_ricerca.putConstraint(SpringLayout.NORTH, lblFiltri, 50, SpringLayout.SOUTH, lblEmailAccesso);
 		sl_ricerca.putConstraint(SpringLayout.SOUTH, lblFiltri, -70, SpringLayout.SOUTH, ricerca);
-		lblFiltri.setToolTipText("Clicca per impostare preferenze aggiuntive");
+		lblFiltri.setToolTipText("Clicca per impostare preferenze aggiuntive, poi esegui la ricerca");
 		
 		lblFiltri.addMouseListener(new MouseAdapter() {
 			@Override

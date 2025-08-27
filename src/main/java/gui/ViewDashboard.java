@@ -218,16 +218,18 @@ public class ViewDashboard extends JFrame {
 		});
 		
 		SpringLayout sl_ricerca = new SpringLayout();
+		sl_ricerca.putConstraint(SpringLayout.SOUTH, campoRicerca, -72, SpringLayout.SOUTH, ricerca);
 		sl_ricerca.putConstraint(SpringLayout.EAST, campoRicerca, -355, SpringLayout.EAST, ricerca);
 		sl_ricerca.putConstraint(SpringLayout.HORIZONTAL_CENTER, campoRicerca, 0, SpringLayout.HORIZONTAL_CENTER, ricerca);
 		sl_ricerca.putConstraint(SpringLayout.VERTICAL_CENTER, campoRicerca, 0, SpringLayout.VERTICAL_CENTER, ricerca);
 		ricerca.setLayout(sl_ricerca);
-				
+		
 		comboBoxAppartamento = new JComboBox<>(opAppartamento);
-		sl_ricerca.putConstraint(SpringLayout.WEST, comboBoxAppartamento, 248, SpringLayout.WEST, ricerca);
-		sl_ricerca.putConstraint(SpringLayout.EAST, comboBoxAppartamento, -23, SpringLayout.WEST, campoRicerca);
-		sl_ricerca.putConstraint(SpringLayout.SOUTH, campoRicerca, 0, SpringLayout.SOUTH, comboBoxAppartamento);
-		sl_ricerca.putConstraint(SpringLayout.SOUTH, comboBoxAppartamento, -70, SpringLayout.SOUTH, ricerca);
+		sl_ricerca.putConstraint(SpringLayout.WEST, comboBoxAppartamento, 253, SpringLayout.WEST, ricerca);
+		sl_ricerca.putConstraint(SpringLayout.EAST, comboBoxAppartamento, -18, SpringLayout.WEST, campoRicerca);
+		sl_ricerca.putConstraint(SpringLayout.NORTH, campoRicerca, 0, SpringLayout.NORTH, comboBoxAppartamento);
+		sl_ricerca.putConstraint(SpringLayout.NORTH, comboBoxAppartamento, 79, SpringLayout.NORTH, ricerca);
+		sl_ricerca.putConstraint(SpringLayout.SOUTH, comboBoxAppartamento, -79, SpringLayout.SOUTH, ricerca);
 		comboBoxAppartamento.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 11));
 		comboBoxAppartamento.setFocusable(false);
 		comboBoxAppartamento.setForeground(new Color(0, 0, 51));
@@ -236,57 +238,62 @@ public class ViewDashboard extends JFrame {
 		
 		ricerca.add(comboBoxAppartamento);
 		ricerca.add(campoRicerca);
-	
-		// Effettua la disconnessione
-		lblLogout = new JLabel();
-		lblLogout.addMouseListener(new MouseAdapter() {
-		    @Override
-		    public void mouseClicked(MouseEvent e) {
-		        // Mostra una finestra di conferma
-		        int scelta = JOptionPane.showConfirmDialog(null,"Sei sicuro di voler fare logout?","Conferma logout",JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE);
-
-		        // Se l'utente sceglie "Sì"
-		        if (scelta == JOptionPane.YES_OPTION) {
-		            try {
-		                // Chiusura della connessione al database
-		                ConnessioneDatabase.getInstance().closeConnection();
-		                // Successo
-		                JOptionPane.showMessageDialog(null,"Disconnessione avvenuta con successo","Avviso",JOptionPane.INFORMATION_MESSAGE);
-		            } catch (SQLException ex) {
-		                // Errore
-		                JOptionPane.showMessageDialog(null,"Errore durante la chiusura della connessione: " + ex.getMessage(),"Errore",JOptionPane.ERROR_MESSAGE);
-		                return; // esce dal metodo se c'è stato un errore
-		            }
-
-		            // Vado a ViewAccesso
-		            ViewAccesso viewAccesso = new ViewAccesso();
-		            viewAccesso.setLocationRelativeTo(null);
-		            viewAccesso.setVisible(true);
-
-		            // Chiudo la View attuale
-		            dispose();
-		        }
-		    }
-		});
-		lblLogout.setToolTipText("Clicca per uscire da DietiEstates25");
-		ricerca.add(lblLogout);
-		GuiUtils.setIconaLabel(lblLogout, "Logout");
 		
-		// Bottone per avviare la ricerca di un immobile
-		JButton btnEseguiRicerca = new JButton();
-		GuiUtils.setIconaButton(btnEseguiRicerca, "Search");
-		btnEseguiRicerca.setBorderPainted(false);
-		btnEseguiRicerca.setFocusPainted(false);
-		btnEseguiRicerca.setContentAreaFilled(false);
-		
-		sl_ricerca.putConstraint(SpringLayout.SOUTH, btnEseguiRicerca, -70, SpringLayout.SOUTH, ricerca);
-		sl_ricerca.putConstraint(SpringLayout.EAST, btnEseguiRicerca, -255, SpringLayout.EAST, ricerca);
-		
-		// Bottone predefinito alla pressione del tasto Enter
-		getRootPane().setDefaultButton(btnEseguiRicerca);
-		btnEseguiRicerca.setToolTipText("Clicca per iniziare una ricerca");
-		btnEseguiRicerca.setBorderPainted(false);
-        
+			// Effettua la disconnessione
+			lblLogout = new JLabel();
+			sl_ricerca.putConstraint(SpringLayout.NORTH, lblLogout, 13, SpringLayout.NORTH, ricerca);
+			sl_ricerca.putConstraint(SpringLayout.SOUTH, lblLogout, -145, SpringLayout.SOUTH, ricerca);
+			sl_ricerca.putConstraint(SpringLayout.EAST, lblLogout, -10, SpringLayout.EAST, ricerca);
+			lblLogout.addMouseListener(new MouseAdapter() {
+			    @Override
+			    public void mouseClicked(MouseEvent e) {
+			        // Mostra una finestra di conferma
+			        int scelta = JOptionPane.showConfirmDialog(null,"Sei sicuro di voler fare logout?","Conferma logout",JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE);
+
+			        // Se l'utente sceglie "Sì"
+			        if (scelta == JOptionPane.YES_OPTION) {
+			            try {
+			                // Chiusura della connessione al database
+			                ConnessioneDatabase.getInstance().closeConnection();
+			                // Successo
+			                JOptionPane.showMessageDialog(null,"Disconnessione avvenuta con successo","Avviso",JOptionPane.INFORMATION_MESSAGE);
+			            } catch (SQLException ex) {
+			                // Errore
+			                JOptionPane.showMessageDialog(null,"Errore durante la chiusura della connessione: " + ex.getMessage(),"Errore",JOptionPane.ERROR_MESSAGE);
+			                return; // esce dal metodo se c'è stato un errore
+			            }
+
+			            // Vado a ViewAccesso
+			            ViewAccesso viewAccesso = new ViewAccesso();
+			            viewAccesso.setLocationRelativeTo(null);
+			            viewAccesso.setVisible(true);
+
+			            // Chiudo la View attuale
+			            dispose();
+			        }
+			    }
+			});
+			lblLogout.setToolTipText("Clicca per uscire da DietiEstates25");
+			ricerca.add(lblLogout);
+			GuiUtils.setIconaLabel(lblLogout, "Logout");
+			
+			// Bottone per avviare la ricerca di un immobile
+			JButton btnEseguiRicerca = new JButton();
+			sl_ricerca.putConstraint(SpringLayout.WEST, lblLogout, 215, SpringLayout.EAST, btnEseguiRicerca);
+			sl_ricerca.putConstraint(SpringLayout.NORTH, btnEseguiRicerca, 0, SpringLayout.NORTH, comboBoxAppartamento);
+			
+			sl_ricerca.putConstraint(SpringLayout.SOUTH, btnEseguiRicerca, 0, SpringLayout.SOUTH, comboBoxAppartamento);
+			sl_ricerca.putConstraint(SpringLayout.EAST, btnEseguiRicerca, -255, SpringLayout.EAST, ricerca);
+			GuiUtils.setIconaButton(btnEseguiRicerca, "Search");
+			btnEseguiRicerca.setBorderPainted(false);
+			btnEseguiRicerca.setFocusPainted(false);
+			btnEseguiRicerca.setContentAreaFilled(false);
+			
+			// Bottone predefinito alla pressione del tasto Enter
+			getRootPane().setDefaultButton(btnEseguiRicerca);
+			btnEseguiRicerca.setToolTipText("Clicca per iniziare una ricerca");
+			btnEseguiRicerca.setBorderPainted(false);
+			
 		
 		btnEseguiRicerca.addActionListener(new ActionListener() {
 		    @Override
@@ -298,11 +305,10 @@ public class ViewDashboard extends JFrame {
 		ricerca.add(btnEseguiRicerca);
 		
 		
-		JLabel lblUser = new JLabel("");
-		sl_ricerca.putConstraint(SpringLayout.SOUTH, lblLogout, 0, SpringLayout.SOUTH, lblUser);
-		sl_ricerca.putConstraint(SpringLayout.NORTH, lblUser, 8, SpringLayout.NORTH, ricerca);
-		sl_ricerca.putConstraint(SpringLayout.NORTH, lblLogout, 0, SpringLayout.NORTH, lblUser);
-		sl_ricerca.putConstraint(SpringLayout.WEST, lblLogout, 11, SpringLayout.EAST, lblUser);
+		JLabel lblUser = new JLabel();
+		sl_ricerca.putConstraint(SpringLayout.NORTH, lblUser, 0, SpringLayout.NORTH, lblLogout);
+		sl_ricerca.putConstraint(SpringLayout.SOUTH, lblUser, -145, SpringLayout.SOUTH, ricerca);
+		sl_ricerca.putConstraint(SpringLayout.EAST, lblUser, -49, SpringLayout.EAST, lblLogout);
 		lblUser.setToolTipText("Clicca per vedere altre ozioni sul profilo");
 		ricerca.add(lblUser);
 		
@@ -345,7 +351,7 @@ public class ViewDashboard extends JFrame {
 				viewModificaPassword.setVisible(true);
 			}
 		});
-
+        
         // Evento per mostrare il menù al clic sull'immagine
         lblUser.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mousePressed(java.awt.event.MouseEvent evt) {
@@ -354,111 +360,62 @@ public class ViewDashboard extends JFrame {
                 }
             }
         });
-		
+		        
         GuiUtils.setIconaLabel(lblUser, "User");
-		
-		JLabel lblTitolo = new JLabel("DietiEstates25");
-		sl_ricerca.putConstraint(SpringLayout.NORTH, lblTitolo, 0, SpringLayout.NORTH, ricerca);
-		sl_ricerca.putConstraint(SpringLayout.WEST, lblTitolo, 10, SpringLayout.WEST, ricerca);
-		sl_ricerca.putConstraint(SpringLayout.SOUTH, lblTitolo, -145, SpringLayout.SOUTH, ricerca);
-		sl_ricerca.putConstraint(SpringLayout.EAST, lblTitolo, -1008, SpringLayout.EAST, ricerca);
-		lblTitolo.setForeground(new Color(27, 99, 142));
-		lblTitolo.setHorizontalAlignment(SwingConstants.LEFT);
-		lblTitolo.setFont(new Font("Tahoma", Font.BOLD, 30));
-		ricerca.add(lblTitolo);
-		
-		JLabel lblBenvenuto = new JLabel("Accesso effettuato con:");
-		sl_ricerca.putConstraint(SpringLayout.NORTH, lblBenvenuto, 11, SpringLayout.NORTH, ricerca);
-		sl_ricerca.putConstraint(SpringLayout.WEST, lblBenvenuto, 601, SpringLayout.EAST, lblTitolo);
-		lblBenvenuto.setHorizontalAlignment(SwingConstants.RIGHT);
-		lblBenvenuto.setVerticalAlignment(SwingConstants.TOP);
-		ricerca.add(lblBenvenuto);
-		
-		JLabel lblEmailAccesso = new JLabel("<email>");
-		sl_ricerca.putConstraint(SpringLayout.NORTH, btnEseguiRicerca, 50, SpringLayout.SOUTH, lblEmailAccesso);
-		sl_ricerca.putConstraint(SpringLayout.NORTH, campoRicerca, 50, SpringLayout.SOUTH, lblEmailAccesso);
-		sl_ricerca.putConstraint(SpringLayout.NORTH, comboBoxAppartamento, 50, SpringLayout.SOUTH, lblEmailAccesso);
-		sl_ricerca.putConstraint(SpringLayout.NORTH, lblEmailAccesso, 1, SpringLayout.SOUTH, lblBenvenuto);
-		sl_ricerca.putConstraint(SpringLayout.WEST, lblEmailAccesso, 532, SpringLayout.EAST, lblTitolo);
-		sl_ricerca.putConstraint(SpringLayout.SOUTH, lblEmailAccesso, 0, SpringLayout.SOUTH, lblLogout);
-		sl_ricerca.putConstraint(SpringLayout.EAST, lblEmailAccesso, 0, SpringLayout.EAST, lblBenvenuto);
-		lblEmailAccesso.setHorizontalAlignment(SwingConstants.RIGHT);
-		lblEmailAccesso.setText(emailInserita+" ");
-		lblEmailAccesso.setFont(new Font("Yu Gothic UI Semibold", Font.ITALIC, 11));
-		ricerca.add(lblEmailAccesso);
-		
-		// filtri
-		JLabel lblFiltri = new JLabel();
-		sl_ricerca.putConstraint(SpringLayout.WEST, lblFiltri, 23, SpringLayout.EAST, campoRicerca);
-		sl_ricerca.putConstraint(SpringLayout.EAST, lblFiltri, -302, SpringLayout.EAST, ricerca);
-		sl_ricerca.putConstraint(SpringLayout.WEST, btnEseguiRicerca, 17, SpringLayout.EAST, lblFiltri);
-		sl_ricerca.putConstraint(SpringLayout.NORTH, lblFiltri, 50, SpringLayout.SOUTH, lblEmailAccesso);
-		sl_ricerca.putConstraint(SpringLayout.SOUTH, lblFiltri, -70, SpringLayout.SOUTH, ricerca);
-		lblFiltri.setToolTipText("Clicca per impostare preferenze aggiuntive");
-		
-		lblFiltri.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				String tipologiaAppartamento = (String) comboBoxAppartamento.getSelectedItem();	
-				viewFiltri = new ViewFiltri(tipologiaAppartamento);
-				viewFiltri.setLocationRelativeTo(null);
-				viewFiltri.setVisible(true);
-
-			}
-		});
-		ricerca.add(lblFiltri);
-		
-		GuiUtils.setIconaLabel(lblFiltri, "Tune");
-		
-		// Aggiungi un nuovo agente o amministratore
-		// Creazione del menù a tendina per le opzioni di amministrazione
-        JPopupMenu menuAggiungiUtente = new JPopupMenu();
-        JMenuItem amministratoreDiSupporto = new JMenuItem("Aggiungi un nuovo amministratore di supporto");
-        JMenuItem agente = new JMenuItem("Aggiungi un nuovo agente immobiliare");//---------------------------------------------------------------------------------------------------
-
-        menuAggiungiUtente.add(amministratoreDiSupporto);
-        menuAggiungiUtente.add(agente);
         
-        amministratoreDiSupporto.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// nuovo help admin
-				// ...................................................................
-				JOptionPane.showMessageDialog(null, "Qui aggiungi un amministratore di supporto", "Avviso", JOptionPane.INFORMATION_MESSAGE);
-				
-			}
-		});
+        JLabel lblTitolo = new JLabel("DietiEstates25");
+        sl_ricerca.putConstraint(SpringLayout.SOUTH, lblUser, 0, SpringLayout.SOUTH, lblTitolo);
+        sl_ricerca.putConstraint(SpringLayout.NORTH, lblTitolo, 0, SpringLayout.NORTH, ricerca);
+        sl_ricerca.putConstraint(SpringLayout.WEST, lblTitolo, 10, SpringLayout.WEST, ricerca);
+        sl_ricerca.putConstraint(SpringLayout.SOUTH, lblTitolo, -145, SpringLayout.SOUTH, ricerca);
+        sl_ricerca.putConstraint(SpringLayout.EAST, lblTitolo, -1008, SpringLayout.EAST, ricerca);
+        lblTitolo.setForeground(new Color(27, 99, 142));
+        lblTitolo.setHorizontalAlignment(SwingConstants.LEFT);
+        lblTitolo.setFont(new Font("Tahoma", Font.BOLD, 30));
+        ricerca.add(lblTitolo);
         
-        agente.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// nuovo agente
-				// ...................................................................
-				
-			}
-		});
+        JLabel lblBenvenuto = new JLabel("Accesso effettuato con:");
+        sl_ricerca.putConstraint(SpringLayout.NORTH, lblBenvenuto, 0, SpringLayout.NORTH, lblLogout);
+        sl_ricerca.putConstraint(SpringLayout.WEST, lblBenvenuto, 739, SpringLayout.EAST, lblTitolo);
+        sl_ricerca.putConstraint(SpringLayout.EAST, lblBenvenuto, -27, SpringLayout.WEST, lblUser);
+        lblBenvenuto.setHorizontalAlignment(SwingConstants.RIGHT);
+        lblBenvenuto.setVerticalAlignment(SwingConstants.TOP);
+        ricerca.add(lblBenvenuto);
+        
+        JLabel lblEmailAccesso = new JLabel("<email>");
+        sl_ricerca.putConstraint(SpringLayout.WEST, lblEmailAccesso, 685, SpringLayout.EAST, lblTitolo);
+        sl_ricerca.putConstraint(SpringLayout.SOUTH, lblEmailAccesso, 0, SpringLayout.SOUTH, lblLogout);
+        sl_ricerca.putConstraint(SpringLayout.EAST, lblEmailAccesso, 0, SpringLayout.EAST, lblBenvenuto);
+        lblEmailAccesso.setHorizontalAlignment(SwingConstants.RIGHT);
+        lblEmailAccesso.setText(emailInserita+" ");
+        lblEmailAccesso.setFont(new Font("Yu Gothic UI Semibold", Font.ITALIC, 11));
+        ricerca.add(lblEmailAccesso);
+        
+        // filtri
+        JLabel lblFiltri = new JLabel();
+        sl_ricerca.putConstraint(SpringLayout.WEST, btnEseguiRicerca, 17, SpringLayout.EAST, lblFiltri);
+        sl_ricerca.putConstraint(SpringLayout.NORTH, lblFiltri, 79, SpringLayout.NORTH, ricerca);
+        sl_ricerca.putConstraint(SpringLayout.SOUTH, lblFiltri, -79, SpringLayout.SOUTH, ricerca);
+        sl_ricerca.putConstraint(SpringLayout.WEST, lblFiltri, 23, SpringLayout.EAST, campoRicerca);
+        sl_ricerca.putConstraint(SpringLayout.EAST, lblFiltri, -302, SpringLayout.EAST, ricerca);
+        lblFiltri.setToolTipText("Clicca per impostare preferenze aggiuntive, poi esegui la ricerca");
+        
+        lblFiltri.addMouseListener(new MouseAdapter() {
+        	@Override
+        	public void mouseClicked(MouseEvent e) {
+        		String tipologiaAppartamento = (String) comboBoxAppartamento.getSelectedItem();	
+        		viewFiltri = new ViewFiltri(tipologiaAppartamento);
+        		viewFiltri.setLocationRelativeTo(null);
+        		viewFiltri.setVisible(true);
 
-        
-		
-		JLabel lblAggiungiUtente = new JLabel();
-		sl_ricerca.putConstraint(SpringLayout.EAST, lblAggiungiUtente, -95, SpringLayout.EAST, ricerca);
-		sl_ricerca.putConstraint(SpringLayout.WEST, lblUser, 6, SpringLayout.EAST, lblAggiungiUtente);
-		sl_ricerca.putConstraint(SpringLayout.NORTH, lblAggiungiUtente, 11, SpringLayout.NORTH, ricerca);
-		sl_ricerca.putConstraint(SpringLayout.EAST, lblBenvenuto, -49, SpringLayout.WEST, lblAggiungiUtente);
-		
-		// Evento per mostrare il menù al clic sull'immagine
-		lblAggiungiUtente.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mousePressed(java.awt.event.MouseEvent evt) {
-                if (evt.getButton() == java.awt.event.MouseEvent.BUTTON1) {
-                	menuAggiungiUtente.show(lblAggiungiUtente, evt.getX(), evt.getY());
-                }
-            }
+        	}
         });
+        ricerca.add(lblFiltri);
+        
+        GuiUtils.setIconaLabel(lblFiltri, "Tune");
 		
-		lblAggiungiUtente.setToolTipText("Clicca per aggiungere una nuovo agente o amministratore di supporto");
-		ricerca.add(lblAggiungiUtente);
-
-		GuiUtils.setIconaLabel(lblAggiungiUtente, "AddUser");
+		
+		
 	}
 
 	
