@@ -142,6 +142,39 @@ public class ViewDashboard extends JFrame {
 		tableRisultati.getColumnModel().getColumn(2).setResizable(false);
 		tableRisultati.getColumnModel().getColumn(2).setPreferredWidth(450);
 		tableRisultati.getColumnModel().getColumn(3).setResizable(false);
+		
+		
+		
+		// Nel mouse listener
+					tableRisultati.addMouseListener(new MouseAdapter() {
+					    @Override
+					    public void mouseClicked(MouseEvent e) {
+					        if (e.getClickCount() == 1) {
+					            String idAccount = null;  // DICHIARAZIONE QUI
+
+					            try {
+					                Controller controller = new Controller();
+					                idAccount = controller.getIdSession(emailInserita); // ASSEGNAZIONE QUI
+					                System.out.println("ID account: " + idAccount);
+					            } catch (SQLException ex) {
+					                ex.printStackTrace();
+					            }
+
+					            int row = tableRisultati.rowAtPoint(e.getPoint());
+					            if (row >= 0) {
+					                long idImmobile = (Long) tableRisultati.getValueAt(row, 0);
+					                ViewImmobile finestra = new ViewImmobile(idImmobile, idAccount);
+					                finestra.setVisible(true);
+					            }
+					        }
+					    }
+
+					});
+
+		// blocco finito
+				
+		
+		
 		scrollPane.setViewportView(tableRisultati);
 		
 		lblRisultati = new JLabel("Avvia una ricerca per visualizzare i risultati");
