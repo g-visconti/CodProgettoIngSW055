@@ -332,7 +332,8 @@ public class ViewDashboardSupportoAmministratore2 extends JFrame {
 					JOptionPane.showMessageDialog(null, "Scrivere qualcosa prima di impostare i filtri!", "Attenzione", JOptionPane.INFORMATION_MESSAGE);
 				}
 				else {
-					ViewFiltri viewPreferenze = new ViewFiltri();
+					String tipologiaAppartamento = (String) comboBoxAppartamento.getSelectedItem();	
+					ViewFiltri viewPreferenze = new ViewFiltri(tipologiaAppartamento);
 					viewPreferenze.setLocationRelativeTo(null);
 					viewPreferenze.setVisible(true);
 				}

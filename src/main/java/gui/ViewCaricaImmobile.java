@@ -235,9 +235,9 @@ public class ViewCaricaImmobile extends JFrame {
 		                return;
 		            }
 
-		            double prezzo;
+		            int prezzo;
 		            try {
-		                prezzo = Double.parseDouble(prezzofield.getText().trim());
+		                prezzo = Integer.parseInt(prezzofield.getText().trim());
 		            } catch (NumberFormatException ex) {
 		                JOptionPane.showMessageDialog(null, "Inserisci un numero valido per il prezzo");
 		                return;

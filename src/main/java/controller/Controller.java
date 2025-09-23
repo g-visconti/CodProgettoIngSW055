@@ -15,10 +15,10 @@ import javax.swing.table.TableColumnModel;
 
 import org.mindrot.jbcrypt.BCrypt;
 
-import DAO.AccountDAO;
-import DAO.ClienteDAO;
-import DAO.ImmobileDAO;
-import DAO.OffertaDAO;
+import dao.AccountDAO;
+import dao.ClienteDAO;
+import dao.ImmobileDAO;
+import dao.OffertaDAO;
 import database.ConnessioneDatabase;
 import model.Account;
 import model.Cliente;
