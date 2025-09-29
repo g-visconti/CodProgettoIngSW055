@@ -197,7 +197,7 @@ public class ViewAccessoConPassword extends JFrame {
 				@SuppressWarnings("deprecation")
 				String passwordInserita = passwordField.getText();
 				try {
-					if(con.checkCredenziali(emailInserita,passwordInserita)) { 
+					if(con.checkCredenziali(emailInserita,passwordInserita)) {
 						/* DISTINGUO I 4 CASI D'USO DI ACCESSO PER
 						 * UTENTE
 						 * AGENTE
@@ -205,31 +205,39 @@ public class ViewAccessoConPassword extends JFrame {
 						 * ADMIN 
 						 * */
 						// Guardo com'è strutturato l'id associato alla email, uso un metodo nel controller
-						switch(con.emailToId(emailInserita)) {
-							case "ACC":
-								// mostro la dashboard per l'utente
-								ViewDashboard viewDashboard = new ViewDashboard(emailInserita);
-								viewDashboard.setLocationRelativeTo(null);
-								viewDashboard.setVisible(true);
-								dispose();
-								break;
-							case "AGE":
-								// mostro la dashboard per l'agente
-								
-								break;
-							case "HLP":
-								// mostro la dashboard per l'amministratore di supporto
-								
-								break;
-							case "ADM":
-								// mostro la dashboard per l'admin
-								ViewDashboardAdmin viewDashboardAdmin = new ViewDashboardAdmin(emailInserita);
-								viewDashboardAdmin.setLocationRelativeTo(null);
-								viewDashboardAdmin.setVisible(true);
-								dispose();
-								break;
-							default:
-								JOptionPane.showMessageDialog(null, "Nessun id associato", "Errore", JOptionPane.INFORMATION_MESSAGE);
+						String ruolo = con.getRuoloByEmail(emailInserita);
+
+						switch (ruolo) {
+						    case "Cliente":
+						        ViewDashboard viewDashboard = new ViewDashboard(emailInserita);
+						        viewDashboard.setLocationRelativeTo(null);
+						        viewDashboard.setVisible(true);
+						        dispose();
+						        break;
+
+						    case "Agente":
+						        ViewDashboardAdmin viewDashboardAgente = new ViewDashboardAdmin(emailInserita);
+						        viewDashboardAgente.setLocationRelativeTo(null);
+						        viewDashboardAgente.setVisible(true);
+						        dispose();
+						        break;
+
+						    case "Supporto":
+						        /*ViewDashboardSupporto viewDashboardSupporto = new ViewDashboardSupporto(emailInserita);
+						        viewDashboardSupporto.setLocationRelativeTo(null);
+						        viewDashboardSupporto.setVisible(true);
+						        dispose();*/
+						        break;
+
+						    case "Admin":
+						        ViewDashboardAdmin viewDashboardAdmin = new ViewDashboardAdmin(emailInserita);
+						        viewDashboardAdmin.setLocationRelativeTo(null);
+						        viewDashboardAdmin.setVisible(true);
+						        dispose();
+						        break;
+
+						    default:
+						        JOptionPane.showMessageDialog(null, "Ruolo non riconosciuto", "Errore", JOptionPane.INFORMATION_MESSAGE);
 						}
 					}
 					else {
