@@ -329,126 +329,107 @@ public class ImmobileDAO {
 	
 	// riempie la tabella con immobili in vendita ed affitto che hanno ricevuto un'offerta
 	public void riempiTableRisultatiDAO(JTable tableRisultati) {
-		String query = 
-				" SELECT " +
-				"'Vendita' AS \"Categoria\", " +
-			    "i.\"immagini\" AS \"Immagini\", " +   
-			    "i.\"titolo\" AS \"Titolo dell'annuncio\", " + 
-			    "i.\"descrizione\" AS \"Descrizione\", " +
-			    "v.\"prezzoTotale\" AS \"Prezzo (€)\", " +
-			    "i.\"idImmobile\" AS \"idOrdine\" " +
-			    " FROM \"Immobile\" i JOIN \"ImmobileinVendita\" v " +
-			    " ON i.\"idImmobile\" = v.\"idImmobile\" " +
-			    " UNION " +
-			    " SELECT " +
-				" 'Affitto' AS \"Categoria\", " +
-			    " i.\"immagini\" AS \"Immagini\", " +
-			    "i.\"titolo\" AS \"Titolo dell'annuncio\", " +
-			    " i.\"descrizione\" AS \"Descrizione\", " +
-			    " a.\"prezzoMensile\" AS \"Prezzo (€)\", " +
-			    " i.\"idImmobile\" AS \"idOrdine\" " +
-			    " FROM \"Immobile\" i JOIN \"ImmobileinAffitto\" a " +
-			    " ON i.\"idImmobile\" = a.\"idImmobile\" " +
-			    " ORDER BY " +
-			    " \"idOrdine\" DESC ";
-		try (PreparedStatement stmt = connection.prepareStatement(query)){
-			ResultSet rs = stmt.executeQuery();
-			
-			ResultSetMetaData metaData = rs.getMetaData();
-            int colonne = 5;
-
-            // Intestazioni della tabella
-            String[] nomiColonne = new String[colonne];
-            nomiColonne[0] = metaData.getColumnName(1);
-            nomiColonne[1] = metaData.getColumnName(2);
-            nomiColonne[2] = metaData.getColumnName(3);
-            nomiColonne[3] = metaData.getColumnName(4);
-            nomiColonne[4] = metaData.getColumnName(5);
-            
-            // Modello della tabella
-            @SuppressWarnings("serial")
-            DefaultTableModel model = new DefaultTableModel(nomiColonne, 0) {
-                @Override
-                public Class<?> getColumnClass(int columnIndex) {
-                    switch (columnIndex) {
-                        case 0: return String.class;       // Categoria
-                        case 1: return ImageIcon.class;    // Immagini
-                        case 2: return String.class;       // Tipologia
-                        case 3: return String.class;       // Descrizione
-                        case 4: return String.class;       // Prezzo
-                        case 5: return Integer.class;      // idOrdine
-                        default: return Object.class;
-                    }
-                };
-
-                @Override
-                public boolean isCellEditable(int row, int column) {
-                    return false;
-                }
-            };
-
-            NumberFormat format = NumberFormat.getNumberInstance(Locale.ITALY);
+	    String query = 
+	            " SELECT " +
+	            "'Vendita' AS \"Categoria\", " +
+	            "i.\"titolo\" AS \"Tipologia\", " +
+	            "v.\"prezzoTotale\" AS \"Prezzo (€)\", " +
+	            "i.\"idImmobile\" AS \"idOrdine\" " +
+	            " FROM \"Immobile\" i JOIN \"ImmobileinVendita\" v " +
+	            " ON i.\"idImmobile\" = v.\"idImmobile\" " +
+	            " UNION " +
+	            " SELECT " +
+	            " 'Affitto' AS \"Categoria\", " +
+	            " i.\"titolo\" AS \"Tipologia\", " +
+	            " a.\"prezzoMensile\" AS \"Prezzo (€)\", " +
+	            " i.\"idImmobile\" AS \"idOrdine\" " +
+	            " FROM \"Immobile\" i JOIN \"ImmobileinAffitto\" a " +
+	            " ON i.\"idImmobile\" = a.\"idImmobile\" " +
+	            " ORDER BY " +
+	            " \"idOrdine\" DESC ";
+	    
+	    try (PreparedStatement stmt = connection.prepareStatement(query)){
+	        ResultSet rs = stmt.executeQuery();
+	        
+	        ResultSetMetaData metaData = rs.getMetaData();
+	        int colonne = 3;
+	
+	        // Intestazioni della tabella
+	        String[] nomiColonne = new String[colonne];
+	        nomiColonne[0] = metaData.getColumnName(1);
+	        nomiColonne[1] = metaData.getColumnName(2);
+	        nomiColonne[2] = metaData.getColumnName(3);
+	        
+	        // Modello della tabella
+	        @SuppressWarnings("serial")
+	        DefaultTableModel model = new DefaultTableModel(nomiColonne, 0) {
+	            @Override
+	            public Class<?> getColumnClass(int columnIndex) {
+	                switch (columnIndex) {
+	                    case 0: return String.class;
+	                    case 1: return String.class;
+	                    case 2: return String.class;
+	                    default: return Object.class;
+	                }
+	            }
+	
+	            @Override
+	            public boolean isCellEditable(int row, int column) {
+	                return false;
+	            }
+	        };
+	
+	        NumberFormat format = NumberFormat.getNumberInstance(Locale.ITALY);
 	        format.setGroupingUsed(true);
 	        format.setMaximumFractionDigits(0);
 	        format.setMinimumFractionDigits(0);
-            
-            // Riempimento delle righe
-            while (rs.next()) {
-                Object[] riga = new Object[colonne];
-
-                riga[0] = rs.getObject(1);
-                riga[1] = rs.getObject(2);
-                riga[2] = rs.getObject(3);
-                riga[3] = rs.getObject(4);
-                riga[4] = "€ " + format.format(rs.getObject(5));
-                
-                
-                model.addRow(riga);
-            }
-
-            // Imposta il nuovo modello
-            tableRisultati.setModel(model);
-
-	        // Solo dopo imposta la larghezza delle colonne
-	        TableColumnModel columnModel = tableRisultati.getColumnModel();
-
-	        // Colonna 0: Categoria
-	        columnModel.getColumn(0).setPreferredWidth(75);
 	        
-	        // Colonna 1: Foto
-	        columnModel.getColumn(1).setPreferredWidth(75);
-
-	        // Colonna 2: Tipologia
-	        columnModel.getColumn(2).setPreferredWidth(170);
-
-	        // Colonna 3: Descrizione
-	        columnModel.getColumn(3).setPreferredWidth(450);
-
-	        // Colonna 4: Prezzo Totale
-	        columnModel.getColumn(4).setPreferredWidth(75);
-
+	        // Riempimento delle righe
+	        while (rs.next()) {
+	            Object[] riga = new Object[colonne];
+	
+	            riga[0] = rs.getObject(1);
+	            riga[1] = rs.getObject(2);
+	            riga[2] = "€ " + format.format(rs.getObject(3));
+	            
+	            model.addRow(riga);
+	        }
+	
+	        // Imposta il nuovo modello
+	        tableRisultati.setModel(model);
+	
+	        // Configurazione larghezze colonne - DIMENSIONI PIÙ STRETTE PER CATEGORIA E PREZZO
+	        TableColumnModel columnModel = tableRisultati.getColumnModel();
+	
+	        // Colonna 0: Categoria - DIMENSIONE RIDOTTA (80px invece di 200px)
+	        columnModel.getColumn(0).setPreferredWidth(80);
+	        columnModel.getColumn(0).setMinWidth(80);
+	        columnModel.getColumn(0).setMaxWidth(100); // Massimo leggermente superiore
+	        
+	        // Colonna 1: Tipologia - OCCUPA LO SPAZIO RESIDUO
+	        columnModel.getColumn(1).setPreferredWidth(500);
+	        
+	        // Colonna 2: Prezzo - DIMENSIONE RIDOTTA (100px invece di 150px)
+	        columnModel.getColumn(2).setPreferredWidth(100);
+	        columnModel.getColumn(2).setMinWidth(100);
+	        columnModel.getColumn(2).setMaxWidth(120); // Massimo leggermente superiore
+	
 	        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
 	        centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
-
-	        // Applica il renderer alla colonna desiderata (es. indice 0 = Categoria)
+	
+	        // Applica il renderer alla colonna Categoria
 	        tableRisultati.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
 	        
-	        // Applica il renderer alla colonna desiderata (es. indice 4 = Prezzo)
-	        tableRisultati.getColumnModel().getColumn(4).setCellRenderer(centerRenderer);
+	        // Applica il renderer alla colonna Prezzo
+	        tableRisultati.getColumnModel().getColumn(2).setCellRenderer(centerRenderer);
 	        
-	        // Applica renderer multilinea solo alla colonna Descrizione (indice 3)
-            columnModel.getColumn(3).setCellRenderer(new TextAreaRenderer());
-
-            // Altezza fissa sufficiente per vedere il contenuto
-            tableRisultati.setRowHeight(100);
+	        // Altezza righe ridotta
+	        tableRisultati.setRowHeight(50);
 	        
-		} catch (SQLException e) {
-            e.printStackTrace();
-        }
-		
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
 	}
-		
-	 
 	 public Immobile getImmobileById(long idimmobile) throws SQLException {
 		    String sqlBase = "SELECT * FROM \"Immobile\" WHERE \"idImmobile\" = ?";
 		    Immobile immobile = null;

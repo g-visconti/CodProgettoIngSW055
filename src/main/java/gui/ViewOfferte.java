@@ -56,7 +56,6 @@ public class ViewOfferte extends JFrame {
 		lblTitolo.setFont(new Font("Tahoma", Font.BOLD, 30));
 		panelComandi.add(lblTitolo);
 
-
 		JLabel lblDescrizione = new JLabel("Seleziona un immobile per visualizzare le offerte ricevute");
 		sl_panelComandi.putConstraint(SpringLayout.SOUTH, lblTitolo, -13, SpringLayout.NORTH, lblDescrizione);
 		sl_panelComandi.putConstraint(SpringLayout.NORTH, lblDescrizione, 97, SpringLayout.NORTH, panelComandi);
@@ -119,14 +118,14 @@ public class ViewOfferte extends JFrame {
 		scrollPane.setBackground(Color.WHITE);
 		panelRisultati.add(scrollPane);
 
-		// Crea il modello dati della tabella
+		// Crea il modello dati della tabella (rimosse colonne Immagini e Descrizione)
 		DefaultTableModel model = new DefaultTableModel(
 		    new Object[][]{},
-		    new String[] {"Categoria", "Immagini", "Tipologia", "Descrizione", "Prezzo (€)"}
+		    new String[] {"Categoria", "Tipologia", "Prezzo (€)"}  // Solo 3 colonne
 		) {
 		    private static final long serialVersionUID = 1L;
 		    Class<?>[] columnTypes = new Class[] {
-		        Object.class, String.class, String.class, String.class
+		        Object.class, String.class, String.class  // Aggiornato per 3 colonne
 		    };
 
 		    @Override
@@ -148,12 +147,21 @@ public class ViewOfferte extends JFrame {
 		tableRisultati.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		tableRisultati.setSelectionBackground(new Color(226, 226, 226));
 
-		// Configura larghezze colonne
-		int[] preferredWidths = {100, 100, 170, 450, 100};
+		// Configura larghezze colonne (aggiornate per 3 colonne)
+		int[] preferredWidths = {80, 500, 100}; // Dimensioni più strette per categoria e prezzo
 		for (int i = 0; i < preferredWidths.length; i++) {
 		    TableColumn col = tableRisultati.getColumnModel().getColumn(i);
 		    col.setPreferredWidth(preferredWidths[i]);
 		    col.setResizable(false);
+		    
+		    // Blocca le dimensioni per le colonne categoria e prezzo
+		    if (i == 0) { // Categoria
+		        col.setMinWidth(80);
+		        col.setMaxWidth(100);
+		    } else if (i == 2) { // Prezzo
+		        col.setMinWidth(100);
+		        col.setMaxWidth(120);
+		    }
 		}
 
 		// Inserisci la tabella nello scroll pane
@@ -162,6 +170,5 @@ public class ViewOfferte extends JFrame {
 		// Popola la tabella con i dati tramite il controller
 		Controller controller = new Controller();
 		controller.riempiTableRisultati(tableRisultati);
-
 	}
 }
