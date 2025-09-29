@@ -22,6 +22,7 @@ import java.util.prefs.Preferences;
 import java.awt.Component;
 import javax.swing.JComboBox;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.JLayeredPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
@@ -499,13 +500,23 @@ public class ViewDashboardAdmin extends JFrame {
 		});
         
         agente.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// nuovo agente
-				// ...................................................................
-				
-			}
-		});
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Apri la tua interfaccia di inserimento email
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                    	Controller con1 = new Controller();
+	                	String agenzia = con1.getAgenzia(emailInserita);
+                    	
+                        ViewInserimentoEmail view = new ViewInserimentoEmail(agenzia);
+                        view.setLocationRelativeTo(null); // centra la finestra
+                        view.setVisible(true);
+                    }
+                });
+            }
+        });
+
 
         
 		
