@@ -40,7 +40,7 @@ import java.awt.event.KeyEvent;
 import javax.swing.SpringLayout;
 
 
-public class ViewDashboardAdmin extends JFrame {
+public class ViewDashboardSupporto extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	private JTextField campoRicerca;
@@ -56,10 +56,10 @@ public class ViewDashboardAdmin extends JFrame {
 	/**
 	 * Create the frame ViewDashboardAdmin.
 	 */
-	public ViewDashboardAdmin(String emailInserita) {
+	public ViewDashboardSupporto(String emailInserita) {
 		// Imposta l'icona di DietiEstates25 alla finestra in uso
 		GuiUtils.setIconaFinestra(this);
-		setTitle("DietiEstates25 - Dashboard per l'amministratore di agenzia");
+		setTitle("DietiEstates25 - Dashboard per l'amministratore di supporto");
 		
 		setResizable(true);
 		Preferences.userNodeForPackage(ViewFiltri.class);
@@ -483,33 +483,13 @@ public class ViewDashboardAdmin extends JFrame {
 		// Aggiungi un nuovo agente o amministratore
 		// Creazione del menù a tendina per le opzioni di amministrazione
         JPopupMenu menuAggiungiUtente = new JPopupMenu();
-        JMenuItem amministratoreDiSupporto = new JMenuItem("Aggiungi un nuovo amministratore di supporto");
+      
         JMenuItem agente = new JMenuItem("Aggiungi un nuovo agente immobiliare");//---------------------------------------------------------------------------------------------------
 
-        menuAggiungiUtente.add(amministratoreDiSupporto);
+        
         menuAggiungiUtente.add(agente);
         
-        amministratoreDiSupporto.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// nuovo help admin
-				// ...................................................................
-				JOptionPane.showMessageDialog(null, "Qui aggiungi un amministratore di supporto", "Avviso", JOptionPane.INFORMATION_MESSAGE);
-				
-				 SwingUtilities.invokeLater(new Runnable() {
-	                    @Override
-	                    public void run() {
-	                    	Controller con2 = new Controller();
-		                	String agenzia = con2.getAgenzia(emailInserita);
-	                    	
-	                        ViewInserimentoEmail view = new ViewInserimentoEmail(agenzia);
-	                        view.setLocationRelativeTo(null); // centra la finestra
-	                        view.setVisible(true);
-	                    }
-	                });
-				
-			}
-		});
+       
         
         agente.addActionListener(new ActionListener() {
             @Override

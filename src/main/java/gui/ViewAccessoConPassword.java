@@ -216,17 +216,19 @@ public class ViewAccessoConPassword extends JFrame {
 						        break;
 
 						    case "Agente":
-						        ViewDashboardAdmin viewDashboardAgente = new ViewDashboardAdmin(emailInserita);
+						        ViewDashboardAgente viewDashboardAgente = new ViewDashboardAgente(emailInserita);
 						        viewDashboardAgente.setLocationRelativeTo(null);
 						        viewDashboardAgente.setVisible(true);
 						        dispose();
 						        break;
 
 						    case "Supporto":
-						        /*ViewDashboardSupporto viewDashboardSupporto = new ViewDashboardSupporto(emailInserita);
+						        
+						        
+						        ViewDashboardSupporto viewDashboardSupporto = new ViewDashboardSupporto(emailInserita);
 						        viewDashboardSupporto.setLocationRelativeTo(null);
 						        viewDashboardSupporto.setVisible(true);
-						        dispose();*/
+						        dispose();
 						        break;
 
 						    case "Admin":

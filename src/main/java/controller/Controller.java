@@ -18,12 +18,14 @@ import org.mindrot.jbcrypt.BCrypt;
 import dao.AccountDAO;
 import dao.AgenteImmobiliareDAO;
 import dao.AmministratoreDAO;
+import dao.AmministratoreDiSupportoDAO;
 import dao.ClienteDAO;
 import dao.ImmobileDAO;
 import dao.OffertaDAO;
 import database.ConnessioneDatabase;
 import model.Account;
 import model.AgenteImmobiliare;
+import model.AmministratoreDiSupporto;
 import model.Cliente;
 import model.Filtri;
 import model.Immobile;
@@ -104,6 +106,37 @@ public class Controller {
 	}
 	
 	//Registrazione di un Agente
+	
+	public void registraNuovoSupporto(String email, String password, String nome, String cognome,
+            String citta, String telefono, String cap, String indirizzo, 
+            String ruolo, String agenzia) {
+		
+		try {
+			Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
+			AccountDAO accountDAO = new AccountDAO(connAWS);
+			AmministratoreDiSupportoDAO supportoDAO = new AmministratoreDiSupportoDAO(connAWS);
+
+			if (accountDAO.emailEsiste(email)) {
+				System.out.println("Email già registrata.");
+					return;
+			}
+
+			String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
+			AmministratoreDiSupporto nuovosupporto = new AmministratoreDiSupporto(email, hashedPassword, nome, cognome,
+                                          citta, telefono, cap, indirizzo, ruolo, agenzia);
+
+			String idGenerato = accountDAO.insertAccount(nuovosupporto);
+			nuovosupporto.setIdSupporto(idGenerato);
+			supportoDAO.insertSupporto(nuovosupporto);
+
+			System.out.println("Agente registrato con successo!");
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	
 
 	public void registraNuovoAgente(String email, String password, String nome, String cognome,
 	                                String citta, String telefono, String cap, String indirizzo, 

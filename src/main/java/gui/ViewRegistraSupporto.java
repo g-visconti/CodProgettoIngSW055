@@ -30,7 +30,7 @@ import java.awt.SystemColor;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 
-public class ViewRegistraAgente extends JFrame {
+public class ViewRegistraSupporto extends JFrame {
 
 	private JPanel contentPane;
 	private JTextField Nome_Utente;
@@ -48,14 +48,14 @@ public class ViewRegistraAgente extends JFrame {
 	private JLabel lblTelefonoError;
 	private JLabel lblCapError;
 	private JLabel lblIndirizzoError;
-	private String ruolo="Agente";
+	private String ruolo="Supporto";
 
 	
 	/**
 	 * Create the frame.
 	 */
 	
-	public ViewRegistraAgente(String Email_Utente, String agenzia) {
+	public ViewRegistraSupporto(String Email_Utente, String agenzia) {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 459, 618);
 		contentPane = new JPanel();
@@ -282,9 +282,9 @@ public class ViewRegistraAgente extends JFrame {
 
 				 if (success) {
 			            Controller cont1= new Controller();
-			            cont1.registraNuovoAgente(Email_Utente, passwordUtente, nome, cognome, citta, telefono,cap,indirizzo, ruolo, agenzia);
+			            cont1.registraNuovoSupporto(Email_Utente, passwordUtente, nome, cognome, citta, telefono,cap,indirizzo, ruolo, agenzia);
 			           
-			            dispose();
+			           dispose();
 			        } else {
 			        	
 			        	JOptionPane.showMessageDialog(null, "La registrazione � fallita. Riprova con i dati corretti.", 
