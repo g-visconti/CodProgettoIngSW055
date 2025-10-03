@@ -135,6 +135,12 @@ public class ViewDashboardSupporto extends JFrame {
 		};
 
 		// Assegna il modello alla tabella
+		// Blocca l'ordinamento/riposizionamento delle colonne
+		tableRisultati.getTableHeader().setReorderingAllowed(false);
+
+		// Blocca il ridimensionamento delle colonne
+		tableRisultati.getTableHeader().setResizingAllowed(false);
+
 		tableRisultati.setModel(model);
 
 		tableRisultati.getColumnModel().getColumn(0).setResizable(false);
@@ -192,7 +198,7 @@ public class ViewDashboardSupporto extends JFrame {
         btnCaricaImmobile.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                ViewCaricaImmobile viewCaricaImmobile = new ViewCaricaImmobile();
+                ViewCaricaImmobile viewCaricaImmobile = new ViewCaricaImmobile(emailInserita);
                 viewCaricaImmobile.setLocationRelativeTo(null);
                 viewCaricaImmobile.setVisible(true);
             	}
@@ -205,6 +211,7 @@ public class ViewDashboardSupporto extends JFrame {
 		
 		// Vedi Offerte Proposte
 		JButton btnVediOfferteProposte = new JButton("Vedi offerte proposte");
+		btnVediOfferteProposte.setFocusable(false);
 		sl_risultatiDaRicerca.putConstraint(SpringLayout.NORTH, btnVediOfferteProposte, 8, SpringLayout.NORTH, lblRisultati);
 		sl_risultatiDaRicerca.putConstraint(SpringLayout.EAST, btnVediOfferteProposte, -18, SpringLayout.WEST, btnCaricaImmobile);
 		btnVediOfferteProposte.addActionListener(new ActionListener() {
@@ -501,7 +508,7 @@ public class ViewDashboardSupporto extends JFrame {
                     	Controller con1 = new Controller();
 	                	String agenzia = con1.getAgenzia(emailInserita);
                     	
-                        ViewInserimentoEmail view = new ViewInserimentoEmail(agenzia);
+                        ViewInserimentoEmail view = new ViewInserimentoEmail(agenzia, ViewInserimentoEmail.TipoInserimento.AGENTE);
                         view.setLocationRelativeTo(null); // centra la finestra
                         view.setVisible(true);
                     }

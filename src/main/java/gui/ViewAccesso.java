@@ -1,4 +1,4 @@
-package gui;
+ package gui;
 
 import java.awt.Color;
 import java.awt.Cursor;
@@ -448,7 +448,7 @@ public class ViewAccesso extends JFrame {
 	        
 	    	String facebookLoginUrl = "https://www.facebook.com/v11.0/dialog/oauth?"
 	    	        + "client_id=1445081039790531"
-	    	        + "&redirect_uri=https://manxxle.github.io/fb-callback-redirect/callbackfb"
+	    	        + "&redirect_uri=https://manubxx.github.io/fb-callback-redirect/callbackfb"
 	    	        + "&scope=email,public_profile"
 	    	        + "&response_type=token";
 
@@ -492,7 +492,7 @@ public class ViewAccesso extends JFrame {
         try {
             String googleLoginUrl = "https://accounts.google.com/o/oauth2/v2/auth?"
                     + "client_id=1099039266131-kt4al5u1r4ldd4q64h9euh3a9pjpeu98.apps.googleusercontent.com"
-                    + "&redirect_uri=https://manxxle.github.io/google-callback-redirect/callbackgoogle"
+                    + "&redirect_uri=https://manubxx.github.io/google-callback-redirect/callbackgoogle"
                     + "&response_type=token"
                     + "&scope=openid%20profile%20email";
 

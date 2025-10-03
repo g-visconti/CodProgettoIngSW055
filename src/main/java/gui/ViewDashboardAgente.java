@@ -20,6 +20,8 @@ import java.awt.event.MouseEvent;
 import java.sql.SQLException;
 import java.util.prefs.Preferences;
 import java.awt.Component;
+import java.awt.Dimension;
+
 import javax.swing.JComboBox;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
@@ -59,7 +61,7 @@ public class ViewDashboardAgente extends JFrame {
 	public ViewDashboardAgente(String emailInserita) {
 		// Imposta l'icona di DietiEstates25 alla finestra in uso
 		GuiUtils.setIconaFinestra(this);
-		setTitle("DietiEstates25 - Dashboard per l'Agente Immobiliare");
+		setTitle("DietiEstates25 - Dashboard per l'Agente immobiliare");
 		
 		setResizable(true);
 		Preferences.userNodeForPackage(ViewFiltri.class);
@@ -135,6 +137,12 @@ public class ViewDashboardAgente extends JFrame {
 		};
 
 		// Assegna il modello alla tabella
+		// Blocca l'ordinamento/riposizionamento delle colonne
+		tableRisultati.getTableHeader().setReorderingAllowed(false);
+
+		// Blocca il ridimensionamento delle colonne
+		tableRisultati.getTableHeader().setResizingAllowed(false);
+
 		tableRisultati.setModel(model);
 
 		tableRisultati.getColumnModel().getColumn(0).setResizable(false);
@@ -192,7 +200,7 @@ public class ViewDashboardAgente extends JFrame {
         btnCaricaImmobile.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                ViewCaricaImmobile viewCaricaImmobile = new ViewCaricaImmobile();
+                ViewCaricaImmobile viewCaricaImmobile = new ViewCaricaImmobile(emailInserita);
                 viewCaricaImmobile.setLocationRelativeTo(null);
                 viewCaricaImmobile.setVisible(true);
             	}
@@ -205,6 +213,7 @@ public class ViewDashboardAgente extends JFrame {
 		
 		// Vedi Offerte Proposte
 		JButton btnVediOfferteProposte = new JButton("Vedi offerte proposte");
+		btnVediOfferteProposte.setFocusable(false);
 		sl_risultatiDaRicerca.putConstraint(SpringLayout.NORTH, btnVediOfferteProposte, 8, SpringLayout.NORTH, lblRisultati);
 		sl_risultatiDaRicerca.putConstraint(SpringLayout.EAST, btnVediOfferteProposte, -18, SpringLayout.WEST, btnCaricaImmobile);
 		btnVediOfferteProposte.addActionListener(new ActionListener() {
@@ -482,14 +491,35 @@ public class ViewDashboardAgente extends JFrame {
 		
 		// Aggiungi un nuovo agente o amministratore
 		// Creazione del menù a tendina per le opzioni di amministrazione
-       
-      
-       
+		 JPopupMenu menuAggiungiUtente = new JPopupMenu();
+	      
+	        
+	       
+	        
+	       
 
+	       
+	        
+			
+			JLabel lblAggiungiUtente = new JLabel();
+			sl_ricerca.putConstraint(SpringLayout.EAST, lblAggiungiUtente, -95, SpringLayout.EAST, ricerca);
+			sl_ricerca.putConstraint(SpringLayout.WEST, lblUser, 6, SpringLayout.EAST, lblAggiungiUtente);
+			sl_ricerca.putConstraint(SpringLayout.NORTH, lblAggiungiUtente, 11, SpringLayout.NORTH, ricerca);
+			sl_ricerca.putConstraint(SpringLayout.EAST, lblBenvenuto, -49, SpringLayout.WEST, lblAggiungiUtente);
+			
+			// Evento per mostrare il menù al clic sull'immagine
+			lblAggiungiUtente.addMouseListener(new java.awt.event.MouseAdapter() {
+	            public void mousePressed(java.awt.event.MouseEvent evt) {
+	                if (evt.getButton() == java.awt.event.MouseEvent.BUTTON1) {
+	                	menuAggiungiUtente.show(lblAggiungiUtente, evt.getX(), evt.getY());
+	                }
+	            }
+	        });
+			
+			lblAggiungiUtente.setToolTipText("Clicca per aggiungere una nuovo agente o amministratore di supporto");
+			ricerca.add(lblAggiungiUtente);
 
-        
-		
-		
+			GuiUtils.setIconaLabel(lblAggiungiUtente, "AddUser");
 	}
 
 	

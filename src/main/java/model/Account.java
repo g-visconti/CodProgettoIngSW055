@@ -15,10 +15,12 @@ public class Account {
     
     
 //Costruttore con tutti i parametri
-    public Account(String email, String password, String nome, String cognome, String citta, String telefono, String cap, String indirizzo, String ruolo) {
+    public Account(String id,String email, String password, String nome, String cognome, String citta, String telefono, String cap, String indirizzo, String ruolo) {
+    	this.idAccount=id;
         this.email = email;
         this.password = password;
         this.nome=nome;
+        this.cognome = cognome;
         this.setCitta(citta);
         this.setTelefono(telefono);
         this.setCap(cap);

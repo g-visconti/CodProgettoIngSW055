@@ -15,19 +15,21 @@ public class ImmobileInVendita extends Immobile {
         String descrizione,
         String tipologia,
         JSONObject filtri,
+        String agenteAssociato, // aggiunto
         int prezzoTotale
     ) {
-        super(titolo, indirizzo, localita, dimensione, descrizione, tipologia, filtri);
+        super(titolo, indirizzo, localita, dimensione, descrizione, tipologia, filtri, agenteAssociato);
         this.prezzoTotale = prezzoTotale;
     }
 
     // Costruttore vuoto (utile per compatibilità o istanziazione parziale)
     public ImmobileInVendita() {
-        super();
+        super("", "", "", 0, "", "", null, null);
+        this.prezzoTotale = 0;
     }
 
     // Getter e Setter per prezzoTotale
-    public double getPrezzoTotale() {
+    public int getPrezzoTotale() {
         return prezzoTotale;
     }
 
@@ -35,3 +37,5 @@ public class ImmobileInVendita extends Immobile {
         this.prezzoTotale = prezzoTotale;
     }
 }
+
+

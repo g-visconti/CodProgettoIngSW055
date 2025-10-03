@@ -10,6 +10,8 @@ import java.sql.Statement;
 import org.mindrot.jbcrypt.BCrypt;
 
 import model.Account;
+import model.AgenteImmobiliare;
+import model.AmministratoreDiSupporto;
 import model.Cliente;
 
 public class AccountDAO {
@@ -60,6 +62,8 @@ public class AccountDAO {
 	
 	// creo un nuovo account
 	public String insertAccount(Account account) throws SQLException {
+		System.out.println("DEBUG DAO insertAccount - cognome: '" + account.getCognome() + "'");
+
 	    String query = "INSERT INTO \"Account\" (\"email\", \"password\", \"nome\", \"cognome\", \"citta\", \"numeroTelefono\",\"cap\", \"indirizzo\", ruolo ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 	    try (PreparedStatement stmt = connection.prepareStatement(query, new String[]{"idAccount"})) {
@@ -91,9 +95,11 @@ public class AccountDAO {
 	
 	
 	public String insertAccount(Cliente cliente) throws SQLException {
-	    String query = "INSERT INTO \"Account\" (\"email\", \"password\", \"nome\", \"cognome\", \"citta\", \"numeroTelefono\", \"cap\", \"indirizzo\", ruolo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+	    // Lasciamo il DB generare idAccount, quindi non lo inseriamo
+	    String query = "INSERT INTO \"Account\" (\"email\", \"password\", \"nome\", \"cognome\", \"citta\", \"numeroTelefono\", \"cap\", \"indirizzo\", ruolo) " +
+	                   "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING \"idAccount\"";
 
-	    try (PreparedStatement stmt = connection.prepareStatement(query, new String[]{"idAccount"})) {
+	    try (PreparedStatement stmt = connection.prepareStatement(query)) {
 	        stmt.setString(1, cliente.getEmail());
 	        stmt.setString(2, cliente.getPassword());
 	        stmt.setString(3, cliente.getNome());
@@ -104,21 +110,78 @@ public class AccountDAO {
 	        stmt.setString(8, cliente.getIndirizzo());
 	        stmt.setString(9, cliente.getRuolo());
 
-	        int affectedRows = stmt.executeUpdate();
-	        if (affectedRows == 0) {
-	            throw new SQLException("Creazione account fallita, nessuna riga inserita.");
-	        }
-
-	        try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
-	            if (generatedKeys.next()) {
-	                return generatedKeys.getString(1);
-	            } else {
-	                throw new SQLException("Creazione account fallita, nessun ID generato.");
-	            }
+	        ResultSet rs = stmt.executeQuery();
+	        if (rs.next()) {
+	            // restituiamo la string generata dal DB
+	            return rs.getString("idAccount");
+	        } else {
+	            throw new SQLException("Creazione account fallita, nessun ID generato.");
 	        }
 	    }
 	}
+
 	
+	
+	public Account getAccountDettagli(String idAccount) throws SQLException {
+	    String sql = "SELECT a.\"idAccount\", a.nome, a.cognome, a.email, a.\"numeroTelefono\", " +
+	                 "       ag.agenzia, s.\"id\" AS supporto_id " +
+	                 "FROM \"Account\" a " +
+	                 "LEFT JOIN \"AgenteImmobiliare\" ag ON a.\"idAccount\" = ag.id " +
+	                 "LEFT JOIN \"AmministratoreDiSupporto\" s ON a.\"idAccount\" = s.id " +
+	                 "WHERE a.\"idAccount\" = ?";
+
+	    try (PreparedStatement ps = connection.prepareStatement(sql)) {
+	        ps.setString(1, idAccount);
+	        ResultSet rs = ps.executeQuery();
+
+	        if (rs.next()) {
+	            String id = rs.getString("idAccount");
+	            String nome = rs.getString("nome");
+	            String cognome = rs.getString("cognome");
+	            String email = rs.getString("email");
+	            String numeroTelefono = rs.getString("numeroTelefono"); // <-- nuovo campo
+	            String agenzia = rs.getString("agenzia");
+	            String supportoId = rs.getString("supporto_id");
+
+	            System.out.println("DEBUG: id=" + id +
+	                               ", nome=" + nome +
+	                               ", cognome=" + cognome +
+	                               ", email=" + email +
+	                               ", numeroTelefono=" + numeroTelefono +
+	                               ", agenzia=" + agenzia +
+	                               ", supporto_id=" + supportoId);
+
+	            if (supportoId != null) {
+	                return new AmministratoreDiSupporto(
+	                    id,          // id
+	                    email,       // email
+	                    null,        // password
+	                    nome,        // nome
+	                    cognome,     // cognome
+	                    null,        // citta
+	                    numeroTelefono, // telefono
+	                    null,        // cap
+	                    null,        // indirizzo
+	                    "Supporto", // ruolo
+	                    agenzia     // agenzia
+	                );
+	            } else if (agenzia != null) {
+	                return new AgenteImmobiliare(
+	                    id, email, null, nome, cognome, null, numeroTelefono, null, null, "Agente", agenzia
+	                );
+	            } else {
+	                return new Account(
+	                    id, email, null, nome, cognome, null, numeroTelefono, null, null, "Account"
+	                );
+	            }
+
+	        } else {
+	            return null;
+	        }
+	    }
+	}
+
+
 	
 	public String getRuoloByEmail(String email) throws SQLException {
 	    String sql = "SELECT ruolo FROM \"Account\" WHERE email = ?";

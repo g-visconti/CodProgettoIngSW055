@@ -135,6 +135,12 @@ public class ViewDashboardAdmin extends JFrame {
 		};
 
 		// Assegna il modello alla tabella
+		// Blocca l'ordinamento/riposizionamento delle colonne
+		tableRisultati.getTableHeader().setReorderingAllowed(false);
+
+		// Blocca il ridimensionamento delle colonne
+		tableRisultati.getTableHeader().setResizingAllowed(false);
+
 		tableRisultati.setModel(model);
 
 		tableRisultati.getColumnModel().getColumn(0).setResizable(false);
@@ -188,11 +194,12 @@ public class ViewDashboardAdmin extends JFrame {
 		
 		// Carica un immobile
 		JButton btnCaricaImmobile = new JButton("Carica immobile");
+		btnCaricaImmobile.setFocusable(false);
 		sl_risultatiDaRicerca.putConstraint(SpringLayout.NORTH, btnCaricaImmobile, 8, SpringLayout.NORTH, lblRisultati);
         btnCaricaImmobile.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                ViewCaricaImmobile viewCaricaImmobile = new ViewCaricaImmobile();
+                ViewCaricaImmobile viewCaricaImmobile = new ViewCaricaImmobile(emailInserita);
                 viewCaricaImmobile.setLocationRelativeTo(null);
                 viewCaricaImmobile.setVisible(true);
             	}
@@ -205,6 +212,7 @@ public class ViewDashboardAdmin extends JFrame {
 		
 		// Vedi Offerte Proposte
 		JButton btnVediOfferteProposte = new JButton("Vedi offerte proposte");
+		btnVediOfferteProposte.setFocusable(false);
 		sl_risultatiDaRicerca.putConstraint(SpringLayout.NORTH, btnVediOfferteProposte, 8, SpringLayout.NORTH, lblRisultati);
 		sl_risultatiDaRicerca.putConstraint(SpringLayout.EAST, btnVediOfferteProposte, -18, SpringLayout.WEST, btnCaricaImmobile);
 		btnVediOfferteProposte.addActionListener(new ActionListener() {
@@ -222,6 +230,7 @@ public class ViewDashboardAdmin extends JFrame {
 		
 		// Elimina un immobile
 		JButton btnEliminaImmobile = new JButton("Elimina Immobile");
+		btnEliminaImmobile.setFocusable(false);
 		sl_risultatiDaRicerca.putConstraint(SpringLayout.EAST, btnCaricaImmobile, -19, SpringLayout.WEST, btnEliminaImmobile);
 		sl_risultatiDaRicerca.putConstraint(SpringLayout.NORTH, btnEliminaImmobile, -34, SpringLayout.NORTH, scrollPane);
 		sl_risultatiDaRicerca.putConstraint(SpringLayout.EAST, btnEliminaImmobile, -42, SpringLayout.EAST, risultatiDaRicerca);
@@ -236,7 +245,7 @@ public class ViewDashboardAdmin extends JFrame {
             	btnEliminaImmobile.setEnabled(tableRisultati.getSelectedRow() != -1);
             }
         });
-		btnEliminaImmobile.setToolTipText("Clicca su uno degli immobili per poterlo eliminare");
+		btnEliminaImmobile.setToolTipText("Clicca su uno degli immobili per eliminarlo");
 		btnEliminaImmobile.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 11));
 		btnEliminaImmobile.setBackground(Color.WHITE);
 		risultatiDaRicerca.add(btnEliminaImmobile);
@@ -502,7 +511,7 @@ public class ViewDashboardAdmin extends JFrame {
 	                    	Controller con2 = new Controller();
 		                	String agenzia = con2.getAgenzia(emailInserita);
 	                    	
-	                        ViewInserimentoEmail view = new ViewInserimentoEmail(agenzia);
+	                        ViewInserimentoEmail view = new ViewInserimentoEmail(agenzia, ViewInserimentoEmail.TipoInserimento.SUPPORTO);
 	                        view.setLocationRelativeTo(null); // centra la finestra
 	                        view.setVisible(true);
 	                    }
@@ -521,7 +530,7 @@ public class ViewDashboardAdmin extends JFrame {
                     	Controller con1 = new Controller();
 	                	String agenzia = con1.getAgenzia(emailInserita);
                     	
-                        ViewInserimentoEmail view = new ViewInserimentoEmail(agenzia);
+                        ViewInserimentoEmail view = new ViewInserimentoEmail(agenzia, ViewInserimentoEmail.TipoInserimento.AGENTE);
                         view.setLocationRelativeTo(null); // centra la finestra
                         view.setVisible(true);
                     }

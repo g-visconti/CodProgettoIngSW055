@@ -4,7 +4,7 @@ import org.json.JSONObject;
 
 public class ImmobileInAffitto extends Immobile {
 
-    private int prezzoMensile;
+    private double prezzoMensile;
 
     // Costruttore completo
     public ImmobileInAffitto(
@@ -15,23 +15,25 @@ public class ImmobileInAffitto extends Immobile {
         String descrizione,
         String tipologia,
         JSONObject filtri,
-        int prezzoMensile
+        String agenteAssociato, // aggiunto
+        double prezzoMensile
     ) {
-        super(titolo, indirizzo, localita, dimensione, descrizione, tipologia, filtri);
+        super(titolo, indirizzo, localita, dimensione, descrizione, tipologia, filtri, agenteAssociato);
         this.prezzoMensile = prezzoMensile;
     }
 
-    // Costruttore vuoto (opzionale ma utile per flessibilità)
+    // Costruttore vuoto (opzionale)
     public ImmobileInAffitto() {
-        super();
+        super("", "", "", 0, "", "", null, null); // chiama super con valori di default
+        this.prezzoMensile = 0;
     }
 
-    // Getter e Setter per prezzoMensile
+    // Getter e Setter
     public double getPrezzoMensile() {
         return prezzoMensile;
     }
 
-    public void setPrezzoMensile(int prezzoMensile) {
+    public void setPrezzoMensile(double prezzoMensile) {
         this.prezzoMensile = prezzoMensile;
     }
 }

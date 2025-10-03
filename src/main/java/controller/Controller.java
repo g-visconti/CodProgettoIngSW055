@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.text.NumberFormat;
 import java.util.Base64;
 import java.util.Locale;
+import java.util.UUID;
 
 import javax.swing.ImageIcon;
 import javax.swing.JTable;
@@ -56,7 +57,7 @@ public class Controller {
 	        String idGenerato = accountDAO.insertAccount(nuovoCliente);
 
 	        // Imposta idCliente uguale all'idAccount appena generato
-	        nuovoCliente.setIdCliente(idGenerato);
+	        nuovoCliente.setIdAccount(idGenerato);
 
 	        // Inserisci in Cliente con idCliente e email valorizzati
 	        clienteDAO.insertCliente(nuovoCliente);
@@ -91,11 +92,11 @@ public class Controller {
 	        
 	        String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
 	        
-	        Cliente nuovoCliente = new Cliente(email, hashedPassword, nome, cognome, citta, telefono, cap, indirizzo, ruolo);
+	        Cliente nuovoCliente = new Cliente(null,email, hashedPassword, nome, cognome, citta, telefono, cap, indirizzo, ruolo);
 	        
 	        String idGenerato = accountDAO.insertAccount(nuovoCliente);
 
-	        nuovoCliente.setIdCliente(idGenerato);
+	        nuovoCliente.setIdAccount(idGenerato);
 	        clienteDAO.insertCliente(nuovoCliente);
 
 	        System.out.println("Utente registrato con successo!");
@@ -106,65 +107,134 @@ public class Controller {
 	}
 	
 	//Registrazione di un Agente
-	
 	public void registraNuovoSupporto(String email, String password, String nome, String cognome,
-            String citta, String telefono, String cap, String indirizzo, 
-            String ruolo, String agenzia) {
-		
-		try {
-			Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
-			AccountDAO accountDAO = new AccountDAO(connAWS);
-			AmministratoreDiSupportoDAO supportoDAO = new AmministratoreDiSupportoDAO(connAWS);
-
-			if (accountDAO.emailEsiste(email)) {
+				            String citta, String telefono, String cap, String indirizzo,
+				            String ruolo, String agenzia) {
+				Connection connAWS = null;
+				
+				try {
+				connAWS = ConnessioneDatabase.getInstance().getConnection();
+				connAWS.setAutoCommit(false); // Inizio transazione
+				
+				AccountDAO accountDAO = new AccountDAO(connAWS);
+				AmministratoreDiSupportoDAO supportoDAO = new AmministratoreDiSupportoDAO(connAWS);
+				AgenteImmobiliareDAO agenteDAO = new AgenteImmobiliareDAO(connAWS);
+				
+				// Controllo email
+				if (accountDAO.emailEsiste(email)) {
 				System.out.println("Email già registrata.");
-					return;
-			}
+				return;
+				}
+				
+				// Hash della password
+				String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
+				
+				// Creiamo l’oggetto senza ID
+				AmministratoreDiSupporto nuovosupporto = new AmministratoreDiSupporto(
+				null, email, hashedPassword, nome, cognome,
+				citta, telefono, cap, indirizzo, ruolo, agenzia
+				);
+				
+				// 1️⃣ Inserimento in Account → il DB genera l’ID string
+				String idGenerato = accountDAO.insertAccount(nuovosupporto);
+				nuovosupporto.setIdAccount(idGenerato);
+				
+				// 2️⃣ Inserimento come Agente
+				agenteDAO.insertAgente(nuovosupporto);
+				
+				// 3️⃣ Inserimento come Supporto
+				supportoDAO.insertSupporto(nuovosupporto);
+				
+				connAWS.commit(); // Commit della transazione
+				System.out.println("Supporto registrato con successo!");
+				
+				} catch (SQLException e) {
+				if (connAWS != null) {
+				try { connAWS.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
+				}
+				e.printStackTrace();
+				} finally {
+				if (connAWS != null) {
+				try { connAWS.setAutoCommit(true); } catch (SQLException e) { e.printStackTrace(); }
+				}
+				}
+				}
 
-			String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
-			AmministratoreDiSupporto nuovosupporto = new AmministratoreDiSupporto(email, hashedPassword, nome, cognome,
-                                          citta, telefono, cap, indirizzo, ruolo, agenzia);
 
-			String idGenerato = accountDAO.insertAccount(nuovosupporto);
-			nuovosupporto.setIdSupporto(idGenerato);
-			supportoDAO.insertSupporto(nuovosupporto);
 
-			System.out.println("Agente registrato con successo!");
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-	}
 	
 	
 
 	public void registraNuovoAgente(String email, String password, String nome, String cognome,
-	                                String citta, String telefono, String cap, String indirizzo, 
-	                                String ruolo, String agenzia) {
+	        String citta, String telefono, String cap, String indirizzo,
+	        String ruolo, String agenzia) {
+
+	    Connection connAWS = null;
+
 	    try {
-	        Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
+	    	System.out.println("DEBUG Controller - cognome: '" + cognome + "'");
+
+	        connAWS = ConnessioneDatabase.getInstance().getConnection();
+	        connAWS.setAutoCommit(false); // Inizio transazione
+
 	        AccountDAO accountDAO = new AccountDAO(connAWS);
 	        AgenteImmobiliareDAO agenteDAO = new AgenteImmobiliareDAO(connAWS);
 
+	        // Controllo email
 	        if (accountDAO.emailEsiste(email)) {
 	            System.out.println("Email già registrata.");
 	            return;
 	        }
 
+	        // Hash della password
 	        String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
-	        AgenteImmobiliare nuovoAgente = new AgenteImmobiliare(email, hashedPassword, nome, cognome,
-	                                                              citta, telefono, cap, indirizzo, ruolo, agenzia);
 
+	        // Creiamo l’oggetto senza ID
+	        AgenteImmobiliare nuovoAgente = new AgenteImmobiliare(
+	                null, // lasciare null, DB genera l’ID
+	                email,
+	                hashedPassword,
+	                nome,
+	                cognome,
+	                citta,
+	                telefono,
+	                cap,
+	                indirizzo,
+	                ruolo,
+	                agenzia
+	        );
+
+	        // 1️⃣ Inserimento in Account → il DB genera l’ID string
+	        System.out.println("DEBUG prima insert: nome='" + nuovoAgente.getNome() + "', cognome='" + nuovoAgente.getCognome() + "'");
 	        String idGenerato = accountDAO.insertAccount(nuovoAgente);
-	        nuovoAgente.setIdAgente(idGenerato);
+	        nuovoAgente.setIdAccount(idGenerato);
+
+	        // 2️⃣ Inserimento come Agente
 	        agenteDAO.insertAgente(nuovoAgente);
 
+	        connAWS.commit(); // Commit della transazione
 	        System.out.println("Agente registrato con successo!");
 
 	    } catch (SQLException e) {
+	        if (connAWS != null) {
+	            try { 
+	                connAWS.rollback(); // rollback se errore
+	            } catch (SQLException ex) { 
+	                ex.printStackTrace(); 
+	            }
+	        }
 	        e.printStackTrace();
+	    } finally {
+	        if (connAWS != null) {
+	            try { 
+	                connAWS.setAutoCommit(true); // Ripristino autocommit
+	            } catch (SQLException e) { 
+	                e.printStackTrace(); 
+	            }
+	        }
 	    }
 	}
+
 
 	public String getAgenzia(String email) {
 	    String agenzia = null;
@@ -279,7 +349,16 @@ public class Controller {
     	    }
     	}
 
-     
+     public Account recuperaDettagliAgente(String idAccount) {
+         try {
+             Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
+             AccountDAO accountDAO = new AccountDAO(connAWS);
+             return accountDAO.getAccountDettagli(idAccount);
+         } catch (SQLException e) {
+             e.printStackTrace();
+             return null;
+         }
+     }
      
 
      public int riempiTableRisultati(JTable tableRisultati, String campoPieno, String tipologia, Filtri filtri) {

@@ -13,8 +13,10 @@ import controller.Controller;
 import model.Immobile;
 import model.ImmobileInAffitto;
 import model.ImmobileInVendita;
+import util.GuiUtils;
 
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
@@ -32,9 +34,12 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.SwingConstants;
+import java.awt.Font;
 
 public class ViewCaricaImmobile extends JFrame {
 
@@ -58,8 +63,12 @@ public class ViewCaricaImmobile extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public ViewCaricaImmobile() {
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	public ViewCaricaImmobile(String email) {
+		super("Schermata di caricamento immobile");
+		
+		GuiUtils.setIconaFinestra(this);
+
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 584, 630);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -68,19 +77,24 @@ public class ViewCaricaImmobile extends JFrame {
 		contentPane.setLayout(null);
 		
 		descrizionefield = new JTextField();
-		descrizionefield.setBounds(89, 371, 376, 92);
+		descrizionefield.setBounds(66, 390, 419, 106);
 		contentPane.add(descrizionefield);
 		descrizionefield.setColumns(10);
 		
-		JLabel lblNewLabel = new JLabel("Carica foto");
+		JLabel lblNewLabel = new JLabel("");
 		lblNewLabel.setOpaque(true);
-		lblNewLabel.setBackground(Color.GRAY);
+		lblNewLabel.setBackground(new Color(255, 255, 255));
 		lblNewLabel.setBounds(8, 10, 132, 157);
 		contentPane.add(lblNewLabel);
 		
-		JLabel lblNewLabel_4 = new JLabel("+ x foto");
-		lblNewLabel_4.setBounds(143, 11, 46, 156);
+		   GuiUtils.setIconaLabel(lblNewLabel, "camera");
+		
+		
+		JLabel lblNewLabel_4 = new JLabel("+ foto");
+		lblNewLabel_4.setAutoscrolls(false);
+		lblNewLabel_4.setBounds(140, 10, 46, 157);
 		contentPane.add(lblNewLabel_4);
+		
 		
 		
 		//CARICA FOTO
@@ -133,22 +147,26 @@ public class ViewCaricaImmobile extends JFrame {
 		contentPane.add(labeltitolo);
 		
 		JLabel lblNewLabel_2 = new JLabel("Descrizione");
-		lblNewLabel_2.setBounds(236, 345, 109, 20);
+		lblNewLabel_2.setBounds(245, 359, 109, 20);
 		contentPane.add(lblNewLabel_2);
 		
 		JCheckBox ascensorefield = new JCheckBox("Ascensore");
+		ascensorefield.setForeground(new Color(0, 0, 0));
 		ascensorefield.setBounds(18, 204, 97, 23);
 		contentPane.add(ascensorefield);
 		
 		JCheckBox portineriafield = new JCheckBox("Portineria");
+		portineriafield.setForeground(new Color(0, 0, 0));
 		portineriafield.setBounds(117, 205, 97, 20);
 		contentPane.add(portineriafield);
 		
 		JCheckBox climatizzazionefield = new JCheckBox("Climatizzazione");
-		climatizzazionefield.setBounds(17, 242, 98, 23);
+		climatizzazionefield.setForeground(new Color(0, 0, 0));
+		climatizzazionefield.setBounds(17, 242, 140, 23);
 		contentPane.add(climatizzazionefield);
 		
 		JComboBox<String> tipologiafield = new JComboBox<>();
+		tipologiafield.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		tipologiafield.setModel(new DefaultComboBoxModel<>(new String[] { "-", "Vendita", "Affitto" }));
 		tipologiafield.setBounds(380, 78, 103, 20);
 		contentPane.add(tipologiafield);
@@ -159,7 +177,8 @@ public class ViewCaricaImmobile extends JFrame {
 		localitafield.setColumns(10);
 		
 		JLabel lblNewLabel_3 = new JLabel("mq");
-		lblNewLabel_3.setBounds(340, 207, 20, 17);
+		lblNewLabel_3.setFont(new Font("Tahoma", Font.BOLD, 11));
+		lblNewLabel_3.setBounds(333, 207, 18, 17);
 		contentPane.add(lblNewLabel_3);
 		
 		JLabel labellocalita = new JLabel("Località");
@@ -191,6 +210,7 @@ public class ViewCaricaImmobile extends JFrame {
 		String[] piani = { "-", "0", "1", "2", "3", "4", "5", "6", "7" };
 
 		JComboBox<String> pianofield = new JComboBox<>(piani);
+		pianofield.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		pianofield.setBounds(380, 205, 103, 19);
 		contentPane.add(pianofield);
 		
@@ -207,14 +227,19 @@ public class ViewCaricaImmobile extends JFrame {
 		contentPane.add(labelbagni);
 		
 		JSpinner localifield = new JSpinner();
+		localifield.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		localifield.setBounds(259, 261, 101, 20);
 		contentPane.add(localifield);
 		
 		JSpinner bagnifield = new JSpinner();
+		bagnifield.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		bagnifield.setBounds(382, 262, 101, 20);
 		contentPane.add(bagnifield);
 		
 		JButton btnNewButton = new JButton("Carica");
+		btnNewButton.setFocusable(false);
+		btnNewButton.setForeground(new Color(255, 255, 255));
+		btnNewButton.setBackground(new Color(255, 0, 51));
 		btnNewButton.addMouseListener(new MouseAdapter() {
 		    @Override
 		    public void mouseClicked(MouseEvent e) {
@@ -242,14 +267,22 @@ public class ViewCaricaImmobile extends JFrame {
 		                JOptionPane.showMessageDialog(null, "Inserisci un numero valido per il prezzo");
 		                return;
 		            }
-
+		            
 		            
 		            String pianoStr = pianofield.getSelectedItem().toString();
 		            int piano = pianoStr.equals("-") ? -1 : Integer.parseInt(pianoStr);
 
 		            int bagni = (Integer) bagnifield.getValue();
 		            int locali = (Integer) localifield.getValue();
+		            if (titolo.isBlank() || indirizzo.isBlank() || localita.isBlank() || descrizione.isBlank()) {
+		                JOptionPane.showMessageDialog(null, "Compila tutti i campi obbligatori.");
+		                return;
+		            }
 
+		            if ("-".equals(tipologia)) {
+		                JOptionPane.showMessageDialog(null, "Seleziona una tipologia valida.");
+		                return;
+		            }
 
 
 		            JSONObject filtri = new JSONObject();
@@ -262,11 +295,23 @@ public class ViewCaricaImmobile extends JFrame {
 		            
 
 		            Immobile immobile;
-
+		            Controller controller = new Controller();
+		            String agenteAssociato = controller.getIdSession(email);
+		           
+		            if ("undef".equals(agenteAssociato)) {
+		                JOptionPane.showMessageDialog(null, "Agente non trovato, impossibile associare immobile.");
+		                return;
+		            }
 		            if ("Affitto".equalsIgnoreCase(tipologia)) {
-		                immobile = new ImmobileInAffitto(titolo, indirizzo, localita, dimensione, descrizione, tipologia, filtri, prezzo);
+		                immobile = new ImmobileInAffitto(
+		                    titolo, indirizzo, localita, dimensione, descrizione, tipologia,
+		                    filtri, agenteAssociato, prezzo
+		                );
 		            } else if ("Vendita".equalsIgnoreCase(tipologia)) {
-		                immobile = new ImmobileInVendita(titolo, indirizzo, localita, dimensione, descrizione, tipologia, filtri, prezzo);
+		                immobile = new ImmobileInVendita(
+		                    titolo, indirizzo, localita, dimensione, descrizione, tipologia,
+		                    filtri, agenteAssociato, prezzo
+		                );
 		            } else {
 		                JOptionPane.showMessageDialog(null, "Tipologia non valida");
 		                return;
@@ -288,7 +333,7 @@ public class ViewCaricaImmobile extends JFrame {
 		    }
 
 		});
-		btnNewButton.setBounds(373, 513, 121, 37);
+		btnNewButton.setBounds(218, 516, 121, 37);
 		contentPane.add(btnNewButton);
 		
 		
@@ -304,13 +349,12 @@ public class ViewCaricaImmobile extends JFrame {
 		labelprezzo.setBounds(259, 289, 69, 14);
 		contentPane.add(labelprezzo);
 		
-		JLabel lblmeseototale = new JLabel("New label");
+		JLabel lblmeseototale = new JLabel("€");
+		lblmeseototale.setFont(new Font("Tahoma", Font.BOLD, 11));
 		lblmeseototale.setBounds(349, 317, 69, 17);
 		contentPane.add(lblmeseototale);
 		
-		JButton btnNewButton_1 = new JButton("Annulla");
-		btnNewButton_1.setBounds(18, 513, 114, 37);
-		contentPane.add(btnNewButton_1);
+		
 		
 		
 	}

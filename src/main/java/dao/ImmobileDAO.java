@@ -68,7 +68,7 @@ public class ImmobileDAO {
 	 
 	
 	 public void caricaImmobileInAffitto(ImmobileInAffitto immobile) throws SQLException {
-		    String query1 = "INSERT INTO \"Immobile\" (titolo, indirizzo, localita, dimensione, descrizione, tipologia, filtri, immagini) VALUES (?, ?, ?, ?, ?, ?, ?, ?) RETURNING \"idImmobile\"";
+		    String query1 = "INSERT INTO \"Immobile\" (titolo, indirizzo, localita, dimensione, descrizione, tipologia, filtri, immagini, \"agenteAssociato\") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING \"idImmobile\"";
 
 		    try (PreparedStatement stmt = connection.prepareStatement(query1)) {
 		        stmt.setString(1, immobile.getTitolo());
@@ -84,26 +84,27 @@ public class ImmobileDAO {
 		        jsonObject.setValue(immobile.getFiltriAsJson().toString());
 		        stmt.setObject(7, jsonObject);
 
-		        // Converti immagini in Base64
+		        // Immagini in Base64 come JSONB
 		        List<String> immaginiBase64 = new ArrayList<>();
 		        if (immobile.getImmagini() != null) {
 		            for (byte[] img : immobile.getImmagini()) {
 		                immaginiBase64.add(Base64.getEncoder().encodeToString(img));
 		            }
 		        }
-
-		        // Inserisci immagini come JSONB
 		        PGobject immaginiJson = new PGobject();
 		        immaginiJson.setType("jsonb");
 		        immaginiJson.setValue(new org.json.JSONArray(immaginiBase64).toString());
 		        stmt.setObject(8, immaginiJson);
 
+		        // agenteAssociato
+		        stmt.setString(9, immobile.getAgenteAssociato());
+
+		        // Esegui inserimento e recupera id generato
 		        ResultSet rs = stmt.executeQuery();
 		        int generatedId = -1;
 		        if (rs.next()) {
 		            generatedId = rs.getInt("idImmobile");
 		        }
-
 		        rs.close();
 		        stmt.close();
 
@@ -117,10 +118,8 @@ public class ImmobileDAO {
 		    }
 		}
 
-	 
-	 
-	 public void caricaImmobileInVendita(ImmobileInVendita immobile) throws SQLException {
-		    String query1 = "INSERT INTO \"Immobile\" (titolo, indirizzo, localita, dimensione, descrizione, tipologia, filtri, immagini) VALUES (?, ?, ?, ?, ?, ?, ?, ?) RETURNING \"idImmobile\"";
+		public void caricaImmobileInVendita(ImmobileInVendita immobile) throws SQLException {
+		    String query1 = "INSERT INTO \"Immobile\" (titolo, indirizzo, localita, dimensione, descrizione, tipologia, filtri, immagini, \"agenteAssociato\") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING \"idImmobile\"";
 
 		    try (PreparedStatement stmt = connection.prepareStatement(query1)) {
 		        stmt.setString(1, immobile.getTitolo());
@@ -136,7 +135,7 @@ public class ImmobileDAO {
 		        jsonObject.setValue(immobile.getFiltriAsJson().toString());
 		        stmt.setObject(7, jsonObject);
 
-		        // Converti immagini in Base64 e inserisci come JSONB
+		        // Immagini in Base64 come JSONB
 		        List<String> immaginiBase64 = new ArrayList<>();
 		        if (immobile.getImmagini() != null) {
 		            for (byte[] img : immobile.getImmagini()) {
@@ -148,12 +147,15 @@ public class ImmobileDAO {
 		        immaginiJson.setValue(new org.json.JSONArray(immaginiBase64).toString());
 		        stmt.setObject(8, immaginiJson);
 
+		        // agenteAssociato
+		        stmt.setString(9, immobile.getAgenteAssociato());
+
+		        // Esegui inserimento e recupera id generato
 		        ResultSet rs = stmt.executeQuery();
 		        int generatedId = -1;
 		        if (rs.next()) {
 		            generatedId = rs.getInt("idImmobile");
 		        }
-
 		        rs.close();
 		        stmt.close();
 
@@ -166,6 +168,7 @@ public class ImmobileDAO {
 		        }
 		    }
 		}
+
 
 	 
 	
@@ -456,7 +459,7 @@ public class ImmobileDAO {
 		            immobile.setDescrizione(rs.getString("descrizione"));
 		            immobile.setLocalita(rs.getString("localita"));
 		            immobile.setTipologia(rs.getString("tipologia"));
-
+		            immobile.setAgenteAssociato(rs.getString("agenteAssociato")); 
 		            String filtriJsonString = rs.getString("filtri");
 		            if (filtriJsonString != null && !filtriJsonString.isEmpty()) {
 		                JSONObject filtri = new JSONObject(filtriJsonString);

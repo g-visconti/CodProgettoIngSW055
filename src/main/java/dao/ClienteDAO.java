@@ -2,6 +2,7 @@ package dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 
@@ -15,15 +16,11 @@ public class ClienteDAO {
     }
 
     public void insertCliente(Cliente cliente) throws SQLException {
-    	String query = "INSERT INTO \"Cliente\" (\"idCliente\", \"email\") VALUES (?, ?)";
-    	try (PreparedStatement stmt = connection.prepareStatement(query)) {
-    	    stmt.setString(1, cliente.getIdCliente());
-    	    stmt.setString(2, cliente.getEmail()); // email da Cliente che eredita da Account
-    	    stmt.executeUpdate();
-    	
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw e;
+        String query = "INSERT INTO \"Cliente\" (\"id\", \"email\") VALUES (?, ?)";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, cliente.getIdAccount()); // ID generato da Account
+            stmt.setString(2, cliente.getEmail());
+            stmt.executeUpdate();
         }
     }
 
