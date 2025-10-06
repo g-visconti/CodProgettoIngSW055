@@ -27,10 +27,11 @@ public class Immobile {
 	    private boolean climatizzazione;
 	    private boolean portineria;
 	    private boolean postoAuto;
+	    private String agenteAssociato;
 	    // Costruttori, getter e setter
 
 	    // esempio di costruttore
-	    public Immobile(String titolo, String indirizzo, String localita, int dimensione, String descrizione, String tipologia, JSONObject filtri) {
+	    public Immobile(String titolo, String indirizzo, String localita, int dimensione, String descrizione, String tipologia, JSONObject filtri, String agenteAssociato) {
 	    	this.setTitolo(titolo);
 	        this.setIndirizzo(indirizzo);
 	        this.setLocalita(localita);
@@ -38,6 +39,7 @@ public class Immobile {
 	        this.setFiltriFromJson(filtri);
 	        this.setTipologia(tipologia);
 	        this.setDescrizione(descrizione);
+	        this.setAgenteAssociato(agenteAssociato);
 	    }
 	    
 	    
@@ -217,6 +219,10 @@ public class Immobile {
 		    return filtriJson;
 		}
 		public void setFiltriFromJson(JSONObject filtri) {
+		    if (filtri == null) { 
+		        filtri = new JSONObject(); // crea un JSON vuoto se null
+		    }
+
 		    this.filtri = filtri;
 
 		    if (filtri.has("numeroLocali")) {
@@ -242,9 +248,21 @@ public class Immobile {
 		    if (filtri.has("riscaldamento")) {
 		        this.climatizzazione = filtri.getBoolean("riscaldamento");
 		    }
+
 		    if (filtri.has("postoAuto")) {
-                this.postoAuto = filtri.getBoolean("postoAuto");
-            }
+		        this.postoAuto = filtri.getBoolean("postoAuto");
+		    }
+		}
+
+
+
+		public String getAgenteAssociato() {
+			return agenteAssociato;
+		}
+
+
+		public void setAgenteAssociato(String agenteAssociato) {
+			this.agenteAssociato = agenteAssociato;
 		}
 
 
