@@ -16,7 +16,6 @@ public class Immobile {
 	    private String indirizzo;
 	    private String localita;
 	    private int dimensione;
-	    private JSONObject filtri;
 	    private String descrizione;
 	    private String tipologia;
 	 // Campi estratti dal JSON "filtri"
@@ -222,8 +221,6 @@ public class Immobile {
 		    if (filtri == null) { 
 		        filtri = new JSONObject(); // crea un JSON vuoto se null
 		    }
-
-		    this.filtri = filtri;
 
 		    if (filtri.has("numeroLocali")) {
 		        this.numeroLocali = filtri.getInt("numeroLocali");

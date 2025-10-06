@@ -3,9 +3,7 @@ package controller;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.text.NumberFormat;
-import java.util.Base64;
 import java.util.Locale;
-import java.util.UUID;
 
 import javax.swing.ImageIcon;
 import javax.swing.JTable;

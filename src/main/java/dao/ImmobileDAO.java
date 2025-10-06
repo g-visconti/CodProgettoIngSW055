@@ -13,7 +13,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-import javax.swing.ImageIcon;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
@@ -26,7 +25,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.postgresql.util.PGobject;
 
-import database.ConnessioneDatabase;
 import model.Filtri;
 import model.Immobile;
 import model.ImmobileInAffitto;
