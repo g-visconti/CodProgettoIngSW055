@@ -36,14 +36,21 @@ public class ViewInserimentoEmail extends JFrame {
 	private JPanel contentPane;
 	private JPanel panel;
 	
-	
+	 public enum TipoInserimento {
+	        SUPPORTO,
+	        AGENTE
+	    }
+	 private TipoInserimento tipoInserimento;
 
 	
 	/**
 	 * Create the frame.
 	 */
 	
-	public ViewInserimentoEmail(String agenzia) {
+	public ViewInserimentoEmail(String agenzia, TipoInserimento tipo) {
+		
+		this.tipoInserimento = tipo;
+       
 		setResizable(false);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 459, 618);
@@ -85,12 +92,13 @@ public class ViewInserimentoEmail extends JFrame {
 		        } else {
 		            lblErroreEmail.setText(""); // pulisco eventuale messaggio di errore
 
-		            // Apri interfaccia ViewRegistraAgente
-		            SwingUtilities.invokeLater(new Runnable() {
-		                @Override
-		                public void run() {
-		                	
-		                    ViewRegistraAgente view = new ViewRegistraAgente(email,agenzia); 
+		            SwingUtilities.invokeLater(() -> {
+		                if (tipoInserimento == TipoInserimento.SUPPORTO) {
+		                    ViewRegistraSupporto view = new ViewRegistraSupporto(email, agenzia);
+		                    view.setLocationRelativeTo(null);
+		                    view.setVisible(true);
+		                } else if (tipoInserimento == TipoInserimento.AGENTE) {
+		                    ViewRegistraAgente view = new ViewRegistraAgente(email, agenzia);
 		                    view.setLocationRelativeTo(null);
 		                    view.setVisible(true);
 		                }
