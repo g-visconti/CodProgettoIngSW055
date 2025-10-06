@@ -284,7 +284,7 @@ public class ViewRegistrazione extends JFrame {
 
 				 if (success) {
 			            Controller cont1= new Controller();
-			            cont1.registraNuovoUtente(Email_Utente, passwordUtente, nome, cognome, citta, telefono,cap,indirizzo, ruolo);
+			            cont1.registraNuovoCliente(Email_Utente, passwordUtente, nome, cognome, citta, telefono,cap,indirizzo, ruolo);
 			            ViewDashboard viewDashboard = new ViewDashboard(Email_Utente);
 			            viewDashboard.setVisible(true);
 			            dispose();
