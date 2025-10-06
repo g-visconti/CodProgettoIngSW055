@@ -20,12 +20,12 @@ import javax.swing.border.EmptyBorder;
 
 public class ViewInserimentoEmail extends JFrame {
 
-	private JPanel contentPane;
-	private JPanel panel;
-
 	public enum TipoInserimento {
 		SUPPORTO, AGENTE
 	}
+	private JPanel contentPane;
+
+	private JPanel panel;
 
 	private TipoInserimento tipoInserimento;
 
@@ -37,52 +37,53 @@ public class ViewInserimentoEmail extends JFrame {
 
 		this.tipoInserimento = tipo;
 
-		setResizable(false);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 459, 618);
-		contentPane = new JPanel();
-		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-		setContentPane(contentPane);
-		contentPane.setLayout(null);
+		this.setResizable(false);
+		this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		this.setBounds(100, 100, 459, 618);
+		this.contentPane = new JPanel();
+		this.contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		this.setContentPane(this.contentPane);
+		this.contentPane.setLayout(null);
 
-		panel = new JPanel();
-		panel.setBackground(SystemColor.menu);
-		panel.setBounds(0, 0, 443, 579);
-		contentPane.add(panel);
-		panel.setLayout(null);
-		SwingUtilities.invokeLater(() -> requestFocusInWindow());
+		this.panel = new JPanel();
+		this.panel.setBackground(SystemColor.menu);
+		this.panel.setBounds(0, 0, 443, 579);
+		this.contentPane.add(this.panel);
+		this.panel.setLayout(null);
+		SwingUtilities.invokeLater(() -> this.requestFocusInWindow());
 
-		URL pathlogo2 = getClass().getClassLoader().getResource("images/DietiEstatesLogomid.png");
+		URL pathlogo2 = this.getClass().getClassLoader().getResource("images/DietiEstatesLogomid.png");
 
 		JTextArea emailArea = new JTextArea();
 		emailArea.setBounds(121, 101, 189, 22);
-		panel.add(emailArea);
+		this.panel.add(emailArea);
 
 		JLabel lblErroreEmail = new JLabel("");
 		lblErroreEmail.setForeground(Color.RED);
 		lblErroreEmail.setBounds(121, 125, 300, 22); // subito sotto l'emailArea
-		panel.add(lblErroreEmail);
+		this.panel.add(lblErroreEmail);
 
 		// Bottone Procedi
 		JButton btnNewButton = new JButton("Procedi");
 		btnNewButton.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				String email = emailArea.getText().trim();
 
 				// Controllo chiocciola: deve esserci una e una sola
 				int countAt = email.length() - email.replace("@", "").length();
 
-				if (countAt != 1) {
+				if (countAt != 1)
 					lblErroreEmail.setText("L'email deve contenere una sola chiocciola (@).");
-				} else {
+				else {
 					lblErroreEmail.setText(""); // pulisco eventuale messaggio di errore
 
 					SwingUtilities.invokeLater(() -> {
-						if (tipoInserimento == TipoInserimento.SUPPORTO) {
+						if (ViewInserimentoEmail.this.tipoInserimento == TipoInserimento.SUPPORTO) {
 							ViewRegistraSupporto view = new ViewRegistraSupporto(email, agenzia);
 							view.setLocationRelativeTo(null);
 							view.setVisible(true);
-						} else if (tipoInserimento == TipoInserimento.AGENTE) {
+						} else if (ViewInserimentoEmail.this.tipoInserimento == TipoInserimento.AGENTE) {
 							ViewRegistraAgente view = new ViewRegistraAgente(email, agenzia);
 							view.setLocationRelativeTo(null);
 							view.setVisible(true);
@@ -96,12 +97,12 @@ public class ViewInserimentoEmail extends JFrame {
 		btnNewButton.setBackground(SystemColor.textHighlight);
 		btnNewButton.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 13));
 		btnNewButton.setBounds(145, 194, 139, 50);
-		panel.add(btnNewButton);
+		this.panel.add(btnNewButton);
 
 		JLabel lblNewLabel = new JLabel("Inserisci l'email di lavoro dell'utente");
 		lblNewLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
 		lblNewLabel.setBounds(92, 57, 278, 33);
-		panel.add(lblNewLabel);
+		this.panel.add(lblNewLabel);
 
 	}
 
@@ -111,16 +112,14 @@ public class ViewInserimentoEmail extends JFrame {
 		field.addFocusListener(new FocusAdapter() {
 			@Override
 			public void focusGained(FocusEvent e) {
-				if (field.getText().equals(text)) {
+				if (field.getText().equals(text))
 					field.setText("");
-				}
 			}
 
 			@Override
 			public void focusLost(FocusEvent e) {
-				if (field.getText().trim().isEmpty()) {
+				if (field.getText().trim().isEmpty())
 					field.setText(text);
-				}
 			}
 		});
 	}

@@ -23,9 +23,6 @@ public class ImageUtils {
 			BufferedImage img = ImageIO.read(bis);
 			System.out.println("Dimensione immagine originale: " + img.getWidth() + "x" + img.getHeight());
 
-			if (img == null)
-				return getDefaultIcon(width, height);
-
 			BufferedImage resized = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 			Graphics2D g2 = resized.createGraphics();
 			g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
