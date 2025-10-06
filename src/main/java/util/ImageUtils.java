@@ -2,7 +2,6 @@ package util;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
@@ -16,9 +15,8 @@ public class ImageUtils {
 
 	public static ImageIcon decodeToIcon(String base64, int width, int height) {
 		try {
-			if (base64 == null || base64.isBlank()) {
+			if (base64 == null || base64.isBlank())
 				return getDefaultIcon(width, height);
-			}
 
 			byte[] bytes = Base64.getDecoder().decode(base64.getBytes(StandardCharsets.UTF_8));
 			ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
