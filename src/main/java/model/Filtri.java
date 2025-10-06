@@ -13,13 +13,11 @@ public class Filtri extends Ricerca {
 	public Boolean portineria;
 	public Boolean postoAuto;
 	public Boolean climatizzazione;
-	
+
 	// Costruttore
-	public Filtri(Integer prezzoMin, Integer prezzoMax,
-			Integer superficieMin, Integer superficieMax, 
-			String piano, Integer numLocali, Integer numBagni, 
-			Boolean ascensore, Boolean portineria, 
-			Boolean postoAuto, Boolean climatizzazione) {
+	public Filtri(Integer prezzoMin, Integer prezzoMax, Integer superficieMin, Integer superficieMax, String piano,
+			Integer numLocali, Integer numBagni, Boolean ascensore, Boolean portineria, Boolean postoAuto,
+			Boolean climatizzazione) {
 		this.prezzoMin = prezzoMin;
 		this.prezzoMax = prezzoMax;
 		this.superficieMin = superficieMin;

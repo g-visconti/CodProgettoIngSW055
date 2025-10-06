@@ -1,7 +1,5 @@
 package gui;
 
-
-
 import java.awt.Font;
 import java.awt.SystemColor;
 import java.awt.event.MouseAdapter;
@@ -26,8 +24,7 @@ public class ViewProponiOfferta extends JFrame {
 	/**
 	 * Launch the application.
 	 */
-	
-	
+
 	public ViewProponiOfferta(long idimmobile, String idAccount) {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 539, 295);
@@ -37,37 +34,37 @@ public class ViewProponiOfferta extends JFrame {
 
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
-		
+
 		JLabel lblNewLabel = new JLabel("Proponi un nuovo prezzo all'agente, adatto al tuo budget");
 		lblNewLabel.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		lblNewLabel.setBounds(20, 11, 372, 24);
 		contentPane.add(lblNewLabel);
-		
+
 		lblOfferta = new JTextField();
 		lblOfferta.setBounds(150, 118, 131, 24);
 		contentPane.add(lblOfferta);
 		lblOfferta.setColumns(10);
-		
+
 		JLabel lblNewLabel_1 = new JLabel("La tua proposta:");
 		lblNewLabel_1.setBounds(48, 121, 92, 19);
 		contentPane.add(lblNewLabel_1);
-		
+
 		JButton btnNewButton = new JButton("Conferma");
 		btnNewButton.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-			    double offertaProposta = 0;  // dichiarazione fuori dal try
+				double offertaProposta = 0; // dichiarazione fuori dal try
 
-			    try {
-			        String testo = lblOfferta.getText();
-			        offertaProposta = Double.parseDouble(testo);
-			    } catch (NumberFormatException ex) {
-			        JOptionPane.showMessageDialog(null, "Inserisci un valore numerico valido per l'offerta.");
-			        return;  // esci dal metodo se il valore non è valido
-			    }
+				try {
+					String testo = lblOfferta.getText();
+					offertaProposta = Double.parseDouble(testo);
+				} catch (NumberFormatException ex) {
+					JOptionPane.showMessageDialog(null, "Inserisci un valore numerico valido per l'offerta.");
+					return; // esci dal metodo se il valore non è valido
+				}
 
-			    Controller con = new Controller();
-			    con.InserisciOfferta(offertaProposta, idAccount, idimmobile);
+				Controller con = new Controller();
+				con.InserisciOfferta(offertaProposta, idAccount, idimmobile);
 			}
 
 		});

@@ -13,7 +13,6 @@ import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
-
 public class ViewOfferte extends JFrame {
 
 	private static final long serialVersionUID = 1L;
@@ -27,7 +26,7 @@ public class ViewOfferte extends JFrame {
 		// Imposta l'icona di DietiEstates25 alla finestra in uso
 		GuiUtils.setIconaFinestra(this);
 		setTitle("DietiEstates25 - Visualizza le offerte ricevute sui tuoi immobili");
-		
+
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 1248, 946);
 
@@ -80,7 +79,7 @@ public class ViewOfferte extends JFrame {
 		btnTornaIndietro.setToolTipText("Clicca qui per tornare alla dashboard");
 		btnTornaIndietro.setBorderPainted(false);
 		panelComandi.add(btnTornaIndietro);
-		
+
 		JLabel lblBenvenuto = new JLabel("Accesso effettuato con:");
 		sl_panelComandi.putConstraint(SpringLayout.NORTH, lblBenvenuto, 0, SpringLayout.NORTH, btnTornaIndietro);
 		sl_panelComandi.putConstraint(SpringLayout.WEST, lblBenvenuto, 951, SpringLayout.EAST, btnTornaIndietro);
@@ -119,24 +118,22 @@ public class ViewOfferte extends JFrame {
 		panelRisultati.add(scrollPane);
 
 		// Crea il modello dati della tabella (rimosse colonne Immagini e Descrizione)
-		DefaultTableModel model = new DefaultTableModel(
-		    new Object[][]{},
-		    new String[] {"Categoria", "Tipologia", "Prezzo (€)"}  // Solo 3 colonne
+		DefaultTableModel model = new DefaultTableModel(new Object[][] {},
+				new String[] { "Categoria", "Tipologia", "Prezzo (€)" } // Solo 3 colonne
 		) {
-		    private static final long serialVersionUID = 1L;
-		    Class<?>[] columnTypes = new Class[] {
-		        Object.class, String.class, String.class  // Aggiornato per 3 colonne
-		    };
+			private static final long serialVersionUID = 1L;
+			Class<?>[] columnTypes = new Class[] { Object.class, String.class, String.class // Aggiornato per 3 colonne
+			};
 
-		    @Override
-		    public Class<?> getColumnClass(int columnIndex) {
-		        return columnTypes[columnIndex];
-		    }
+			@Override
+			public Class<?> getColumnClass(int columnIndex) {
+				return columnTypes[columnIndex];
+			}
 
-		    @Override
-		    public boolean isCellEditable(int row, int column) {
-		        return false;
-		    }
+			@Override
+			public boolean isCellEditable(int row, int column) {
+				return false;
+			}
 		};
 
 		// Crea e configura la JTable
@@ -148,11 +145,11 @@ public class ViewOfferte extends JFrame {
 		tableRisultati.setSelectionBackground(new Color(226, 226, 226));
 
 		// Configura larghezze colonne (aggiornate per 3 colonne)
-		int[] preferredWidths = {200, 300, 150};  // Larghezze ridistribuite
+		int[] preferredWidths = { 200, 300, 150 }; // Larghezze ridistribuite
 		for (int i = 0; i < preferredWidths.length; i++) {
-		    TableColumn col = tableRisultati.getColumnModel().getColumn(i);
-		    col.setPreferredWidth(preferredWidths[i]);
-		    col.setResizable(false);
+			TableColumn col = tableRisultati.getColumnModel().getColumn(i);
+			col.setPreferredWidth(preferredWidths[i]);
+			col.setResizable(false);
 		}
 
 		// Inserisci la tabella nello scroll pane
