@@ -1,5 +1,6 @@
 package util;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Image;
 import java.util.Base64;
@@ -35,19 +36,19 @@ public class Base64ImageRenderer extends DefaultTableCellRenderer {
         }
 
         try {
-            if (value instanceof String base64 && !base64.isBlank()) {
+            if (value instanceof String base64 && !base64.trim().isEmpty()) {
                 // Decodifica Base64
                 byte[] imageData = Base64.getDecoder().decode(base64);
                 ImageIcon originalIcon = new ImageIcon(imageData);
                 
-                // Calcola dimensioni della cella
-                int cellWidth = table.getColumnModel().getColumn(column).getWidth() - 10;
-                int cellHeight = table.getRowHeight(row) - 10;
+                // Calcola dimensioni disponibili
+                int availableWidth = table.getColumnModel().getColumn(column).getWidth() - 15;
+                int availableHeight = table.getRowHeight(row) - 15;
                 
                 // Ridimensiona mantenendo le proporzioni
                 Image originalImage = originalIcon.getImage();
-                double widthRatio = (double) cellWidth / originalIcon.getIconWidth();
-                double heightRatio = (double) cellHeight / originalIcon.getIconHeight();
+                double widthRatio = (double) availableWidth / originalIcon.getIconWidth();
+                double heightRatio = (double) availableHeight / originalIcon.getIconHeight();
                 double ratio = Math.min(widthRatio, heightRatio);
                 
                 int newWidth = (int) (originalIcon.getIconWidth() * ratio);
@@ -55,14 +56,14 @@ public class Base64ImageRenderer extends DefaultTableCellRenderer {
                 
                 Image scaledImage = originalImage.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
                 label.setIcon(new ImageIcon(scaledImage));
-                label.setText("");
+                label.setText(""); // ✅ Testo vuoto quando c'è l'immagine
             } else {
                 label.setIcon(null);
-                label.setText("NO IMG");
-            }
+                label.setText("L'immobile non ha foto"); // ✅ Testo personalizzato - puoi cambiare qui
+                label.setForeground(Color.GRAY);            }
         } catch (Exception e) {
             label.setIcon(null);
-            label.setText("ERRORE");
+            label.setText("❌"); // ✅ Testo per errore
         }
         
         return label;

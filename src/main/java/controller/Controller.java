@@ -220,13 +220,13 @@ public class Controller {
 	    // Intestazioni della tabella
 	    String[] nomiColonne = { "Foto", "Categoria", "Descrizione", "Prezzo da me proposto", "Stato" };
 
-	    // Modello della tabella
+	    // Modello della tabella - ✅ CORREZIONE: colonna 0 come String.class
 	    @SuppressWarnings("serial")
 	    DefaultTableModel model = new DefaultTableModel(nomiColonne, 0) {
 	        @Override
 	        public Class<?> getColumnClass(int columnIndex) {
 	            return switch (columnIndex) {
-	                case 0 -> ImageIcon.class;
+	                case 0 -> String.class; // ✅ CAMBIATO: da ImageIcon a String
 	                case 1, 2, 3, 4 -> String.class;
 	                default -> Object.class;
 	            };
@@ -243,14 +243,14 @@ public class Controller {
 	    format.setMaximumFractionDigits(0);
 	    format.setMinimumFractionDigits(0);
 
-	    // ✅ PRIMA riempi il modello, POI imposta altezza e renderer
+	    // Riempimento del modello
 	    for (Object[] riga : datiOfferte) {
 	        Object[] rigaFormattata = new Object[5];
 
-	        // ✅ Salva solo il Base64, il renderer si occuperà del ridimensionamento
+	        // ✅ Salva il Base64 (già corretto)
 	        String base64 = (riga[0] instanceof String) ? (String) riga[0] : "";
 	        
-	        rigaFormattata[0] = base64; // Salva la stringa Base64, non l'ImageIcon
+	        rigaFormattata[0] = base64; // Base64 come stringa
 	        rigaFormattata[1] = (String) riga[1];
 	        rigaFormattata[2] = (String) riga[2];
 	        rigaFormattata[3] = "€ " + format.format(riga[3]);
@@ -267,19 +267,24 @@ public class Controller {
 
 	    // Configurazione larghezze colonne
 	    TableColumnModel columnModel = tableOfferteProposte.getColumnModel();
-	    columnModel.getColumn(0).setPreferredWidth(25);
-	    columnModel.getColumn(1).setPreferredWidth(25);
-	    columnModel.getColumn(2).setPreferredWidth(500);
-	    columnModel.getColumn(3).setPreferredWidth(110);
-	    columnModel.getColumn(4).setPreferredWidth(25);
-	    
-	    // ✅ Usa un renderer personalizzato che gestisca il Base64
+	    columnModel.getColumn(0).setPreferredWidth(100); // ✅ Aumentata per immagini
+	    columnModel.getColumn(1).setPreferredWidth(100);
+	    columnModel.getColumn(2).setPreferredWidth(400);
+	    columnModel.getColumn(3).setPreferredWidth(120);
+	    columnModel.getColumn(4).setPreferredWidth(80);
+
+	    // ✅ RENDERER PER IMMAGINI - Deve essere il PRIMO ad essere impostato
 	    columnModel.getColumn(0).setCellRenderer(new Base64ImageRenderer());
+	    
 	    // Renderer per testi e stili
 	    columnModel.getColumn(1).setCellRenderer(new TextBoldRenderer(true, new Color(50, 133, 177)));
 	    columnModel.getColumn(2).setCellRenderer(new TextAreaRenderer());
 	    columnModel.getColumn(3).setCellRenderer(new TextBoldRenderer(true, new Color(0, 0, 0)));
 	    impostaRendererStato(tableOfferteProposte, 4);
+
+	    // ✅ FORZA AGGIORNAMENTO VISUALE
+	    tableOfferteProposte.repaint();
+	    tableOfferteProposte.revalidate();
 	}
 
 
