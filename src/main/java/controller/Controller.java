@@ -1,6 +1,7 @@
 package controller;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.text.NumberFormat;
@@ -135,6 +136,66 @@ public class Controller {
 		return accountDAO.getRuoloByEmail(email);
 	}
 
+	/**
+	 * Applica un renderer alla colonna "Stato" che cambia colore in base al testo.
+	 * 
+	 * COLORI PER LO STATO DELLA PROPOSTA: "Rifiutata" = (255, 68, 68) "Attesa" =
+	 * (243, 182, 80) "Accettata" = (103, 235, 88) "Controproposta" = (7, 170, 248)
+	 * default = (0, 0, 0)
+	 */
+	private void impostaRendererStato(JTable table, int colonnaStatoIndex) {
+		DefaultTableCellRenderer rendererStato = new DefaultTableCellRenderer() {
+			@Override
+			public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+					boolean hasFocus, int row, int column) {
+
+				Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+
+				// Allinea al centro
+				setHorizontalAlignment(SwingConstants.CENTER);
+
+				// Imposta colore in base al testo
+				if (value != null) {
+					String stato = value.toString();
+					switch (stato) {
+					case "Rifiutata":
+						c.setForeground(new Color(255, 68, 68));
+						break;
+					case "Attesa":
+						c.setForeground(new Color(243, 182, 80));
+						break;
+					case "Accettata":
+						c.setForeground(new Color(103, 235, 88));
+						break;
+					case "Controproposta":
+						c.setForeground(new Color(7, 170, 248));
+						break;
+					default:
+						c.setForeground(new Color(0, 0, 0));
+						break;
+					}
+				} else {
+					c.setForeground(new Color(0, 0, 0));
+				}
+
+				// Mantiene il grassetto come nel tuo TextBoldRenderer
+				c.setFont(c.getFont().deriveFont(java.awt.Font.BOLD));
+
+				// Mantiene lo sfondo selezionato correttamente
+				if (isSelected) {
+					c.setBackground(table.getSelectionBackground());
+				} else {
+					c.setBackground(table.getBackground());
+				}
+
+				return c;
+			}
+		};
+
+		// Applica il renderer alla colonna "stato"
+		table.getColumnModel().getColumn(colonnaStatoIndex).setCellRenderer(rendererStato);
+	}
+
 	public boolean InserisciOfferta(double offertaProposta, String idAccount, long idImmobile) {
 		try {
 			Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
@@ -216,7 +277,7 @@ public class Controller {
 		columnModel.getColumn(3).setCellRenderer(new TextBoldRenderer(true, new Color(0, 0, 0)));
 
 		// Colonna Stato → centrato
-		columnModel.getColumn(4).setCellRenderer(new TextBoldRenderer(true, new Color(243, 182, 80)));
+		impostaRendererStato(tableOfferteProposte, 4);
 
 		// Altezza righe maggiore per testi multilinea
 		tableOfferteProposte.setRowHeight(100);
