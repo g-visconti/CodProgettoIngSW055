@@ -15,9 +15,25 @@ public class Offerta {
 
 	// Costruttori
 	public Offerta(double offertaProposta, String idAccount, long idImmobile) {
-		this.importo = offertaProposta;
-		this.accountAssociato = idAccount;
-		this.immobileAssociato = idImmobile;
+		importo = offertaProposta;
+		accountAssociato = idAccount;
+		immobileAssociato = idImmobile;
+	}
+
+	public String getAgenteAssociato() {
+		return agenteAssociato;
+	}
+
+	public LocalDateTime getData() {
+		return data;
+	}
+
+	public String getIdAccount() {
+		return accountAssociato;
+	}
+
+	public long getIdImmobile() {
+		return immobileAssociato;
 	}
 
 	// Getter e setter
@@ -25,63 +41,47 @@ public class Offerta {
 		return idOfferta;
 	}
 
-	public void setIdOfferta(long idOfferta) {
-		this.idOfferta = idOfferta;
-	}
-
-	public long getIdImmobile() {
-		return immobileAssociato;
-	}
-
-	public void setIdImmobile(long idImmobile) {
-		this.immobileAssociato = idImmobile;
-	}
-
-	public String getIdAccount() {
-		return accountAssociato;
-	}
-
-	public void setIdAccount(String idAccount) {
-		this.accountAssociato = idAccount;
-	}
-
-	public String getAgenteAssociato() {
-		return agenteAssociato;
-	}
-
-	public void setAgenteAssociato(String agenteAssociato) {
-		this.agenteAssociato = agenteAssociato;
-	}
-
-	public LocalDateTime getData() {
-		return data;
-	}
-
-	public void setData(LocalDateTime data) {
-		this.data = data;
+	public double getOffertaProposta() {
+		return importo;
 	}
 
 	public String getStato() {
 		return stato;
 	}
 
-	public void setStato(String stato) {
-		this.stato = stato;
-	}
-
 	public String getTipologia() {
 		return tipologia;
 	}
 
-	public void setTipologia(String tipologia) {
-		this.tipologia = tipologia;
+	public void setAgenteAssociato(String agenteAssociato) {
+		this.agenteAssociato = agenteAssociato;
 	}
 
-	public double getOffertaProposta() {
-		return importo;
+	public void setData(LocalDateTime data) {
+		this.data = data;
+	}
+
+	public void setIdAccount(String idAccount) {
+		accountAssociato = idAccount;
+	}
+
+	public void setIdImmobile(long idImmobile) {
+		immobileAssociato = idImmobile;
+	}
+
+	public void setIdOfferta(long idOfferta) {
+		this.idOfferta = idOfferta;
 	}
 
 	public void setOffertaProposta(double offertaProposta) {
-		this.importo = offertaProposta;
+		importo = offertaProposta;
+	}
+
+	public void setStato(String stato) {
+		this.stato = stato;
+	}
+
+	public void setTipologia(String tipologia) {
+		this.tipologia = tipologia;
 	}
 }

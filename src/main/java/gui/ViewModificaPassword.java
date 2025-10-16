@@ -1,30 +1,27 @@
 package gui;
 
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-
-import controller.Controller;
-
 import java.awt.Color;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-
 import java.awt.Font;
 import java.awt.HeadlessException;
-import java.awt.Image;
-
-import javax.swing.JPasswordField;
-import javax.swing.SwingConstants;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import java.awt.SystemColor;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.net.URL;
 import java.sql.SQLException;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.SwingConstants;
+import javax.swing.WindowConstants;
+import javax.swing.border.EmptyBorder;
+
+import controller.Controller;
+import util.GuiUtils;
 
 public class ViewModificaPassword extends JFrame {
 
@@ -39,17 +36,12 @@ public class ViewModificaPassword extends JFrame {
 	 * Create the frame.
 	 */
 	public ViewModificaPassword(String emailAssociata) {
-		// Carica l'immagine come icona
-		URL pathIcona = getClass().getClassLoader().getResource("images/DietiEstatesIcona.png");
-		ImageIcon icon = new ImageIcon(pathIcona);
-		Image img = icon.getImage();
-
-		// Imposta l'icona nella finestra
-		setIconImage(img);
+		// Imposta l'icona di DietiEstates25 alla finestra in uso
+		GuiUtils.setIconaFinestra(this);
 
 		setResizable(false);
 		setTitle("DietiEstates25 - Modifica la password");
-		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 562, 338);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));

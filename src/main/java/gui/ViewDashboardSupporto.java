@@ -1,42 +1,44 @@
 package gui;
 
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.border.EmptyBorder;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import java.awt.Color;
-import javax.swing.JTextField;
-import javax.swing.JLabel;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
+import java.awt.Component;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.SQLException;
 import java.util.prefs.Preferences;
-import java.awt.Component;
+
+import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JLayeredPane;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
+import javax.swing.SpringLayout;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
-import javax.swing.JLayeredPane;
-import javax.swing.JTable;
+import javax.swing.WindowConstants;
+import javax.swing.border.EmptyBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
+
 import controller.Controller;
 import database.ConnessioneDatabase;
 import model.Filtri;
 import util.GuiUtils;
 import util.InputUtils;
-
-import javax.swing.JScrollPane;
-import javax.swing.ListSelectionModel;
-import javax.swing.JButton;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import javax.swing.SpringLayout;
 
 public class ViewDashboardSupporto extends JFrame {
 
@@ -65,7 +67,7 @@ public class ViewDashboardSupporto extends JFrame {
 		// Opzioni per le comboBox
 		String[] opAppartamento = { "Vendita", "Affitto" };
 
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1267, 805);
 		JPanel dashboard = new JPanel();
 		dashboard.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 11));
@@ -167,6 +169,7 @@ public class ViewDashboardSupporto extends JFrame {
 					if (row >= 0) {
 						long idImmobile = (Long) tableRisultati.getValueAt(row, 0);
 						ViewImmobile finestra = new ViewImmobile(idImmobile, idAccount);
+						finestra.setLocationRelativeTo(null);
 						finestra.setVisible(true);
 					}
 				}
@@ -213,8 +216,9 @@ public class ViewDashboardSupporto extends JFrame {
 		sl_risultatiDaRicerca.putConstraint(SpringLayout.EAST, btnVediOfferteProposte, -18, SpringLayout.WEST,
 				btnCaricaImmobile);
 		btnVediOfferteProposte.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
-				ViewOfferte viewOfferte = new ViewOfferte(emailInserita);
+				ViewOfferteProposte viewOfferte = new ViewOfferteProposte(emailInserita);
 				viewOfferte.setLocationRelativeTo(null);
 				viewOfferte.setVisible(true);
 			}
@@ -239,6 +243,7 @@ public class ViewDashboardSupporto extends JFrame {
 
 		// Aggiungi un listener per la selezione della tabella
 		tableRisultati.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+			@Override
 			public void valueChanged(ListSelectionEvent e) {
 				// Abilita il pulsante solo se una riga è selezionata
 				btnEliminaImmobile.setEnabled(tableRisultati.getSelectedRow() != -1);
@@ -421,7 +426,7 @@ public class ViewDashboardSupporto extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				// operazione di modifica della password dell'account
 				ViewModificaPassword viewModificaPassword = new ViewModificaPassword(emailInserita);
-				;
+
 				viewModificaPassword.setLocationRelativeTo(null);
 				viewModificaPassword.setVisible(true);
 			}
@@ -429,6 +434,7 @@ public class ViewDashboardSupporto extends JFrame {
 
 		// Evento per mostrare il menù al clic sull'immagine
 		lblUser.addMouseListener(new java.awt.event.MouseAdapter() {
+			@Override
 			public void mousePressed(java.awt.event.MouseEvent evt) {
 				if (evt.getButton() == java.awt.event.MouseEvent.BUTTON1) {
 					menuUtente.show(lblUser, evt.getX(), evt.getY());
@@ -526,6 +532,7 @@ public class ViewDashboardSupporto extends JFrame {
 
 		// Evento per mostrare il menù al clic sull'immagine
 		lblAggiungiUtente.addMouseListener(new java.awt.event.MouseAdapter() {
+			@Override
 			public void mousePressed(java.awt.event.MouseEvent evt) {
 				if (evt.getButton() == java.awt.event.MouseEvent.BUTTON1) {
 					menuAggiungiUtente.show(lblAggiungiUtente, evt.getX(), evt.getY());

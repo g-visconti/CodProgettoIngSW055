@@ -7,68 +7,114 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
-import java.net.URL;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
+
+import util.GuiUtils;
 
 public class ViewInserimentoEmail extends JFrame {
 
 	public enum TipoInserimento {
 		SUPPORTO, AGENTE
 	}
+
+	/**
+	 *
+	 */
+	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 
 	private JPanel panel;
 
 	private TipoInserimento tipoInserimento;
 
+	private JTextField txtEmail;
+	private String campoPieno = "E-mail";
+
 	/**
 	 * Create the frame.
 	 */
 
 	public ViewInserimentoEmail(String agenzia, TipoInserimento tipo) {
+		setTitle("DietiEstates25 - Inserimento dell'e-mail di lavoro");
+		// Imposta l'icona di DietiEstates25 alla finestra in uso
+		GuiUtils.setIconaFinestra(this);
 
-		this.tipoInserimento = tipo;
+		tipoInserimento = tipo;
 
-		this.setResizable(false);
-		this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		this.setBounds(100, 100, 459, 618);
-		this.contentPane = new JPanel();
-		this.contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-		this.setContentPane(this.contentPane);
-		this.contentPane.setLayout(null);
+		setResizable(false);
+		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+		setBounds(100, 100, 643, 343);
+		contentPane = new JPanel();
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		setContentPane(contentPane);
+		contentPane.setLayout(null);
 
-		this.panel = new JPanel();
-		this.panel.setBackground(SystemColor.menu);
-		this.panel.setBounds(0, 0, 443, 579);
-		this.contentPane.add(this.panel);
-		this.panel.setLayout(null);
-		SwingUtilities.invokeLater(() -> this.requestFocusInWindow());
+		panel = new JPanel();
+		panel.setBackground(SystemColor.menu);
+		panel.setBounds(0, 0, 641, 318);
+		contentPane.add(panel);
+		panel.setLayout(null);
+		SwingUtilities.invokeLater(() -> requestFocusInWindow());
 
-		URL pathlogo2 = this.getClass().getClassLoader().getResource("images/DietiEstatesLogomid.png");
+		txtEmail = new JTextField();
+		txtEmail.setText("E-mail");
+		txtEmail.setCaretColor(Color.DARK_GRAY);
+		txtEmail.setDisabledTextColor(Color.DARK_GRAY);
 
-		JTextArea emailArea = new JTextArea();
-		emailArea.setBounds(121, 101, 189, 22);
-		this.panel.add(emailArea);
+		txtEmail.setBounds(170, 101, 300, 22);
+		panel.add(txtEmail);
+
+		// se premo sul campo e-mail
+		txtEmail.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				txtEmail.setText("");
+			}
+		});
+
+		// se premo fuori il campo e-mail
+		panel.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if (txtEmail.getText().trim().isEmpty())
+					txtEmail.setText("E-mail");
+			}
+		});
+
+		// se scrivo sul campo e-mail
+		txtEmail.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyTyped(KeyEvent e) {
+				campoPieno = txtEmail.getText();
+				if (campoPieno.equals("E-mail"))
+					txtEmail.setText("");
+			}
+		});
 
 		JLabel lblErroreEmail = new JLabel("");
 		lblErroreEmail.setForeground(Color.RED);
-		lblErroreEmail.setBounds(121, 125, 300, 22); // subito sotto l'emailArea
-		this.panel.add(lblErroreEmail);
+		lblErroreEmail.setBounds(165, 125, 300, 22); // subito sotto l'emailArea
+		panel.add(lblErroreEmail);
 
 		// Bottone Procedi
 		JButton btnNewButton = new JButton("Procedi");
 		btnNewButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				String email = emailArea.getText().trim();
+				String email = txtEmail.getText().trim();
 
 				// Controllo chiocciola: deve esserci una e una sola
 				int countAt = email.length() - email.replace("@", "").length();
@@ -79,11 +125,11 @@ public class ViewInserimentoEmail extends JFrame {
 					lblErroreEmail.setText(""); // pulisco eventuale messaggio di errore
 
 					SwingUtilities.invokeLater(() -> {
-						if (ViewInserimentoEmail.this.tipoInserimento == TipoInserimento.SUPPORTO) {
+						if (tipoInserimento == TipoInserimento.SUPPORTO) {
 							ViewRegistraSupporto view = new ViewRegistraSupporto(email, agenzia);
 							view.setLocationRelativeTo(null);
 							view.setVisible(true);
-						} else if (ViewInserimentoEmail.this.tipoInserimento == TipoInserimento.AGENTE) {
+						} else if (tipoInserimento == TipoInserimento.AGENTE) {
 							ViewRegistraAgente view = new ViewRegistraAgente(email, agenzia);
 							view.setLocationRelativeTo(null);
 							view.setVisible(true);
@@ -96,13 +142,14 @@ public class ViewInserimentoEmail extends JFrame {
 		btnNewButton.setForeground(Color.WHITE);
 		btnNewButton.setBackground(SystemColor.textHighlight);
 		btnNewButton.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 13));
-		btnNewButton.setBounds(145, 194, 139, 50);
-		this.panel.add(btnNewButton);
+		btnNewButton.setBounds(220, 237, 200, 25);
+		panel.add(btnNewButton);
 
-		JLabel lblNewLabel = new JLabel("Inserisci l'email di lavoro dell'utente");
-		lblNewLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
-		lblNewLabel.setBounds(92, 57, 278, 33);
-		this.panel.add(lblNewLabel);
+		JLabel lblDescrizione = new JLabel("Inserisci l'e-mail di lavoro dell'utente");
+		lblDescrizione.setHorizontalAlignment(SwingConstants.CENTER);
+		lblDescrizione.setFont(new Font("Segoe UI", Font.BOLD, 18));
+		lblDescrizione.setBounds(5, 36, 631, 33);
+		panel.add(lblDescrizione);
 
 	}
 

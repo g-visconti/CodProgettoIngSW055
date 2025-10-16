@@ -1,6 +1,20 @@
 package gui;
 
-import javax.swing.*;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
+import javax.swing.SpringLayout;
+import javax.swing.SwingConstants;
+import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 //import javax.swing.table.DefaultTableModel;
 import javax.swing.table.DefaultTableModel;
@@ -9,25 +23,21 @@ import javax.swing.table.TableColumn;
 import controller.Controller;
 import util.GuiUtils;
 
-import java.awt.*;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-
-public class ViewOfferte extends JFrame {
+public class ViewOfferteProposte extends JFrame {
 
 	private static final long serialVersionUID = 1L;
-	private JTable tableRisultati;
+	private JTable tableOfferteProposte;
 	private JPanel contentPane;
 
 	/**
 	 * Create the frame ViewOfferte.
 	 */
-	public ViewOfferte(String emailUtente) {
+	public ViewOfferteProposte(String emailUtente) {
 		// Imposta l'icona di DietiEstates25 alla finestra in uso
 		GuiUtils.setIconaFinestra(this);
-		setTitle("DietiEstates25 - Visualizza le offerte ricevute sui tuoi immobili");
+		setTitle("DietiEstates25 - Le tue proposte");
 
-		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 1248, 946);
 
 		contentPane = new JPanel();
@@ -55,7 +65,7 @@ public class ViewOfferte extends JFrame {
 		lblTitolo.setFont(new Font("Tahoma", Font.BOLD, 30));
 		panelComandi.add(lblTitolo);
 
-		JLabel lblDescrizione = new JLabel("Seleziona un immobile per visualizzare le offerte ricevute");
+		JLabel lblDescrizione = new JLabel("Seleziona un immobile per vedere la risposta dell'agente");
 		sl_panelComandi.putConstraint(SpringLayout.SOUTH, lblTitolo, -13, SpringLayout.NORTH, lblDescrizione);
 		sl_panelComandi.putConstraint(SpringLayout.NORTH, lblDescrizione, 97, SpringLayout.NORTH, panelComandi);
 		sl_panelComandi.putConstraint(SpringLayout.SOUTH, lblDescrizione, -8, SpringLayout.SOUTH, panelComandi);
@@ -72,6 +82,7 @@ public class ViewOfferte extends JFrame {
 		sl_panelComandi.putConstraint(SpringLayout.SOUTH, btnTornaIndietro, 39, SpringLayout.NORTH, panelComandi);
 		sl_panelComandi.putConstraint(SpringLayout.EAST, btnTornaIndietro, 38, SpringLayout.WEST, panelComandi);
 		btnTornaIndietro.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				dispose();
 			}
@@ -137,26 +148,26 @@ public class ViewOfferte extends JFrame {
 		};
 
 		// Crea e configura la JTable
-		tableRisultati = new JTable(model);
-		tableRisultati.setRowHeight(100);
-		tableRisultati.setShowGrid(false);
-		tableRisultati.setShowVerticalLines(false);
-		tableRisultati.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		tableRisultati.setSelectionBackground(new Color(226, 226, 226));
+		tableOfferteProposte = new JTable(model);
+		tableOfferteProposte.setRowHeight(100);
+		tableOfferteProposte.setShowGrid(false);
+		tableOfferteProposte.setShowVerticalLines(false);
+		tableOfferteProposte.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		tableOfferteProposte.setSelectionBackground(new Color(226, 226, 226));
 
 		// Configura larghezze colonne (aggiornate per 3 colonne)
 		int[] preferredWidths = { 200, 300, 150 }; // Larghezze ridistribuite
 		for (int i = 0; i < preferredWidths.length; i++) {
-			TableColumn col = tableRisultati.getColumnModel().getColumn(i);
+			TableColumn col = tableOfferteProposte.getColumnModel().getColumn(i);
 			col.setPreferredWidth(preferredWidths[i]);
 			col.setResizable(false);
 		}
 
 		// Inserisci la tabella nello scroll pane
-		scrollPane.setViewportView(tableRisultati);
+		scrollPane.setViewportView(tableOfferteProposte);
 
 		// Popola la tabella con i dati tramite il controller
 		Controller controller = new Controller();
-		controller.riempiTableRisultati(tableRisultati);
+		controller.riempiTableOfferteProposte(tableOfferteProposte, emailUtente);
 	}
 }

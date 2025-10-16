@@ -1,39 +1,34 @@
 package gui;
 
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-
-import controller.Controller;
-
-import javax.swing.JButton;
-import javax.swing.JTextField;
-import java.awt.event.ActionEvent;
-import javax.swing.SwingConstants;
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.Image;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-
 import java.awt.SystemColor;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.net.URL;
 import java.sql.SQLException;
 
 import javax.swing.ImageIcon;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JPasswordField;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import javax.swing.WindowConstants;
+import javax.swing.border.EmptyBorder;
+
+import controller.Controller;
+import util.GuiUtils;
 
 public class ViewAccessoConPassword extends JFrame {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JTextField txtAccediORegistrati;
@@ -45,18 +40,13 @@ public class ViewAccessoConPassword extends JFrame {
 	 * Create the frame.
 	 */
 	public ViewAccessoConPassword(String emailInserita) {
-		// Carica l'immagine come icona
-		URL pathIcona = getClass().getClassLoader().getResource("images/DietiEstatesIcona.png");
-		ImageIcon icon = new ImageIcon(pathIcona);
-		Image img = icon.getImage();
-
-		// Imposta l'icona nella finestra
-		setIconImage(img);
+		// Imposta l'icona di DietiEstates25 alla finestra in uso
+		GuiUtils.setIconaFinestra(this);
 
 		setTitle("DietiEstates25 - Accedi con email e password");
 		setResizable(false);
 
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		setBounds(100, 100, 818, 618);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -65,7 +55,7 @@ public class ViewAccessoConPassword extends JFrame {
 
 		JPanel panelLogo = new JPanel();
 		panelLogo.setBackground(new Color(255, 255, 255));
-		panelLogo.setBounds(0, 0, 450, 579);
+		panelLogo.setBounds(0, 0, 450, 593);
 		contentPane.add(panelLogo);
 		panelLogo.setLayout(null);
 
@@ -78,7 +68,7 @@ public class ViewAccessoConPassword extends JFrame {
 		testlogo.setIcon(new ImageIcon(pathlogo));
 
 		JLabel lblNewLabel = new JLabel("DietiEstates25");
-		lblNewLabel.setBounds(5, 39, 440, 32);
+		lblNewLabel.setBounds(2, 39, 445, 32);
 		panelLogo.add(lblNewLabel);
 		lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		lblNewLabel.setForeground(new Color(27, 99, 142));
@@ -87,7 +77,7 @@ public class ViewAccessoConPassword extends JFrame {
 		JPanel panelAccesso = new JPanel();
 
 		panelAccesso.setBackground(new Color(245, 245, 245));
-		panelAccesso.setBounds(446, 0, 356, 579);
+		panelAccesso.setBounds(449, 0, 367, 593);
 		contentPane.add(panelAccesso);
 		panelAccesso.setLayout(null);
 
@@ -100,7 +90,7 @@ public class ViewAccessoConPassword extends JFrame {
 		txtAccediORegistrati.setBorder(new EmptyBorder(0, 0, 0, 0));
 		txtAccediORegistrati.setHorizontalAlignment(SwingConstants.CENTER);
 		txtAccediORegistrati.setText("Accedi con email");
-		txtAccediORegistrati.setBounds(6, 36, 344, 39);
+		txtAccediORegistrati.setBounds(11, 36, 344, 39);
 		panelAccesso.add(txtAccediORegistrati);
 		txtAccediORegistrati.setColumns(10);
 
@@ -111,16 +101,15 @@ public class ViewAccessoConPassword extends JFrame {
 			@Override
 			public void keyTyped(KeyEvent e) {
 				campoPieno = passwordField.getText();
-				if (campoPieno.equals("******")) {
+				if (campoPieno.equals("******"))
 					passwordField.setText(campoVuoto);
-				}
 			}
 		});
 		passwordField.setVerifyInputWhenFocusTarget(false);
 		passwordField.setToolTipText("Inserire la password di accesso");
 		passwordField.setText("******");
 		passwordField.setFont(new Font("Tahoma", Font.BOLD, 11));
-		passwordField.setBounds(75, 255, 205, 20);
+		passwordField.setBounds(81, 255, 205, 20);
 		panelAccesso.add(passwordField);
 
 		// se premo sul campo di ricerca
@@ -148,22 +137,21 @@ public class ViewAccessoConPassword extends JFrame {
 		JLabel lblInserireLaPassword = new JLabel("Inserire la password di accesso");
 		lblInserireLaPassword.setHorizontalAlignment(SwingConstants.CENTER);
 		lblInserireLaPassword.setFont(new Font("Tahoma", Font.BOLD, 11));
-		lblInserireLaPassword.setBounds(39, 224, 278, 20);
+		lblInserireLaPassword.setBounds(44, 224, 278, 20);
 		panelAccesso.add(lblInserireLaPassword);
 
 		JLabel lblEmail = new JLabel("Email inserita:");
 		lblEmail.setHorizontalAlignment(SwingConstants.CENTER);
 		lblEmail.setFont(new Font("Tahoma", Font.BOLD, 11));
-		lblEmail.setBounds(39, 86, 99, 20);
+		lblEmail.setBounds(44, 88, 99, 20);
 		panelAccesso.add(lblEmail);
 
 		JLabel lblEmailAttuale = new JLabel("<email>");
-		if (!(emailInserita.equals("Email"))) {
+		if (!(emailInserita.equals("Email")))
 			lblEmailAttuale.setText(emailInserita);
-		}
 		lblEmailAttuale.setHorizontalAlignment(SwingConstants.CENTER);
 		lblEmailAttuale.setFont(new Font("Tahoma", Font.BOLD, 11));
-		lblEmailAttuale.setBounds(139, 86, 178, 20);
+		lblEmailAttuale.setBounds(144, 88, 178, 20);
 		panelAccesso.add(lblEmailAttuale);
 
 		JButton btnTornaIndietro = new JButton("Torna indietro");
@@ -182,6 +170,7 @@ public class ViewAccessoConPassword extends JFrame {
 		getRootPane().setDefaultButton(btnAccedi);
 
 		btnAccedi.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				// Condizione da inserire
 				Controller con = new Controller();
@@ -225,11 +214,10 @@ public class ViewAccessoConPassword extends JFrame {
 						default -> JOptionPane.showMessageDialog(null, "Ruolo non riconosciuto", "Errore",
 								JOptionPane.INFORMATION_MESSAGE);
 						}
-					} else {
+					} else
 						// password errata
 						JOptionPane.showMessageDialog(null, "La password inserita non è corretta, riprova!",
 								"Errore inserimento dei dati", JOptionPane.INFORMATION_MESSAGE);
-					}
 				} catch (SQLException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -242,14 +230,14 @@ public class ViewAccessoConPassword extends JFrame {
 		btnAccedi.setForeground(Color.WHITE);
 		btnAccedi.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 11));
 		btnAccedi.setBackground(SystemColor.textHighlight);
-		btnAccedi.setBounds(203, 382, 114, 23);
+		btnAccedi.setBounds(208, 382, 114, 23);
 		panelAccesso.add(btnAccedi);
 
 		btnTornaIndietro.setForeground(Color.WHITE);
 		btnTornaIndietro.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 11));
 		btnTornaIndietro.setFocusable(false);
 		btnTornaIndietro.setBackground(SystemColor.textHighlight);
-		btnTornaIndietro.setBounds(48, 382, 114, 23);
+		btnTornaIndietro.setBounds(53, 382, 114, 23);
 		panelAccesso.add(btnTornaIndietro);
 
 	}

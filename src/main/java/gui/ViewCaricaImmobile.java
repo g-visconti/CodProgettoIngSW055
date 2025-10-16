@@ -23,6 +23,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -55,10 +57,12 @@ public class ViewCaricaImmobile extends JFrame {
 	 */
 	public ViewCaricaImmobile(String email) {
 		super("Schermata di caricamento immobile");
+		setTitle("DietiEstates25 - Schermata di caricamento immobile");
+		setResizable(false);
 
 		GuiUtils.setIconaFinestra(this);
 
-		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 584, 630);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -67,7 +71,7 @@ public class ViewCaricaImmobile extends JFrame {
 		contentPane.setLayout(null);
 
 		descrizionefield = new JTextField();
-		descrizionefield.setBounds(66, 390, 419, 106);
+		descrizionefield.setBounds(81, 394, 419, 106);
 		contentPane.add(descrizionefield);
 		descrizionefield.setColumns(10);
 
@@ -133,7 +137,8 @@ public class ViewCaricaImmobile extends JFrame {
 		contentPane.add(labeltitolo);
 
 		JLabel lblNewLabel_2 = new JLabel("Descrizione");
-		lblNewLabel_2.setBounds(245, 359, 109, 20);
+		lblNewLabel_2.setHorizontalAlignment(SwingConstants.CENTER);
+		lblNewLabel_2.setBounds(236, 370, 109, 20);
 		contentPane.add(lblNewLabel_2);
 
 		JCheckBox ascensorefield = new JCheckBox("Ascensore");
@@ -312,7 +317,7 @@ public class ViewCaricaImmobile extends JFrame {
 			}
 
 		});
-		btnNewButton.setBounds(218, 516, 121, 37);
+		btnNewButton.setBounds(230, 547, 121, 25);
 		contentPane.add(btnNewButton);
 
 		prezzofield = new JTextField();

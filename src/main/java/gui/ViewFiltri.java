@@ -1,32 +1,35 @@
 package gui;
 
-import util.GuiUtils;
-import util.InputUtils;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-import model.Filtri;
 import java.awt.Color;
-import java.util.prefs.BackingStoreException;
-import java.util.prefs.Preferences;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import java.awt.Font;
-import javax.swing.JComboBox;
-import javax.swing.JCheckBox;
-import javax.swing.JButton;
 import java.awt.SystemColor;
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
+
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.WindowConstants;
+import javax.swing.border.EmptyBorder;
+
+import model.Filtri;
+import util.GuiUtils;
+import util.InputUtils;
 
 public class ViewFiltri extends JFrame {
+	private static final long serialVersionUID = 1L;
 	// Attributi della classe ViewFiltri
 	private Preferences prefs;
-	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	// attributi che serviranno per settare gli input ricevuti all'interno della
 	// classe Filtri
@@ -38,6 +41,7 @@ public class ViewFiltri extends JFrame {
 	private JComboBox<String> comboBoxPiano;
 	private JComboBox<String> comboBoxNumBagni;
 	private JCheckBox chckbxAscensore;
+	// TODO eliminare posto auto
 	private JCheckBox chckbxPostoAuto;
 	private JCheckBox chckbxPortineria;
 	private JCheckBox chckbxClimatizzazione;
@@ -87,8 +91,8 @@ public class ViewFiltri extends JFrame {
 		String[] opNumBagni = { "Indifferente", "1", "2", "3", "4" };
 		String[] opPiano = { "Indifferente", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" };
 
-		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		setBounds(100, 100, 937, 454);
+		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+		this.setBounds(100, 100, 937, 454);
 		contentPane = new JPanel();
 		contentPane.setBackground(new Color(255, 255, 255));
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -97,11 +101,11 @@ public class ViewFiltri extends JFrame {
 		contentPane.setLayout(null);
 
 		JPanel panelTitolo = new JPanel();
-		panelTitolo.setBounds(0, 0, 923, 417);
+		panelTitolo.setBounds(0, 0, 935, 429);
 		contentPane.add(panelTitolo);
 		panelTitolo.setLayout(null);
 
-		SwingUtilities.invokeLater(() -> requestFocusInWindow());
+		SwingUtilities.invokeLater(() -> this.requestFocusInWindow());
 
 		// Titolo schermata
 		JLabel lblFiltri = new JLabel("Qui puoi selezionare i filtri di ricerca");
@@ -239,6 +243,7 @@ public class ViewFiltri extends JFrame {
 
 		getRootPane().setDefaultButton(btnSalvaFiltri);
 		btnSalvaFiltri.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				prefs.put("prezzoMin", (String) comboBoxPMin.getSelectedItem());
 				prefs.put("prezzoMax", (String) comboBoxPMax.getSelectedItem());
@@ -252,7 +257,7 @@ public class ViewFiltri extends JFrame {
 				prefs.putBoolean("postoAuto", chckbxPostoAuto.isSelected());
 				prefs.putBoolean("climatizzazione", chckbxClimatizzazione.isSelected());
 				// chiama view dashboard con stringa di preferenze (?)
-				dispose();
+				ViewFiltri.this.dispose();
 			}
 		});
 		btnSalvaFiltri.setForeground(Color.WHITE);
@@ -264,8 +269,9 @@ public class ViewFiltri extends JFrame {
 
 		JButton btnAnnulla = new JButton("Annulla");
 		btnAnnulla.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
-				dispose();
+				ViewFiltri.this.dispose();
 			}
 		});
 		btnAnnulla.setForeground(Color.WHITE);
@@ -301,7 +307,7 @@ public class ViewFiltri extends JFrame {
 							JOptionPane.INFORMATION_MESSAGE);
 
 					// Chiude la finestra corrente
-					dispose();
+					ViewFiltri.this.dispose();
 				}
 			}
 		});

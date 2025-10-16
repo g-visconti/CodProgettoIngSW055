@@ -215,7 +215,7 @@ public class ViewDashboardAdmin extends JFrame {
 				btnCaricaImmobile);
 		btnVediOfferteProposte.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				ViewOfferte viewOfferte = new ViewOfferte(emailInserita);
+				ViewOfferteProposte viewOfferte = new ViewOfferteProposte(emailInserita);
 				viewOfferte.setLocationRelativeTo(null);
 				viewOfferte.setVisible(true);
 			}

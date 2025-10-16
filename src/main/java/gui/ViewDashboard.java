@@ -27,6 +27,7 @@ import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.SpringLayout;
 import javax.swing.SwingConstants;
+import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
@@ -63,7 +64,7 @@ public class ViewDashboard extends JFrame {
 		// Opzioni per le comboBox
 		String[] opAppartamento = { "Vendita", "Affitto" };
 
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1267, 805);
 		JPanel dashboard = new JPanel();
 		dashboard.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 11));
@@ -159,6 +160,7 @@ public class ViewDashboard extends JFrame {
 					if (row >= 0) {
 						long idImmobile = (Long) tableRisultati.getValueAt(row, 0);
 						ViewImmobile finestra = new ViewImmobile(idImmobile, idAccount);
+						finestra.setLocationRelativeTo(null);
 						finestra.setVisible(true);
 					}
 				}
@@ -188,8 +190,9 @@ public class ViewDashboard extends JFrame {
 				risultatiDaRicerca);
 		sl_risultatiDaRicerca.putConstraint(SpringLayout.EAST, btnStoricoMieOfferte, 0, SpringLayout.EAST, scrollPane);
 		btnStoricoMieOfferte.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
-				ViewOfferte viewOfferte = new ViewOfferte(emailInserita);
+				ViewOfferteProposte viewOfferte = new ViewOfferteProposte(emailInserita);
 				viewOfferte.setLocationRelativeTo(null);
 				viewOfferte.setVisible(true);
 			}
@@ -378,7 +381,7 @@ public class ViewDashboard extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				// operazione di modifica della password dell'account
 				ViewModificaPassword viewModificaPassword = new ViewModificaPassword(emailInserita);
-				;
+
 				viewModificaPassword.setLocationRelativeTo(null);
 				viewModificaPassword.setVisible(true);
 			}
@@ -386,6 +389,7 @@ public class ViewDashboard extends JFrame {
 
 		// Evento per mostrare il menù al clic sull'immagine
 		lblUser.addMouseListener(new java.awt.event.MouseAdapter() {
+			@Override
 			public void mousePressed(java.awt.event.MouseEvent evt) {
 				if (evt.getButton() == java.awt.event.MouseEvent.BUTTON1) {
 					menuUtente.show(lblUser, evt.getX(), evt.getY());

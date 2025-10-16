@@ -1,6 +1,5 @@
 package gui;
 
-
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
@@ -28,6 +27,7 @@ import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.SpringLayout;
 import javax.swing.SwingConstants;
+import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -38,7 +38,6 @@ import database.ConnessioneDatabase;
 import model.Filtri;
 import util.GuiUtils;
 import util.InputUtils;
-
 
 public class ViewDashboardAgente extends JFrame {
 
@@ -59,20 +58,20 @@ public class ViewDashboardAgente extends JFrame {
 	public ViewDashboardAgente(String emailInserita) {
 		// Imposta l'icona di DietiEstates25 alla finestra in uso
 		GuiUtils.setIconaFinestra(this);
-		this.setTitle("DietiEstates25 - Dashboard per l'Agente immobiliare");
+		setTitle("DietiEstates25 - Dashboard per l'Agente immobiliare");
 
-		this.setResizable(true);
+		setResizable(true);
 		Preferences.userNodeForPackage(ViewFiltri.class);
 
 		// Opzioni per le comboBox
-		String[] opAppartamento = {"Vendita", "Affitto"};
+		String[] opAppartamento = { "Vendita", "Affitto" };
 
-		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		this.setBounds(100, 100, 1267, 805);
 		JPanel dashboard = new JPanel();
 		dashboard.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 11));
 		dashboard.setBorder(new EmptyBorder(5, 5, 5, 5));
-		this.setContentPane(dashboard);
+		setContentPane(dashboard);
 		dashboard.setLayout(null);
 		SpringLayout sl_dashboard = new SpringLayout();
 		dashboard.setLayout(sl_dashboard);
@@ -99,33 +98,33 @@ public class ViewDashboardAgente extends JFrame {
 		JScrollPane scrollPane = new JScrollPane();
 		sl_risultatiDaRicerca.putConstraint(SpringLayout.NORTH, scrollPane, 47, SpringLayout.NORTH, risultatiDaRicerca);
 		sl_risultatiDaRicerca.putConstraint(SpringLayout.WEST, scrollPane, 10, SpringLayout.WEST, risultatiDaRicerca);
-		sl_risultatiDaRicerca.putConstraint(SpringLayout.SOUTH, scrollPane, -10, SpringLayout.SOUTH, risultatiDaRicerca);
+		sl_risultatiDaRicerca.putConstraint(SpringLayout.SOUTH, scrollPane, -10, SpringLayout.SOUTH,
+				risultatiDaRicerca);
 		sl_risultatiDaRicerca.putConstraint(SpringLayout.EAST, scrollPane, -10, SpringLayout.EAST, risultatiDaRicerca);
 		scrollPane.setBackground(new Color(255, 255, 255));
 		risultatiDaRicerca.add(scrollPane);
 
 		// Crea la JTable
-		this.tableRisultati = new JTable();
-		this.tableRisultati.setShowVerticalLines(false);
-		this.tableRisultati.setShowGrid(false);
-		this.tableRisultati.setRowHeight(100);
-		this.tableRisultati.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		this.tableRisultati.setSelectionBackground(new Color(226, 226, 226));
+		tableRisultati = new JTable();
+		tableRisultati.setShowVerticalLines(false);
+		tableRisultati.setShowGrid(false);
+		tableRisultati.setRowHeight(100);
+		tableRisultati.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		tableRisultati.setSelectionBackground(new Color(226, 226, 226));
 
-		// Crea il modello della tabella (con colonne: immagine, tipologia, descrizione, prezzo)
+		// Crea il modello della tabella (con colonne: immagine, tipologia, descrizione,
+		// prezzo)
 		DefaultTableModel model = new DefaultTableModel(
 				new String[] { "", "Titolo dell'annuncio", "Descrizione", "Prezzo (€)" }, 0 // 0 righe iniziali
-				) {
+		) {
 			private static final long serialVersionUID = 1L;
 
 			@SuppressWarnings("rawtypes")
-			Class[] columnTypes = new Class[] {
-					Object.class, String.class, String.class, String.class
-			};
+			Class[] columnTypes = new Class[] { Object.class, String.class, String.class, String.class };
 
 			@Override
 			public Class<?> getColumnClass(int columnIndex) {
-				return this.columnTypes[columnIndex];
+				return columnTypes[columnIndex];
 			}
 
 			@Override
@@ -136,27 +135,26 @@ public class ViewDashboardAgente extends JFrame {
 
 		// Assegna il modello alla tabella
 		// Blocca l'ordinamento/riposizionamento delle colonne
-		this.tableRisultati.getTableHeader().setReorderingAllowed(false);
+		tableRisultati.getTableHeader().setReorderingAllowed(false);
 
 		// Blocca il ridimensionamento delle colonne
-		this.tableRisultati.getTableHeader().setResizingAllowed(false);
+		tableRisultati.getTableHeader().setResizingAllowed(false);
 
-		this.tableRisultati.setModel(model);
+		tableRisultati.setModel(model);
 
-		this.tableRisultati.getColumnModel().getColumn(0).setResizable(false);
-		this.tableRisultati.getColumnModel().getColumn(1).setResizable(false);
-		this.tableRisultati.getColumnModel().getColumn(1).setPreferredWidth(170);
-		this.tableRisultati.getColumnModel().getColumn(2).setResizable(false);
-		this.tableRisultati.getColumnModel().getColumn(2).setPreferredWidth(450);
-		this.tableRisultati.getColumnModel().getColumn(3).setResizable(false);
-
+		tableRisultati.getColumnModel().getColumn(0).setResizable(false);
+		tableRisultati.getColumnModel().getColumn(1).setResizable(false);
+		tableRisultati.getColumnModel().getColumn(1).setPreferredWidth(170);
+		tableRisultati.getColumnModel().getColumn(2).setResizable(false);
+		tableRisultati.getColumnModel().getColumn(2).setPreferredWidth(450);
+		tableRisultati.getColumnModel().getColumn(3).setResizable(false);
 
 		// Nel mouse listener
-		this.tableRisultati.addMouseListener(new MouseAdapter() {
+		tableRisultati.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if (e.getClickCount() == 1) {
-					String idAccount = null;  // DICHIARAZIONE QUI
+					String idAccount = null; // DICHIARAZIONE QUI
 
 					try {
 						Controller controller = new Controller();
@@ -166,10 +164,11 @@ public class ViewDashboardAgente extends JFrame {
 						ex.printStackTrace();
 					}
 
-					int row = ViewDashboardAgente.this.tableRisultati.rowAtPoint(e.getPoint());
+					int row = tableRisultati.rowAtPoint(e.getPoint());
 					if (row >= 0) {
-						long idImmobile = (Long) ViewDashboardAgente.this.tableRisultati.getValueAt(row, 0);
+						long idImmobile = (Long) tableRisultati.getValueAt(row, 0);
 						ViewImmobile finestra = new ViewImmobile(idImmobile, idAccount);
+						finestra.setLocationRelativeTo(null);
 						finestra.setVisible(true);
 					}
 				}
@@ -179,22 +178,21 @@ public class ViewDashboardAgente extends JFrame {
 
 		// blocco finito
 
+		scrollPane.setViewportView(tableRisultati);
 
-
-		scrollPane.setViewportView(this.tableRisultati);
-
-		this.lblRisultati = new JLabel("Avvia una ricerca per vedere i tuoi immobili");
-		sl_risultatiDaRicerca.putConstraint(SpringLayout.NORTH, this.lblRisultati, 5, SpringLayout.NORTH, risultatiDaRicerca);
-		sl_risultatiDaRicerca.putConstraint(SpringLayout.WEST, this.lblRisultati, 20, SpringLayout.WEST, risultatiDaRicerca);
-		sl_risultatiDaRicerca.putConstraint(SpringLayout.SOUTH, this.lblRisultati, -10, SpringLayout.NORTH, scrollPane);
-		this.lblRisultati.setHorizontalAlignment(SwingConstants.LEFT);
-		this.lblRisultati.setForeground(Color.WHITE);
-		this.lblRisultati.setFont(new Font("Tahoma", Font.BOLD, 20));
-		risultatiDaRicerca.add(this.lblRisultati);
+		lblRisultati = new JLabel("Avvia una ricerca per vedere i tuoi immobili");
+		sl_risultatiDaRicerca.putConstraint(SpringLayout.NORTH, lblRisultati, 5, SpringLayout.NORTH,
+				risultatiDaRicerca);
+		sl_risultatiDaRicerca.putConstraint(SpringLayout.WEST, lblRisultati, 20, SpringLayout.WEST, risultatiDaRicerca);
+		sl_risultatiDaRicerca.putConstraint(SpringLayout.SOUTH, lblRisultati, -10, SpringLayout.NORTH, scrollPane);
+		lblRisultati.setHorizontalAlignment(SwingConstants.LEFT);
+		lblRisultati.setForeground(Color.WHITE);
+		lblRisultati.setFont(new Font("Tahoma", Font.BOLD, 20));
+		risultatiDaRicerca.add(lblRisultati);
 
 		// Carica un immobile
 		JButton btnCaricaImmobile = new JButton("Carica immobile");
-		sl_risultatiDaRicerca.putConstraint(SpringLayout.NORTH, btnCaricaImmobile, 8, SpringLayout.NORTH, this.lblRisultati);
+		sl_risultatiDaRicerca.putConstraint(SpringLayout.NORTH, btnCaricaImmobile, 8, SpringLayout.NORTH, lblRisultati);
 		btnCaricaImmobile.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -212,12 +210,14 @@ public class ViewDashboardAgente extends JFrame {
 		// Vedi Offerte Proposte
 		JButton btnVediOfferteProposte = new JButton("Vedi offerte proposte");
 		btnVediOfferteProposte.setFocusable(false);
-		sl_risultatiDaRicerca.putConstraint(SpringLayout.NORTH, btnVediOfferteProposte, 8, SpringLayout.NORTH, this.lblRisultati);
-		sl_risultatiDaRicerca.putConstraint(SpringLayout.EAST, btnVediOfferteProposte, -18, SpringLayout.WEST, btnCaricaImmobile);
+		sl_risultatiDaRicerca.putConstraint(SpringLayout.NORTH, btnVediOfferteProposte, 8, SpringLayout.NORTH,
+				lblRisultati);
+		sl_risultatiDaRicerca.putConstraint(SpringLayout.EAST, btnVediOfferteProposte, -18, SpringLayout.WEST,
+				btnCaricaImmobile);
 		btnVediOfferteProposte.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				ViewOfferte viewOfferte = new ViewOfferte(emailInserita);
+				ViewOfferteProposte viewOfferte = new ViewOfferteProposte(emailInserita);
 				viewOfferte.setLocationRelativeTo(null);
 				viewOfferte.setVisible(true);
 			}
@@ -230,27 +230,28 @@ public class ViewDashboardAgente extends JFrame {
 
 		// Elimina un immobile
 		JButton btnEliminaImmobile = new JButton("Elimina Immobile");
-		sl_risultatiDaRicerca.putConstraint(SpringLayout.EAST, btnCaricaImmobile, -19, SpringLayout.WEST, btnEliminaImmobile);
-		sl_risultatiDaRicerca.putConstraint(SpringLayout.NORTH, btnEliminaImmobile, -34, SpringLayout.NORTH, scrollPane);
-		sl_risultatiDaRicerca.putConstraint(SpringLayout.EAST, btnEliminaImmobile, -42, SpringLayout.EAST, risultatiDaRicerca);
+		sl_risultatiDaRicerca.putConstraint(SpringLayout.EAST, btnCaricaImmobile, -19, SpringLayout.WEST,
+				btnEliminaImmobile);
+		sl_risultatiDaRicerca.putConstraint(SpringLayout.NORTH, btnEliminaImmobile, -34, SpringLayout.NORTH,
+				scrollPane);
+		sl_risultatiDaRicerca.putConstraint(SpringLayout.EAST, btnEliminaImmobile, -42, SpringLayout.EAST,
+				risultatiDaRicerca);
 
 		// Disabilita il pulsante inizialmente
 		btnEliminaImmobile.setEnabled(false);
 
 		// Aggiungi un listener per la selezione della tabella
-		this.tableRisultati.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+		tableRisultati.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
 				// Abilita il pulsante solo se una riga è selezionata
-				btnEliminaImmobile.setEnabled(ViewDashboardAgente.this.tableRisultati.getSelectedRow() != -1);
+				btnEliminaImmobile.setEnabled(tableRisultati.getSelectedRow() != -1);
 			}
 		});
 		btnEliminaImmobile.setToolTipText("Clicca su uno degli immobili per poterlo eliminare");
 		btnEliminaImmobile.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 11));
 		btnEliminaImmobile.setBackground(Color.WHITE);
 		risultatiDaRicerca.add(btnEliminaImmobile);
-
-
 
 		// Pannello per effettuare le ricerche di immobili e altri comandi
 		JPanel ricerca = new JPanel();
@@ -265,15 +266,16 @@ public class ViewDashboardAgente extends JFrame {
 		ricerca.setBackground(new Color(255, 255, 255));
 		dashboard.add(ricerca);
 
-		// campo dove scrivere la località o zona nella quale si ha intenzione di effettuare una ricerca
-		this.campoRicerca = new JTextField();
+		// campo dove scrivere la località o zona nella quale si ha intenzione di
+		// effettuare una ricerca
+		campoRicerca = new JTextField();
 
-		this.campoRicerca.setText("Cerca scrivendo una via, una zona o una parola chiave");
-		this.campoRicerca.setFont(new Font("Yu Gothic UI Semibold", Font.ITALIC, 11));
-		this.campoRicerca.setColumns(10);
+		campoRicerca.setText("Cerca scrivendo una via, una zona o una parola chiave");
+		campoRicerca.setFont(new Font("Yu Gothic UI Semibold", Font.ITALIC, 11));
+		campoRicerca.setColumns(10);
 
 		// se scrivo sul campo ricerca
-		this.campoRicerca.addKeyListener(new KeyAdapter() {
+		campoRicerca.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyTyped(KeyEvent e) {
 				ViewDashboardAgente.this.setCampoDiTestoIn();
@@ -281,7 +283,7 @@ public class ViewDashboardAgente extends JFrame {
 		});
 
 		// se premo sul campo di ricerca
-		this.campoRicerca.addMouseListener(new MouseAdapter() {
+		campoRicerca.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				ViewDashboardAgente.this.setCampoDiTestoIn();
@@ -297,32 +299,34 @@ public class ViewDashboardAgente extends JFrame {
 		});
 
 		SpringLayout sl_ricerca = new SpringLayout();
-		sl_ricerca.putConstraint(SpringLayout.EAST, this.campoRicerca, -355, SpringLayout.EAST, ricerca);
-		sl_ricerca.putConstraint(SpringLayout.HORIZONTAL_CENTER, this.campoRicerca, 0, SpringLayout.HORIZONTAL_CENTER, ricerca);
-		sl_ricerca.putConstraint(SpringLayout.VERTICAL_CENTER, this.campoRicerca, 0, SpringLayout.VERTICAL_CENTER, ricerca);
+		sl_ricerca.putConstraint(SpringLayout.EAST, campoRicerca, -355, SpringLayout.EAST, ricerca);
+		sl_ricerca.putConstraint(SpringLayout.HORIZONTAL_CENTER, campoRicerca, 0, SpringLayout.HORIZONTAL_CENTER,
+				ricerca);
+		sl_ricerca.putConstraint(SpringLayout.VERTICAL_CENTER, campoRicerca, 0, SpringLayout.VERTICAL_CENTER, ricerca);
 		ricerca.setLayout(sl_ricerca);
 
-		this.comboBoxAppartamento = new JComboBox<>(opAppartamento);
-		sl_ricerca.putConstraint(SpringLayout.WEST, this.comboBoxAppartamento, 248, SpringLayout.WEST, ricerca);
-		sl_ricerca.putConstraint(SpringLayout.EAST, this.comboBoxAppartamento, -23, SpringLayout.WEST, this.campoRicerca);
-		sl_ricerca.putConstraint(SpringLayout.SOUTH, this.campoRicerca, 0, SpringLayout.SOUTH, this.comboBoxAppartamento);
-		sl_ricerca.putConstraint(SpringLayout.SOUTH, this.comboBoxAppartamento, -70, SpringLayout.SOUTH, ricerca);
-		this.comboBoxAppartamento.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 11));
-		this.comboBoxAppartamento.setFocusable(false);
-		this.comboBoxAppartamento.setForeground(new Color(0, 0, 51));
-		this.comboBoxAppartamento.setBackground(new Color(255, 255, 255));
-		this.comboBoxAppartamento.setToolTipText("Seleziona la tipologia di appartamento");
+		comboBoxAppartamento = new JComboBox<>(opAppartamento);
+		sl_ricerca.putConstraint(SpringLayout.WEST, comboBoxAppartamento, 248, SpringLayout.WEST, ricerca);
+		sl_ricerca.putConstraint(SpringLayout.EAST, comboBoxAppartamento, -23, SpringLayout.WEST, campoRicerca);
+		sl_ricerca.putConstraint(SpringLayout.SOUTH, campoRicerca, 0, SpringLayout.SOUTH, comboBoxAppartamento);
+		sl_ricerca.putConstraint(SpringLayout.SOUTH, comboBoxAppartamento, -70, SpringLayout.SOUTH, ricerca);
+		comboBoxAppartamento.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 11));
+		comboBoxAppartamento.setFocusable(false);
+		comboBoxAppartamento.setForeground(new Color(0, 0, 51));
+		comboBoxAppartamento.setBackground(new Color(255, 255, 255));
+		comboBoxAppartamento.setToolTipText("Seleziona la tipologia di appartamento");
 
-		ricerca.add(this.comboBoxAppartamento);
-		ricerca.add(this.campoRicerca);
+		ricerca.add(comboBoxAppartamento);
+		ricerca.add(campoRicerca);
 
 		// Effettua la disconnessione
-		this.lblLogout = new JLabel();
-		this.lblLogout.addMouseListener(new MouseAdapter() {
+		lblLogout = new JLabel();
+		lblLogout.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				// Mostra una finestra di conferma
-				int scelta = JOptionPane.showConfirmDialog(null,"Sei sicuro di voler fare logout?","Conferma logout",JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE);
+				int scelta = JOptionPane.showConfirmDialog(null, "Sei sicuro di voler fare logout?", "Conferma logout",
+						JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 
 				// Se l'utente sceglie "Sì"
 				if (scelta == JOptionPane.YES_OPTION) {
@@ -330,10 +334,13 @@ public class ViewDashboardAgente extends JFrame {
 						// Chiusura della connessione al database
 						ConnessioneDatabase.getInstance().closeConnection();
 						// Successo
-						JOptionPane.showMessageDialog(null,"Disconnessione avvenuta con successo","Avviso",JOptionPane.INFORMATION_MESSAGE);
+						JOptionPane.showMessageDialog(null, "Disconnessione avvenuta con successo", "Avviso",
+								JOptionPane.INFORMATION_MESSAGE);
 					} catch (SQLException ex) {
 						// Errore
-						JOptionPane.showMessageDialog(null,"Errore durante la chiusura della connessione: " + ex.getMessage(),"Errore",JOptionPane.ERROR_MESSAGE);
+						JOptionPane.showMessageDialog(null,
+								"Errore durante la chiusura della connessione: " + ex.getMessage(), "Errore",
+								JOptionPane.ERROR_MESSAGE);
 						return; // esce dal metodo se c'è stato un errore
 					}
 
@@ -347,9 +354,9 @@ public class ViewDashboardAgente extends JFrame {
 				}
 			}
 		});
-		this.lblLogout.setToolTipText("Clicca per uscire da DietiEstates25");
-		ricerca.add(this.lblLogout);
-		GuiUtils.setIconaLabel(this.lblLogout, "Logout");
+		lblLogout.setToolTipText("Clicca per uscire da DietiEstates25");
+		ricerca.add(lblLogout);
+		GuiUtils.setIconaLabel(lblLogout, "Logout");
 
 		// Bottone per avviare la ricerca di un immobile
 		JButton btnEseguiRicerca = new JButton();
@@ -362,10 +369,9 @@ public class ViewDashboardAgente extends JFrame {
 		sl_ricerca.putConstraint(SpringLayout.EAST, btnEseguiRicerca, -255, SpringLayout.EAST, ricerca);
 
 		// Bottone predefinito alla pressione del tasto Enter
-		this.getRootPane().setDefaultButton(btnEseguiRicerca);
+		getRootPane().setDefaultButton(btnEseguiRicerca);
 		btnEseguiRicerca.setToolTipText("Clicca per iniziare una ricerca");
 		btnEseguiRicerca.setBorderPainted(false);
-
 
 		btnEseguiRicerca.addActionListener(new ActionListener() {
 			@Override
@@ -376,13 +382,12 @@ public class ViewDashboardAgente extends JFrame {
 
 		ricerca.add(btnEseguiRicerca);
 
-
 		JLabel lblUser = new JLabel("");
 		sl_ricerca.putConstraint(SpringLayout.EAST, lblUser, -89, SpringLayout.EAST, ricerca);
-		sl_ricerca.putConstraint(SpringLayout.SOUTH, this.lblLogout, 0, SpringLayout.SOUTH, lblUser);
+		sl_ricerca.putConstraint(SpringLayout.SOUTH, lblLogout, 0, SpringLayout.SOUTH, lblUser);
 		sl_ricerca.putConstraint(SpringLayout.NORTH, lblUser, 8, SpringLayout.NORTH, ricerca);
-		sl_ricerca.putConstraint(SpringLayout.NORTH, this.lblLogout, 0, SpringLayout.NORTH, lblUser);
-		sl_ricerca.putConstraint(SpringLayout.WEST, this.lblLogout, 11, SpringLayout.EAST, lblUser);
+		sl_ricerca.putConstraint(SpringLayout.NORTH, lblLogout, 0, SpringLayout.NORTH, lblUser);
+		sl_ricerca.putConstraint(SpringLayout.WEST, lblLogout, 11, SpringLayout.EAST, lblUser);
 		lblUser.setToolTipText("Clicca per vedere altre ozioni sul profilo");
 		ricerca.add(lblUser);
 
@@ -420,7 +425,7 @@ public class ViewDashboardAgente extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// operazione di modifica della password dell'account
-				ViewModificaPassword viewModificaPassword = new ViewModificaPassword(emailInserita);;
+				ViewModificaPassword viewModificaPassword = new ViewModificaPassword(emailInserita);
 				viewModificaPassword.setLocationRelativeTo(null);
 				viewModificaPassword.setVisible(true);
 			}
@@ -457,20 +462,20 @@ public class ViewDashboardAgente extends JFrame {
 
 		JLabel lblEmailAccesso = new JLabel("<email>");
 		sl_ricerca.putConstraint(SpringLayout.NORTH, btnEseguiRicerca, 50, SpringLayout.SOUTH, lblEmailAccesso);
-		sl_ricerca.putConstraint(SpringLayout.NORTH, this.campoRicerca, 50, SpringLayout.SOUTH, lblEmailAccesso);
-		sl_ricerca.putConstraint(SpringLayout.NORTH, this.comboBoxAppartamento, 50, SpringLayout.SOUTH, lblEmailAccesso);
+		sl_ricerca.putConstraint(SpringLayout.NORTH, campoRicerca, 50, SpringLayout.SOUTH, lblEmailAccesso);
+		sl_ricerca.putConstraint(SpringLayout.NORTH, comboBoxAppartamento, 50, SpringLayout.SOUTH, lblEmailAccesso);
 		sl_ricerca.putConstraint(SpringLayout.NORTH, lblEmailAccesso, 1, SpringLayout.SOUTH, lblBenvenuto);
 		sl_ricerca.putConstraint(SpringLayout.WEST, lblEmailAccesso, 532, SpringLayout.EAST, lblTitolo);
-		sl_ricerca.putConstraint(SpringLayout.SOUTH, lblEmailAccesso, 0, SpringLayout.SOUTH, this.lblLogout);
+		sl_ricerca.putConstraint(SpringLayout.SOUTH, lblEmailAccesso, 0, SpringLayout.SOUTH, lblLogout);
 		sl_ricerca.putConstraint(SpringLayout.EAST, lblEmailAccesso, 0, SpringLayout.EAST, lblBenvenuto);
 		lblEmailAccesso.setHorizontalAlignment(SwingConstants.RIGHT);
-		lblEmailAccesso.setText(emailInserita+" ");
+		lblEmailAccesso.setText(emailInserita + " ");
 		lblEmailAccesso.setFont(new Font("Yu Gothic UI Semibold", Font.ITALIC, 11));
 		ricerca.add(lblEmailAccesso);
 
 		// filtri
 		JLabel lblFiltri = new JLabel();
-		sl_ricerca.putConstraint(SpringLayout.WEST, lblFiltri, 23, SpringLayout.EAST, this.campoRicerca);
+		sl_ricerca.putConstraint(SpringLayout.WEST, lblFiltri, 23, SpringLayout.EAST, campoRicerca);
 		sl_ricerca.putConstraint(SpringLayout.EAST, lblFiltri, -302, SpringLayout.EAST, ricerca);
 		sl_ricerca.putConstraint(SpringLayout.WEST, btnEseguiRicerca, 17, SpringLayout.EAST, lblFiltri);
 		sl_ricerca.putConstraint(SpringLayout.NORTH, lblFiltri, 50, SpringLayout.SOUTH, lblEmailAccesso);
@@ -480,61 +485,58 @@ public class ViewDashboardAgente extends JFrame {
 		lblFiltri.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				String tipologiaAppartamento = (String) ViewDashboardAgente.this.comboBoxAppartamento.getSelectedItem();
-				ViewDashboardAgente.this.viewFiltri = new ViewFiltri(tipologiaAppartamento);
-				ViewDashboardAgente.this.viewFiltri.setLocationRelativeTo(null);
-				ViewDashboardAgente.this.viewFiltri.setVisible(true);
+				String tipologiaAppartamento = (String) comboBoxAppartamento.getSelectedItem();
+				viewFiltri = new ViewFiltri(tipologiaAppartamento);
+				viewFiltri.setLocationRelativeTo(null);
+				viewFiltri.setVisible(true);
 
 			}
 		});
 		ricerca.add(lblFiltri);
 
 		GuiUtils.setIconaLabel(lblFiltri, "Tune");
-
-		// Aggiungi un nuovo agente o amministratore
-		// Creazione del menù a tendina per le opzioni di amministrazione
-		JPopupMenu menuAggiungiUtente = new JPopupMenu();
 	}
-
-
 
 	// METODI
 
-	// tale metodo serve a ricercare immobili per poi riempire la tabella con i risultati trovati
+	// tale metodo serve a ricercare immobili per poi riempire la tabella con i
+	// risultati trovati
 	private void ricercaImmobili() {
 		Controller controller = new Controller();
-		String tipologiaAppartamento = (String) this.comboBoxAppartamento.getSelectedItem();
-		this.campoPieno = this.campoRicerca.getText();
-		if(this.campoPieno.equals("Cerca scrivendo una via, una zona o una parola chiave") || this.campoPieno.equals(this.campoVuoto))
-			JOptionPane.showMessageDialog(null, "Scrivere qualcosa prima di iniziare la ricerca!", "Attenzione", JOptionPane.INFORMATION_MESSAGE);
-		else{
+		String tipologiaAppartamento = (String) comboBoxAppartamento.getSelectedItem();
+		campoPieno = campoRicerca.getText();
+		if (campoPieno.equals("Cerca scrivendo una via, una zona o una parola chiave") || campoPieno.equals(campoVuoto))
+			JOptionPane.showMessageDialog(null, "Scrivere qualcosa prima di iniziare la ricerca!", "Attenzione",
+					JOptionPane.INFORMATION_MESSAGE);
+		else {
 			// effettuo la ricerca e riempio la tabella
 
 			// capitolizzo la parola (o stringa) che l'utente ha inserito da tastiera
-			this.campoPieno = InputUtils.capitalizzaParole(this.campoPieno);
+			campoPieno = InputUtils.capitalizzaParole(campoPieno);
 
 			ViewFiltri viewFiltri = new ViewFiltri(tipologiaAppartamento);
 			Filtri filtri = viewFiltri.getFiltriSelezionati();
-			this.numeroRisultatiTrovati = controller.riempiTableRisultati(this.tableRisultati, this.campoPieno, tipologiaAppartamento, filtri);
-			this.lblRisultati.setText("Immobili trovati: " + this.numeroRisultatiTrovati);
+			numeroRisultatiTrovati = controller.riempiTableRisultati(tableRisultati, campoPieno, tipologiaAppartamento,
+					filtri);
+			lblRisultati.setText("Immobili trovati: " + numeroRisultatiTrovati);
 		}
 	}
 
 	// metodo che serve a sostituire il campo di ricerca in un campo vuoto
 	private void setCampoDiTestoIn() {
-		this.campoPieno = this.campoRicerca.getText();
-		if(this.campoPieno.equals("Cerca scrivendo una via, una zona o una parola chiave")) {
-			this.campoRicerca.setText(this.campoVuoto);
-			this.campoRicerca.setFont(new Font("Yu Gothic UI Semibold", Font.CENTER_BASELINE, 11));
+		campoPieno = campoRicerca.getText();
+		if (campoPieno.equals("Cerca scrivendo una via, una zona o una parola chiave")) {
+			campoRicerca.setText(campoVuoto);
+			campoRicerca.setFont(new Font("Yu Gothic UI Semibold", Font.CENTER_BASELINE, 11));
 		}
 	}
 
 	// metodo che serve a sostituire il campo di ricerca con un testo predefinito
 	private void setCampoDiTestoOut() {
-		this.campoPieno = this.campoRicerca.getText();
-		if(this.campoPieno.equals(this.campoVuoto)) {
-			this.campoRicerca.setText("Cerca scrivendo una via, una zona o una parola chiave");
-			this.campoRicerca.setFont(new Font("Yu Gothic UI Semibold", Font.ITALIC, 11));
+		campoPieno = campoRicerca.getText();
+		if (campoPieno.equals(campoVuoto)) {
+			campoRicerca.setText("Cerca scrivendo una via, una zona o una parola chiave");
+			campoRicerca.setFont(new Font("Yu Gothic UI Semibold", Font.ITALIC, 11));
 		}
 
 	}

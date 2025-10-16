@@ -9,7 +9,6 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.net.URL;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -20,13 +19,19 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 
 import controller.Controller;
 import model.CognitoApp;
+import util.GuiUtils;
 
 public class ViewRegistraSupporto extends JFrame {
 
+	/**
+	 *
+	 */
+	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JTextField Nome_Utente;
 	private JTextField Cognome_Utente;
@@ -50,7 +55,13 @@ public class ViewRegistraSupporto extends JFrame {
 	 */
 
 	public ViewRegistraSupporto(String Email_Utente, String agenzia) {
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setTitle("DietiEstates25 - Registra un nuovo amministratore di supporto");
+		setResizable(false);
+
+		// Imposta l'icona di DietiEstates25 alla finestra in uso
+		GuiUtils.setIconaFinestra(this);
+
+		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 459, 618);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -59,12 +70,10 @@ public class ViewRegistraSupporto extends JFrame {
 
 		panel = new JPanel();
 		panel.setBackground(SystemColor.menu);
-		panel.setBounds(0, 0, 452, 579);
+		panel.setBounds(0, 0, 457, 593);
 		contentPane.add(panel);
 		panel.setLayout(null);
 		SwingUtilities.invokeLater(() -> requestFocusInWindow());
-
-		URL pathlogo2 = getClass().getClassLoader().getResource("images/DietiEstatesLogomid.png");
 
 		Citta_Utente = new JTextField();
 		Citta_Utente.setFont(new Font("Tahoma", Font.BOLD, 11));
@@ -72,7 +81,7 @@ public class ViewRegistraSupporto extends JFrame {
 		panel.add(Citta_Utente);
 		Citta_Utente.setText("Citt\u00E0");
 		Citta_Utente.setColumns(10);
-		labelClicked(Citta_Utente, "Citt�");
+		labelClicked(Citta_Utente, "Città");
 
 		Password_Utente = new JPasswordField();
 		Password_Utente.setFont(new Font("Tahoma", Font.BOLD, 11));
@@ -208,33 +217,31 @@ public class ViewRegistraSupporto extends JFrame {
 		lblIndirizzoError.setBounds(68, 217, 134, 14);
 		panel.add(lblIndirizzoError);
 
-		JButton btnNewButton = new JButton("Registra agente");
+		JButton btnNewButton = new JButton("Registra supporto");
 		btnNewButton.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 
 				String nome = Nome_Utente.getText();
 				if (!nome.matches("[a-zA-Z�-�\\s]+")) {
 					lblNameError.setVisible(true);
 					Nome_Utente.setText("Nome");
-				} else {
+				} else
 					lblNameError.setVisible(false);
-				}
 
 				String cognome = Cognome_Utente.getText();
 				if (!cognome.matches("[a-zA-Z�-�\\s]+")) {
 					lblCognomeError.setVisible(true);
 					Cognome_Utente.setText("Cognome");
-				} else {
+				} else
 					lblCognomeError.setVisible(false);
-				}
 
 				String citta = Citta_Utente.getText();
 				if (!citta.matches("[a-zA-Z�-�\\s]+")) {
 					lblCittaError.setVisible(true);
 					Citta_Utente.setText("Citt�");
-				} else {
+				} else
 					lblCittaError.setVisible(false);
-				}
 
 				String telefono = Telefono_Utente.getText().trim();
 
@@ -242,9 +249,8 @@ public class ViewRegistraSupporto extends JFrame {
 
 					lblTelefonoError.setVisible(true);
 					Telefono_Utente.setText("Telefono");
-				} else {
+				} else
 					lblTelefonoError.setVisible(false);
-				}
 
 				String cap = Cap_Utente.getText().trim();
 
@@ -252,19 +258,15 @@ public class ViewRegistraSupporto extends JFrame {
 
 					lblCapError.setVisible(true);
 					Cap_Utente.setText("CAP");
-				} else {
+				} else
 					lblCapError.setVisible(false);
-				}
 
 				String indirizzo = Indirizzo_Utente.getText();
 				if (!indirizzo.matches("[a-zA-Z�-�\\s]+")) {
 					lblIndirizzoError.setVisible(true);
 					Indirizzo_Utente.setText("Indirizzo");
-				} else {
-
+				} else
 					lblIndirizzoError.setVisible(false);
-
-				}
 
 				char[] passwordChar = Password_Utente.getPassword();
 				String passwordUtente = new String(passwordChar);
@@ -277,12 +279,9 @@ public class ViewRegistraSupporto extends JFrame {
 							indirizzo, ruolo, agenzia);
 
 					dispose();
-				} else {
-
+				} else
 					JOptionPane.showMessageDialog(null, "La registrazione � fallita. Riprova con i dati corretti.",
 							"Errore nella registrazione", JOptionPane.ERROR_MESSAGE);
-
-				}
 
 				ViewDashboard schermata = new ViewDashboard(Email_Utente);
 				schermata.setVisible(true);
@@ -293,7 +292,7 @@ public class ViewRegistraSupporto extends JFrame {
 		btnNewButton.setForeground(Color.WHITE);
 		btnNewButton.setBackground(SystemColor.textHighlight);
 		btnNewButton.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 13));
-		btnNewButton.setBounds(154, 420, 139, 50);
+		btnNewButton.setBounds(128, 435, 200, 25);
 		panel.add(btnNewButton);
 	}
 
@@ -303,16 +302,14 @@ public class ViewRegistraSupporto extends JFrame {
 		field.addFocusListener(new FocusAdapter() {
 			@Override
 			public void focusGained(FocusEvent e) {
-				if (field.getText().equals(text)) {
+				if (field.getText().equals(text))
 					field.setText("");
-				}
 			}
 
 			@Override
 			public void focusLost(FocusEvent e) {
-				if (field.getText().trim().isEmpty()) {
+				if (field.getText().trim().isEmpty())
 					field.setText(text);
-				}
 			}
 		});
 	}
