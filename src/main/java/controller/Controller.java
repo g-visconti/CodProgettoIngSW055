@@ -284,6 +284,7 @@ public class Controller {
 
 		// Imposta renderer per la colonna immagini (se esiste metodo simile)
 		TableUtils.setImageRenderer(tableOfferteProposte, 0);
+
 	}
 
 	public Immobile recuperaDettagli(long idImmobile) {
