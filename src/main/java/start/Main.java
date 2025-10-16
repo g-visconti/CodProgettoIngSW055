@@ -1,15 +1,25 @@
 package start;
 
-import gui.ViewDashboardAgente;
+import gui.ViewDashboard;
 
 public class Main {
 
 	public static void main(String[] args) {
 
-		//ViewAccesso frame = new ViewAccesso();
-		//ViewDashboardAdmin frame = new ViewDashboardAdmin("admin@de25.it");
-		ViewDashboardAgente frame = new ViewDashboardAgente("agent3@immobiliare.it");
-		//ViewDashboard frame = new ViewDashboard("c.gallo@mail.it");
+		// Accesso generico
+		// ViewAccesso frame = new ViewAccesso();
+
+		// Admin
+		// ViewDashboardAdmin frame = new
+		// ViewDashboardAdmin("admimmobiliare@immobiliare.it");
+
+		// Agente
+		// ViewDashboardAgente frame = new
+		// ViewDashboardAgente("lucamagnini@immobiliare.it");
+
+		// Utente
+		ViewDashboard frame = new ViewDashboard("marioros@gmail.com");
+
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
 	}
