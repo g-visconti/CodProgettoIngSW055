@@ -34,6 +34,7 @@ import model.Immobile;
 import model.ImmobileInAffitto;
 import model.ImmobileInVendita;
 import model.Offerta;
+import util.Base64ImageRenderer;
 import util.ImageUtils;
 import util.TableUtils;
 import util.TextAreaRenderer;
@@ -145,6 +146,11 @@ public class Controller {
 	 */
 	private void impostaRendererStato(JTable table, int colonnaStatoIndex) {
 		DefaultTableCellRenderer rendererStato = new DefaultTableCellRenderer() {
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 8565820085308350483L;
+
 			@Override
 			public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
 					boolean hasFocus, int row, int column) {
@@ -211,81 +217,72 @@ public class Controller {
 	}
 
 	private void popolaTabellaOfferteProposte(JTable tableOfferteProposte, List<Object[]> datiOfferte) {
-		// Intestazioni della tabella
-		String[] nomiColonne = { "Immagini", "Categoria", "Descrizione", "Prezzo da me proposto", "Stato" };
+	    // Intestazioni della tabella
+	    String[] nomiColonne = { "Foto", "Categoria", "Descrizione", "Prezzo da me proposto", "Stato" };
 
-		// Modello della tabella
-		@SuppressWarnings("serial")
-		DefaultTableModel model = new DefaultTableModel(nomiColonne, 0) {
-			@Override
-			public Class<?> getColumnClass(int columnIndex) {
-				return switch (columnIndex) {
-				case 0 -> ImageIcon.class;
-				case 1, 2, 3, 4 -> String.class;
-				default -> Object.class;
-				};
-			}
+	    // Modello della tabella
+	    @SuppressWarnings("serial")
+	    DefaultTableModel model = new DefaultTableModel(nomiColonne, 0) {
+	        @Override
+	        public Class<?> getColumnClass(int columnIndex) {
+	            return switch (columnIndex) {
+	                case 0 -> ImageIcon.class;
+	                case 1, 2, 3, 4 -> String.class;
+	                default -> Object.class;
+	            };
+	        }
 
-			@Override
-			public boolean isCellEditable(int row, int column) {
-				return false;
-			}
-		};
+	        @Override
+	        public boolean isCellEditable(int row, int column) {
+	            return false;
+	        }
+	    };
 
-		NumberFormat format = NumberFormat.getNumberInstance(Locale.ITALY);
-		format.setGroupingUsed(true);
-		format.setMaximumFractionDigits(0);
-		format.setMinimumFractionDigits(0);
+	    NumberFormat format = NumberFormat.getNumberInstance(Locale.ITALY);
+	    format.setGroupingUsed(true);
+	    format.setMaximumFractionDigits(0);
+	    format.setMinimumFractionDigits(0);
 
-		// Riempimento delle righe
-		for (Object[] riga : datiOfferte) {
-			Object[] rigaFormattata = new Object[5];
-			rigaFormattata[0] = riga[0]; // immagine
-			rigaFormattata[1] = riga[1]; // categoria
-			rigaFormattata[2] = riga[2]; // descrizione
-			rigaFormattata[3] = "€ " + format.format(riga[3]); // prezzo formattato
-			rigaFormattata[4] = riga[4]; // stato
+	    // ✅ PRIMA riempi il modello, POI imposta altezza e renderer
+	    for (Object[] riga : datiOfferte) {
+	        Object[] rigaFormattata = new Object[5];
 
-			model.addRow(rigaFormattata);
-		}
+	        // ✅ Salva solo il Base64, il renderer si occuperà del ridimensionamento
+	        String base64 = (riga[0] instanceof String) ? (String) riga[0] : "";
+	        
+	        rigaFormattata[0] = base64; // Salva la stringa Base64, non l'ImageIcon
+	        rigaFormattata[1] = (String) riga[1];
+	        rigaFormattata[2] = (String) riga[2];
+	        rigaFormattata[3] = "€ " + format.format(riga[3]);
+	        rigaFormattata[4] = (String) riga[4];
 
-		// Imposta il nuovo modello
-		tableOfferteProposte.setModel(model);
+	        model.addRow(rigaFormattata);
+	    }
 
-		// Configurazione larghezze colonne
-		TableColumnModel columnModel = tableOfferteProposte.getColumnModel();
-		columnModel.getColumn(0).setPreferredWidth(150);
-		// columnModel.getColumn(0).setMinWidth(80);
-		// columnModel.getColumn(0).setMaxWidth(120);
+	    // Imposta il modello
+	    tableOfferteProposte.setModel(model);
 
-		columnModel.getColumn(1).setPreferredWidth(25);
-		columnModel.getColumn(2).setPreferredWidth(500);
-		columnModel.getColumn(3).setPreferredWidth(110);
-		columnModel.getColumn(4).setPreferredWidth(25);
+	    // ✅ IMPOSTA ALTEZZA DOPO aver settato il modello
+	    tableOfferteProposte.setRowHeight(100);
 
-		// Renderer per l'allineamento e lo stile
-		DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
-		centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
-
-		// Colonna Categoria → testo più leggibile (opzionale: grassetto blu scuro)
-		columnModel.getColumn(1).setCellRenderer(new TextBoldRenderer(true, new Color(50, 133, 177)));
-
-		// Colonna Descrizione → multilinea con wrapping automatico
-		columnModel.getColumn(2).setCellRenderer(new TextAreaRenderer());
-
-		// Colonna Prezzo → centrato, grassetto, verde scuro
-		columnModel.getColumn(3).setCellRenderer(new TextBoldRenderer(true, new Color(0, 0, 0)));
-
-		// Colonna Stato → centrato
-		impostaRendererStato(tableOfferteProposte, 4);
-
-		// Altezza righe maggiore per testi multilinea
-		tableOfferteProposte.setRowHeight(100);
-
-		// Imposta renderer per la colonna immagini (se esiste metodo simile)
-		TableUtils.setImageRenderer(tableOfferteProposte, 0);
-
+	    // Configurazione larghezze colonne
+	    TableColumnModel columnModel = tableOfferteProposte.getColumnModel();
+	    columnModel.getColumn(0).setPreferredWidth(25);
+	    columnModel.getColumn(1).setPreferredWidth(25);
+	    columnModel.getColumn(2).setPreferredWidth(500);
+	    columnModel.getColumn(3).setPreferredWidth(110);
+	    columnModel.getColumn(4).setPreferredWidth(25);
+	    
+	    // ✅ Usa un renderer personalizzato che gestisca il Base64
+	    columnModel.getColumn(0).setCellRenderer(new Base64ImageRenderer());
+	    // Renderer per testi e stili
+	    columnModel.getColumn(1).setCellRenderer(new TextBoldRenderer(true, new Color(50, 133, 177)));
+	    columnModel.getColumn(2).setCellRenderer(new TextAreaRenderer());
+	    columnModel.getColumn(3).setCellRenderer(new TextBoldRenderer(true, new Color(0, 0, 0)));
+	    impostaRendererStato(tableOfferteProposte, 4);
 	}
+
+
 
 	public Immobile recuperaDettagli(long idImmobile) {
 		try {

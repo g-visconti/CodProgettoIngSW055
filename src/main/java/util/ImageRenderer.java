@@ -37,7 +37,7 @@ public class ImageRenderer extends DefaultTableCellRenderer {
 			Image scaled = img.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
 			label.setIcon(new ImageIcon(scaled));
 		} else {
-			label.setText("No Image");
+			label.setText("Nessuna foto");
 		}
 
 		return label;

@@ -152,35 +152,53 @@ public class ImmobileDAO {
 		}
 	}
 
-	// Metodo corretto che restituisce solo i dati (senza logica UI)
 	public List<Object[]> getDatiOfferteProposte(String emailUtente) {
-		String query = "SELECT i.\"immagini\" as \"Immagini\", i.\"tipologia\" as \"Categoria\", i.\"descrizione\" as \"Descrizione\", "
-				+ "o.\"importo\" as \"Prezzo da me proposto\", o.\"stato\" as \"Stato\" " + "FROM \"Immobile\" i "
-				+ "INNER JOIN \"Offerta\" o ON i.\"idImmobile\" = o.\"immobileAssociato\" "
-				+ "INNER JOIN \"Cliente\" c ON o.\"accountAssociato\" = c.\"id\" " + "WHERE c.\"email\" = ?";
+	    String query = "SELECT i.\"immagini\" as \"Foto\", i.\"tipologia\" as \"Categoria\", i.\"descrizione\" as \"Descrizione\", "
+	                 + "o.\"importo\" as \"Prezzo da me proposto\", o.\"stato\" as \"Stato\" "
+	                 + "FROM \"Immobile\" i "
+	                 + "INNER JOIN \"Offerta\" o ON i.\"idImmobile\" = o.\"immobileAssociato\" "
+	                 + "INNER JOIN \"Cliente\" c ON o.\"accountAssociato\" = c.\"id\" "
+	                 + "WHERE c.\"email\" = ?";
 
-		List<Object[]> risultati = new ArrayList<>();
+	    List<Object[]> risultati = new ArrayList<>();
 
-		try (PreparedStatement stmt = connection.prepareStatement(query)) {
-			stmt.setString(1, emailUtente);
-			ResultSet rs = stmt.executeQuery();
+	    try (PreparedStatement stmt = connection.prepareStatement(query)) {
+	        stmt.setString(1, emailUtente);
+	        ResultSet rs = stmt.executeQuery();
 
-			while (rs.next()) {
-				Object[] riga = new Object[5];
-				// MODIFICA: usa getBytes invece di getString per le immagini
-				riga[0] = rs.getBytes("Immagini");
-				riga[1] = rs.getString("Categoria");
-				riga[2] = rs.getString("Descrizione");
-				riga[3] = rs.getBigDecimal("Prezzo da me proposto");
-				riga[4] = rs.getString("Stato");
-				risultati.add(riga);
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+	        while (rs.next()) {
+	            Object[] riga = new Object[5];
 
-		return risultati;
+	            // ✅ Leggi il JSON con le immagini (stringa)
+	            String immaginiJson = rs.getString("Foto");
+	            String primaImmagineBase64 = "";
+
+	            if (immaginiJson != null && !immaginiJson.isBlank()) {
+	                try {
+	                    JSONArray array = new JSONArray(immaginiJson);
+	                    if (array.length() > 0)
+	                        primaImmagineBase64 = array.getString(0); // prendi solo la prima immagine
+	                } catch (Exception e) {
+	                    e.printStackTrace();
+	                }
+	            }
+
+	            riga[0] = primaImmagineBase64;
+	            riga[1] = rs.getString("Categoria");
+	            riga[2] = rs.getString("Descrizione");
+	            riga[3] = rs.getBigDecimal("Prezzo da me proposto");
+	            riga[4] = rs.getString("Stato");
+
+	            risultati.add(riga);
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+
+	    return risultati;
 	}
+
+
 
 	public Immobile getImmobileById(long idimmobile) throws SQLException {
 		String sqlBase = "SELECT * FROM \"Immobile\" WHERE \"idImmobile\" = ?";

@@ -1,5 +1,6 @@
 package util;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Image;
 
@@ -36,7 +37,8 @@ public class TableUtils {
 					label.setIcon(new ImageIcon(img));
 					label.setText("");
 				} else {
-					label.setText("NO IMG");
+					label.setText("Nessuna foto");
+					label.setForeground(Color.GRAY);
 				}
 
 				return label;
