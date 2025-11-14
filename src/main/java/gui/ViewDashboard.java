@@ -114,7 +114,7 @@ public class ViewDashboard extends JFrame {
 		// prezzo)
 		DefaultTableModel model = new DefaultTableModel(
 				new String[] { "", "Titolo dell'annuncio", "Descrizione", "Prezzo (€)" }, 0 // 0 righe iniziali
-		) {
+				) {
 			private static final long serialVersionUID = 1L;
 
 			@SuppressWarnings("rawtypes")
@@ -349,11 +349,10 @@ public class ViewDashboard extends JFrame {
 		// Creazione del menù a tendina per la visualizzazione del profilo
 		JPopupMenu menuUtente = new JPopupMenu();
 		JMenuItem visualizzaInfoAccount = new JMenuItem("Visualizza informazioni sull'account");
-		JMenuItem notifiche = new JMenuItem("Notifiche");
 		JMenuItem modificaPassword = new JMenuItem("Modifica password");
 
 		menuUtente.add(visualizzaInfoAccount);
-		menuUtente.add(notifiche);
+
 		menuUtente.add(modificaPassword);
 
 		visualizzaInfoAccount.addActionListener(new ActionListener() {
@@ -363,16 +362,6 @@ public class ViewDashboard extends JFrame {
 				ViewAccount viewAccount = new ViewAccount(emailInserita);
 				viewAccount.setLocationRelativeTo(null);
 				viewAccount.setVisible(true);
-			}
-		});
-
-		// TODO: Sviluppare interfaccia per la visualizzazione delle notifiche
-		notifiche.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// visualizza le notifiche
-				// ...................................................................
-
 			}
 		});
 

@@ -21,7 +21,9 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
@@ -40,7 +42,7 @@ public class ViewCaricaImmobile extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
-	private JTextField descrizionefield;
+	private JTextArea descrizionefield;
 	private JTextField titolofield;
 	private JTextField localitafield;
 	private JTextField dimensionefield;
@@ -70,10 +72,12 @@ public class ViewCaricaImmobile extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 
-		descrizionefield = new JTextField();
-		descrizionefield.setBounds(81, 394, 419, 106);
-		contentPane.add(descrizionefield);
-		descrizionefield.setColumns(10);
+		descrizionefield = new JTextArea();
+		descrizionefield.setLineWrap(true);  // Abilita il wrap a capo automatico
+		descrizionefield.setWrapStyleWord(true);  // Fa andare a capo per parole intere
+		JScrollPane scrollPane = new JScrollPane(descrizionefield);  // Aggiungi scroll
+		scrollPane.setBounds(81, 394, 419, 106);  // Stesse dimensioni del campo originale
+		contentPane.add(scrollPane);  // Aggiungi lo scroll pane invece del campo diretto
 
 		JLabel lblNewLabel = new JLabel("");
 		lblNewLabel.setOpaque(true);
@@ -138,7 +142,7 @@ public class ViewCaricaImmobile extends JFrame {
 
 		JLabel lblNewLabel_2 = new JLabel("Descrizione");
 		lblNewLabel_2.setHorizontalAlignment(SwingConstants.CENTER);
-		lblNewLabel_2.setBounds(236, 370, 109, 20);
+		lblNewLabel_2.setBounds(229, 370, 109, 20);
 		contentPane.add(lblNewLabel_2);
 
 		JCheckBox ascensorefield = new JCheckBox("Ascensore");
@@ -317,7 +321,7 @@ public class ViewCaricaImmobile extends JFrame {
 			}
 
 		});
-		btnNewButton.setBounds(230, 547, 121, 25);
+		btnNewButton.setBounds(223, 547, 121, 25);
 		contentPane.add(btnNewButton);
 
 		prezzofield = new JTextField();

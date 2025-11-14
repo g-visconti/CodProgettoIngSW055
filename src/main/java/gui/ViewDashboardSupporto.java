@@ -30,8 +30,6 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
 import controller.Controller;
@@ -117,7 +115,7 @@ public class ViewDashboardSupporto extends JFrame {
 		// prezzo)
 		DefaultTableModel model = new DefaultTableModel(
 				new String[] { "", "Titolo dell'annuncio", "Descrizione", "Prezzo (€)" }, 0 // 0 righe iniziali
-		) {
+				) {
 			private static final long serialVersionUID = 1L;
 
 			@SuppressWarnings("rawtypes")
@@ -191,30 +189,13 @@ public class ViewDashboardSupporto extends JFrame {
 		lblRisultati.setFont(new Font("Tahoma", Font.BOLD, 20));
 		risultatiDaRicerca.add(lblRisultati);
 
-		// Carica un immobile
-		JButton btnCaricaImmobile = new JButton("Carica immobile");
-		sl_risultatiDaRicerca.putConstraint(SpringLayout.NORTH, btnCaricaImmobile, 8, SpringLayout.NORTH, lblRisultati);
-		btnCaricaImmobile.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				ViewCaricaImmobile viewCaricaImmobile = new ViewCaricaImmobile(emailInserita);
-				viewCaricaImmobile.setLocationRelativeTo(null);
-				viewCaricaImmobile.setVisible(true);
-			}
-		});
-
-		btnCaricaImmobile.setToolTipText("Clicca per inserire un nuovo immobile");
-		btnCaricaImmobile.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 11));
-		btnCaricaImmobile.setBackground(Color.WHITE);
-		risultatiDaRicerca.add(btnCaricaImmobile);
-
 		// Vedi Offerte Proposte
 		JButton btnVediOfferteProposte = new JButton("Vedi offerte proposte");
 		btnVediOfferteProposte.setFocusable(false);
 		sl_risultatiDaRicerca.putConstraint(SpringLayout.NORTH, btnVediOfferteProposte, 8, SpringLayout.NORTH,
 				lblRisultati);
-		sl_risultatiDaRicerca.putConstraint(SpringLayout.EAST, btnVediOfferteProposte, -18, SpringLayout.WEST,
-				btnCaricaImmobile);
+		sl_risultatiDaRicerca.putConstraint(SpringLayout.EAST, btnVediOfferteProposte, -42, SpringLayout.EAST,
+				risultatiDaRicerca);
 		btnVediOfferteProposte.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -229,30 +210,24 @@ public class ViewDashboardSupporto extends JFrame {
 		btnVediOfferteProposte.setBackground(Color.WHITE);
 		risultatiDaRicerca.add(btnVediOfferteProposte);
 
-		// Elimina un immobile
-		JButton btnEliminaImmobile = new JButton("Elimina Immobile");
-		sl_risultatiDaRicerca.putConstraint(SpringLayout.EAST, btnCaricaImmobile, -19, SpringLayout.WEST,
-				btnEliminaImmobile);
-		sl_risultatiDaRicerca.putConstraint(SpringLayout.NORTH, btnEliminaImmobile, -34, SpringLayout.NORTH,
-				scrollPane);
-		sl_risultatiDaRicerca.putConstraint(SpringLayout.EAST, btnEliminaImmobile, -42, SpringLayout.EAST,
-				risultatiDaRicerca);
-
-		// Disabilita il pulsante inizialmente
-		btnEliminaImmobile.setEnabled(false);
-
-		// Aggiungi un listener per la selezione della tabella
-		tableRisultati.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+		// Carica un immobile
+		JButton btnCaricaImmobile = new JButton("Carica immobile");
+		sl_risultatiDaRicerca.putConstraint(SpringLayout.NORTH, btnCaricaImmobile, 8, SpringLayout.NORTH, lblRisultati);
+		sl_risultatiDaRicerca.putConstraint(SpringLayout.EAST, btnCaricaImmobile, -18, SpringLayout.WEST,
+				btnVediOfferteProposte);
+		btnCaricaImmobile.addMouseListener(new MouseAdapter() {
 			@Override
-			public void valueChanged(ListSelectionEvent e) {
-				// Abilita il pulsante solo se una riga è selezionata
-				btnEliminaImmobile.setEnabled(tableRisultati.getSelectedRow() != -1);
+			public void mouseClicked(MouseEvent e) {
+				ViewCaricaImmobile viewCaricaImmobile = new ViewCaricaImmobile(emailInserita);
+				viewCaricaImmobile.setLocationRelativeTo(null);
+				viewCaricaImmobile.setVisible(true);
 			}
 		});
-		btnEliminaImmobile.setToolTipText("Clicca su uno degli immobili per poterlo eliminare");
-		btnEliminaImmobile.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 11));
-		btnEliminaImmobile.setBackground(Color.WHITE);
-		risultatiDaRicerca.add(btnEliminaImmobile);
+
+		btnCaricaImmobile.setToolTipText("Clicca per inserire un nuovo immobile");
+		btnCaricaImmobile.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 11));
+		btnCaricaImmobile.setBackground(Color.WHITE);
+		risultatiDaRicerca.add(btnCaricaImmobile);
 
 		// Pannello per effettuare le ricerche di immobili e altri comandi
 		JPanel ricerca = new JPanel();
@@ -394,11 +369,9 @@ public class ViewDashboardSupporto extends JFrame {
 		// Creazione del menù a tendina per la visualizzazione del profilo
 		JPopupMenu menuUtente = new JPopupMenu();
 		JMenuItem visualizzaInfoAccount = new JMenuItem("Visualizza informazioni sull'account");
-		JMenuItem notifiche = new JMenuItem("Notifiche");
 		JMenuItem modificaPassword = new JMenuItem("Modifica password");
 
 		menuUtente.add(visualizzaInfoAccount);
-		menuUtente.add(notifiche);
 		menuUtente.add(modificaPassword);
 
 		visualizzaInfoAccount.addActionListener(new ActionListener() {
@@ -408,16 +381,6 @@ public class ViewDashboardSupporto extends JFrame {
 				ViewAccount viewAccount = new ViewAccount(emailInserita);
 				viewAccount.setLocationRelativeTo(null);
 				viewAccount.setVisible(true);
-			}
-		});
-
-		// TODO: Sviluppare interfaccia per la visualizzazione delle notifiche
-		notifiche.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// visualizza le notifiche
-				// ...................................................................
-
 			}
 		});
 

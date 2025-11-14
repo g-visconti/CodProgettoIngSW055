@@ -41,8 +41,6 @@ public class ViewFiltri extends JFrame {
 	private JComboBox<String> comboBoxPiano;
 	private JComboBox<String> comboBoxNumBagni;
 	private JCheckBox chckbxAscensore;
-	// TODO eliminare posto auto
-	private JCheckBox chckbxPostoAuto;
 	private JCheckBox chckbxPortineria;
 	private JCheckBox chckbxClimatizzazione;
 
@@ -220,12 +218,6 @@ public class ViewFiltri extends JFrame {
 		// chckbxAscensore.setSelected(false);
 		chckbxAscensore.setSelected(prefs.getBoolean("ascensore", false));
 
-		chckbxPostoAuto = new JCheckBox("Posto auto");
-		chckbxPostoAuto.setFont(new Font("Tahoma", Font.BOLD, 11));
-		chckbxPostoAuto.setBounds(523, 255, 97, 23);
-		panelTitolo.add(chckbxPostoAuto);
-		chckbxPostoAuto.setSelected(prefs.getBoolean("postoAuto", false));
-
 		chckbxPortineria = new JCheckBox("Portineria");
 		chckbxPortineria.setFont(new Font("Tahoma", Font.BOLD, 11));
 		chckbxPortineria.setBounds(648, 215, 97, 23);
@@ -234,7 +226,7 @@ public class ViewFiltri extends JFrame {
 
 		chckbxClimatizzazione = new JCheckBox("Climatizzazione");
 		chckbxClimatizzazione.setFont(new Font("Tahoma", Font.BOLD, 11));
-		chckbxClimatizzazione.setBounds(648, 255, 115, 23);
+		chckbxClimatizzazione.setBounds(523, 255, 115, 23);
 		panelTitolo.add(chckbxClimatizzazione);
 		chckbxClimatizzazione.setSelected(prefs.getBoolean("climatizzazione", false));
 
@@ -254,7 +246,6 @@ public class ViewFiltri extends JFrame {
 				prefs.put("numBagni", (String) comboBoxNumBagni.getSelectedItem());
 				prefs.putBoolean("ascensore", chckbxAscensore.isSelected());
 				prefs.putBoolean("portineria", chckbxPortineria.isSelected());
-				prefs.putBoolean("postoAuto", chckbxPostoAuto.isSelected());
 				prefs.putBoolean("climatizzazione", chckbxClimatizzazione.isSelected());
 				// chiama view dashboard con stringa di preferenze (?)
 				ViewFiltri.this.dispose();
@@ -332,11 +323,9 @@ public class ViewFiltri extends JFrame {
 		Integer numBagni = InputUtils.parseComboInteger(comboBoxNumBagni);
 		Boolean ascensore = chckbxAscensore.isSelected() ? Boolean.TRUE : null;
 		Boolean portineria = chckbxPortineria.isSelected() ? Boolean.TRUE : null;
-		Boolean postoAuto = chckbxPostoAuto.isSelected() ? Boolean.TRUE : null;
 		Boolean climatizzazione = chckbxClimatizzazione.isSelected() ? Boolean.TRUE : null;
 
-		return new Filtri(prezzoMin, prezzoMax, supMin, supMax, piano, numLocali, numBagni, ascensore, portineria,
-				postoAuto, climatizzazione);
+		return new Filtri(prezzoMin, prezzoMax, supMin, supMax, piano, numLocali, numBagni, ascensore, portineria, climatizzazione);
 
 	}
 

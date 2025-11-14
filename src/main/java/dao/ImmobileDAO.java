@@ -153,49 +153,51 @@ public class ImmobileDAO {
 	}
 
 	public List<Object[]> getDatiOfferteProposte(String emailUtente) {
-	    String query = "SELECT i.\"immagini\" as \"Foto\", i.\"tipologia\" as \"Categoria\", i.\"descrizione\" as \"Descrizione\", "
-	                 + "o.\"importo\" as \"Prezzo da me proposto\", o.\"stato\" as \"Stato\" "
-	                 + "FROM \"Immobile\" i "
-	                 + "INNER JOIN \"Offerta\" o ON i.\"idImmobile\" = o.\"immobileAssociato\" "
-	                 + "INNER JOIN \"Cliente\" c ON o.\"accountAssociato\" = c.\"id\" "
-	                 + "WHERE c.\"email\" = ?";
+		String query = "SELECT i.\"immagini\" as \"Foto\", i.\"tipologia\" as \"Categoria\", i.\"descrizione\" as \"Descrizione\", "
+				+ "o.\"importo\" as \"Prezzo da me proposto\", o.\"stato\" as \"Stato\" "
+				+ "FROM \"Immobile\" i "
+				+ "INNER JOIN \"Offerta\" o ON i.\"idImmobile\" = o.\"immobileAssociato\" "
+				+ "INNER JOIN \"Cliente\" c ON o.\"accountAssociato\" = c.\"id\" "
+				+ "WHERE c.\"email\" = ?";
 
-	    List<Object[]> risultati = new ArrayList<>();
+		List<Object[]> risultati = new ArrayList<>();
 
-	    try (PreparedStatement stmt = connection.prepareStatement(query)) {
-	        stmt.setString(1, emailUtente);
-	        ResultSet rs = stmt.executeQuery();
+		try (PreparedStatement stmt = connection.prepareStatement(query)) {
+			stmt.setString(1, emailUtente);
+			ResultSet rs = stmt.executeQuery();
 
-	        while (rs.next()) {
-	            Object[] riga = new Object[5];
+			while (rs.next()) {
+				Object[] riga = new Object[5];
 
-	            // ✅ Leggi il JSON con le immagini (stringa)
-	            String immaginiJson = rs.getString("Foto");
-	            String primaImmagineBase64 = "";
+				// ✅ Leggi il JSON con le immagini (stringa)
+				String immaginiJson = rs.getString("Foto");
+				String primaImmagineBase64 = "";
 
-	            if (immaginiJson != null && !immaginiJson.isBlank()) {
-	                try {
-	                    JSONArray array = new JSONArray(immaginiJson);
-	                    if (array.length() > 0)
-	                        primaImmagineBase64 = array.getString(0); // prendi solo la prima immagine
-	                } catch (Exception e) {
-	                    e.printStackTrace();
-	                }
-	            }
+				if (immaginiJson != null && !immaginiJson.isBlank()) {
+					try {
+						JSONArray array = new JSONArray(immaginiJson);
+						if (array.length() > 0)
+						{
+							primaImmagineBase64 = array.getString(0); // prendi solo la prima immagine
+						}
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
 
-	            riga[0] = primaImmagineBase64;
-	            riga[1] = rs.getString("Categoria");
-	            riga[2] = rs.getString("Descrizione");
-	            riga[3] = rs.getBigDecimal("Prezzo da me proposto");
-	            riga[4] = rs.getString("Stato");
+				riga[0] = primaImmagineBase64;
+				riga[1] = rs.getString("Categoria");
+				riga[2] = rs.getString("Descrizione");
+				riga[3] = rs.getBigDecimal("Prezzo da me proposto");
+				riga[4] = rs.getString("Stato");
 
-	            risultati.add(riga);
-	        }
-	    } catch (SQLException e) {
-	        e.printStackTrace();
-	    }
+				risultati.add(riga);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 
-	    return risultati;
+		return risultati;
 	}
 
 
@@ -282,28 +284,36 @@ public class ImmobileDAO {
 				+ " WHERE ( " + " i.\"titolo\" ILIKE '%' || ? || '%' OR " + " i.\"localita\" ILIKE '%' || ? || '%' OR "
 				+ " i.\"descrizione\" ILIKE '%' || ? || '%' " + " ) " + " AND i.\"tipologia\" = 'Affitto' ";
 
-		if (filtri.prezzoMin != null)
+		if (filtri.prezzoMin != null) {
 			query += " AND a.\"prezzoMensile\" >= ?";
-		if (filtri.prezzoMax != null)
+		}
+		if (filtri.prezzoMax != null) {
 			query += " AND a.\"prezzoMensile\" <= ?";
-		if (filtri.superficieMin != null)
+		}
+		if (filtri.superficieMin != null) {
 			query += " AND i.\"dimensione\" >= ?";
-		if (filtri.superficieMax != null)
+		}
+		if (filtri.superficieMax != null) {
 			query += " AND i.\"dimensione\" <= ?";
-		if (filtri.piano != null && !filtri.piano.equals("Indifferente"))
+		}
+		if (filtri.piano != null && !filtri.piano.equals("Indifferente")) {
 			query += " AND (i.\"filtri\"->>'piano')::int = ?";
-		if (filtri.numLocali != null)
+		}
+		if (filtri.numLocali != null) {
 			query += " AND (i.\"filtri\"->>'numeroLocali')::int = ?";
-		if (filtri.numBagni != null)
+		}
+		if (filtri.numBagni != null) {
 			query += " AND (i.\"filtri\"->>'numeroBagni')::int = ?";
-		if (filtri.ascensore != null)
+		}
+		if (filtri.ascensore != null) {
 			query += " AND (i.\"filtri\"->>'ascensore')::boolean = ?";
-		if (filtri.portineria != null)
+		}
+		if (filtri.portineria != null) {
 			query += " AND (i.\"filtri\"->>'portineria')::boolean = ?";
-		if (filtri.postoAuto != null)
-			query += " AND (i.\"filtri\"->>'postoAuto')::boolean = ?";
-		if (filtri.climatizzazione != null)
+		}
+		if (filtri.climatizzazione != null) {
 			query += " AND (i.\"filtri\"->>'climatizzazione')::boolean = ?";
+		}
 
 		try (PreparedStatement ps = connection.prepareStatement(query)) {
 			int i = 1;
@@ -349,10 +359,10 @@ public class ImmobileDAO {
 				ps.setBoolean(i, filtri.portineria);
 				i++;
 			}
-			if (filtri.postoAuto != null)
-				ps.setBoolean(i++, filtri.postoAuto);
-			if (filtri.climatizzazione != null)
-				ps.setBoolean(i++, filtri.climatizzazione);
+			if (filtri.climatizzazione != null) {
+				ps.setBoolean(i, filtri.climatizzazione);
+				i++;
+			}
 
 			ResultSet rs = ps.executeQuery();
 
@@ -398,28 +408,36 @@ public class ImmobileDAO {
 				+ " WHERE ( " + " i.\"titolo\" ILIKE '%' || ? || '%' OR " + " i.\"localita\" ILIKE '%' || ? || '%' OR "
 				+ " i.\"descrizione\" ILIKE '%' || ? || '%' " + " ) " + " AND i.\"tipologia\" = 'Vendita' ";
 
-		if (filtri.prezzoMin != null)
+		if (filtri.prezzoMin != null) {
 			query += " AND v.\"prezzoTotale\" >= ?";
-		if (filtri.prezzoMax != null)
+		}
+		if (filtri.prezzoMax != null) {
 			query += " AND v.\"prezzoTotale\" <= ?";
-		if (filtri.superficieMin != null)
+		}
+		if (filtri.superficieMin != null) {
 			query += " AND i.\"dimensione\" >= ?";
-		if (filtri.superficieMax != null)
+		}
+		if (filtri.superficieMax != null) {
 			query += " AND i.\"dimensione\" <= ?";
-		if (filtri.piano != null && !filtri.piano.equals("Indifferente"))
+		}
+		if (filtri.piano != null && !filtri.piano.equals("Indifferente")) {
 			query += " AND (i.\"filtri\"->>'piano')::int = ?";
-		if (filtri.numLocali != null)
+		}
+		if (filtri.numLocali != null) {
 			query += " AND (i.\"filtri\"->>'numeroLocali')::int = ?";
-		if (filtri.numBagni != null)
+		}
+		if (filtri.numBagni != null) {
 			query += " AND (i.\"filtri\"->>'numeroBagni')::int = ?";
-		if (filtri.ascensore != null)
+		}
+		if (filtri.ascensore != null) {
 			query += " AND (i.\"filtri\"->>'ascensore')::boolean = ?";
-		if (filtri.portineria != null)
+		}
+		if (filtri.portineria != null) {
 			query += " AND (i.\"filtri\"->>'portineria')::boolean = ?";
-		if (filtri.postoAuto != null)
-			query += " AND (i.\"filtri\"->>'postoAuto')::boolean = ?";
-		if (filtri.climatizzazione != null)
+		}
+		if (filtri.climatizzazione != null) {
 			query += " AND (i.\"filtri\"->>'climatizzazione')::boolean = ?";
+		}
 
 		try (PreparedStatement ps = connection.prepareStatement(query)) {
 			int i = 1;
@@ -465,10 +483,10 @@ public class ImmobileDAO {
 				ps.setBoolean(i, filtri.portineria);
 				i++;
 			}
-			if (filtri.postoAuto != null)
-				ps.setBoolean(i++, filtri.postoAuto);
-			if (filtri.climatizzazione != null)
-				ps.setBoolean(i++, filtri.climatizzazione);
+			if (filtri.climatizzazione != null) {
+				ps.setBoolean(i, filtri.climatizzazione);
+				i++;
+			}
 
 			ResultSet rs = ps.executeQuery();
 

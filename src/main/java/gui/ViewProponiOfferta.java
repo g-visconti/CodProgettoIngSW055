@@ -73,7 +73,7 @@ public class ViewProponiOfferta extends JFrame {
 				try {
 					String testo = lblOfferta.getText();
 					offertaProposta = Double.parseDouble(testo);
-					
+
 					if (offertaProposta <= 0) {
 						JOptionPane.showMessageDialog(null, "L'offerta deve essere un valore positivo.");
 						return;
@@ -85,7 +85,7 @@ public class ViewProponiOfferta extends JFrame {
 
 				Controller con = new Controller();
 				boolean successo = con.InserisciOfferta(offertaProposta, idAccount, idimmobile);
-				
+
 				if (successo) {
 					JOptionPane.showMessageDialog(null, "Offerta inviata con successo!");
 					dispose();
@@ -95,7 +95,7 @@ public class ViewProponiOfferta extends JFrame {
 			}
 
 		});
-		btnConferma.setBounds(203, 160, 131, 23);
+		btnConferma.setBounds(196, 148, 131, 23);
 		contentPane.add(btnConferma);
 	}
 }

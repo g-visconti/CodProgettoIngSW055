@@ -1,42 +1,41 @@
 package gui;
 
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.border.EmptyBorder;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import java.awt.Color;
-import javax.swing.JTextField;
-import javax.swing.JLabel;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
+import java.awt.Component;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.SQLException;
 import java.util.prefs.Preferences;
-import java.awt.Component;
+
+import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JLayeredPane;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
+import javax.swing.SpringLayout;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
-import javax.swing.JLayeredPane;
-import javax.swing.JTable;
+import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
+
 import controller.Controller;
 import database.ConnessioneDatabase;
 import model.Filtri;
 import util.GuiUtils;
 import util.InputUtils;
-
-import javax.swing.JScrollPane;
-import javax.swing.ListSelectionModel;
-import javax.swing.JButton;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import javax.swing.SpringLayout;
 
 public class ViewDashboardAdmin extends JFrame {
 
@@ -115,7 +114,7 @@ public class ViewDashboardAdmin extends JFrame {
 		// prezzo)
 		DefaultTableModel model = new DefaultTableModel(
 				new String[] { "", "Titolo dell'annuncio", "Descrizione", "Prezzo (€)" }, 0 // 0 righe iniziali
-		) {
+				) {
 			private static final long serialVersionUID = 1L;
 
 			@SuppressWarnings("rawtypes")
@@ -188,10 +187,32 @@ public class ViewDashboardAdmin extends JFrame {
 		lblRisultati.setFont(new Font("Tahoma", Font.BOLD, 20));
 		risultatiDaRicerca.add(lblRisultati);
 
+		// Vedi Offerte Proposte
+		JButton btnVediOfferteProposte = new JButton("Vedi offerte proposte");
+		btnVediOfferteProposte.setFocusable(false);
+		sl_risultatiDaRicerca.putConstraint(SpringLayout.NORTH, btnVediOfferteProposte, 8, SpringLayout.NORTH,
+				lblRisultati);
+		sl_risultatiDaRicerca.putConstraint(SpringLayout.EAST, btnVediOfferteProposte, -42, SpringLayout.EAST,
+				risultatiDaRicerca);
+		btnVediOfferteProposte.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				ViewOfferteProposte viewOfferte = new ViewOfferteProposte(emailInserita);
+				viewOfferte.setLocationRelativeTo(null);
+				viewOfferte.setVisible(true);
+			}
+		});
+
+		btnVediOfferteProposte.setToolTipText("Clicca per visualizzare tutte le offerte proposte");
+		btnVediOfferteProposte.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 11));
+		btnVediOfferteProposte.setBackground(Color.WHITE);
+		risultatiDaRicerca.add(btnVediOfferteProposte);
+
 		// Carica un immobile
 		JButton btnCaricaImmobile = new JButton("Carica immobile");
-		btnCaricaImmobile.setFocusable(false);
 		sl_risultatiDaRicerca.putConstraint(SpringLayout.NORTH, btnCaricaImmobile, 8, SpringLayout.NORTH, lblRisultati);
+		sl_risultatiDaRicerca.putConstraint(SpringLayout.EAST, btnCaricaImmobile, -18, SpringLayout.WEST,
+				btnVediOfferteProposte);
 		btnCaricaImmobile.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -205,51 +226,6 @@ public class ViewDashboardAdmin extends JFrame {
 		btnCaricaImmobile.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 11));
 		btnCaricaImmobile.setBackground(Color.WHITE);
 		risultatiDaRicerca.add(btnCaricaImmobile);
-
-		// Vedi Offerte Proposte
-		JButton btnVediOfferteProposte = new JButton("Vedi offerte proposte");
-		btnVediOfferteProposte.setFocusable(false);
-		sl_risultatiDaRicerca.putConstraint(SpringLayout.NORTH, btnVediOfferteProposte, 8, SpringLayout.NORTH,
-				lblRisultati);
-		sl_risultatiDaRicerca.putConstraint(SpringLayout.EAST, btnVediOfferteProposte, -18, SpringLayout.WEST,
-				btnCaricaImmobile);
-		btnVediOfferteProposte.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				ViewOfferteProposte viewOfferte = new ViewOfferteProposte(emailInserita);
-				viewOfferte.setLocationRelativeTo(null);
-				viewOfferte.setVisible(true);
-			}
-		});
-
-		btnVediOfferteProposte.setToolTipText("Clicca per visualizzare tutte le offerte proposte");
-		btnVediOfferteProposte.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 11));
-		btnVediOfferteProposte.setBackground(Color.WHITE);
-		risultatiDaRicerca.add(btnVediOfferteProposte);
-
-		// Elimina un immobile
-		JButton btnEliminaImmobile = new JButton("Elimina Immobile");
-		btnEliminaImmobile.setFocusable(false);
-		sl_risultatiDaRicerca.putConstraint(SpringLayout.EAST, btnCaricaImmobile, -19, SpringLayout.WEST,
-				btnEliminaImmobile);
-		sl_risultatiDaRicerca.putConstraint(SpringLayout.NORTH, btnEliminaImmobile, -34, SpringLayout.NORTH,
-				scrollPane);
-		sl_risultatiDaRicerca.putConstraint(SpringLayout.EAST, btnEliminaImmobile, -42, SpringLayout.EAST,
-				risultatiDaRicerca);
-
-		// Disabilita il pulsante inizialmente
-		btnEliminaImmobile.setEnabled(false);
-
-		// Aggiungi un listener per la selezione della tabella
-		tableRisultati.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-			public void valueChanged(ListSelectionEvent e) {
-				// Abilita il pulsante solo se una riga è selezionata
-				btnEliminaImmobile.setEnabled(tableRisultati.getSelectedRow() != -1);
-			}
-		});
-		btnEliminaImmobile.setToolTipText("Clicca su uno degli immobili per eliminarlo");
-		btnEliminaImmobile.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 11));
-		btnEliminaImmobile.setBackground(Color.WHITE);
-		risultatiDaRicerca.add(btnEliminaImmobile);
 
 		// Pannello per effettuare le ricerche di immobili e altri comandi
 		JPanel ricerca = new JPanel();
@@ -391,11 +367,9 @@ public class ViewDashboardAdmin extends JFrame {
 		// Creazione del menù a tendina per la visualizzazione del profilo
 		JPopupMenu menuUtente = new JPopupMenu();
 		JMenuItem visualizzaInfoAccount = new JMenuItem("Visualizza informazioni sull'account");
-		JMenuItem notifiche = new JMenuItem("Notifiche");
 		JMenuItem modificaPassword = new JMenuItem("Modifica password");
 
 		menuUtente.add(visualizzaInfoAccount);
-		menuUtente.add(notifiche);
 		menuUtente.add(modificaPassword);
 
 		visualizzaInfoAccount.addActionListener(new ActionListener() {
@@ -408,22 +382,12 @@ public class ViewDashboardAdmin extends JFrame {
 			}
 		});
 
-		// TODO: Sviluppare interfaccia per la visualizzazione delle notifiche
-		notifiche.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// visualizza le notifiche
-				// ...................................................................
-
-			}
-		});
-
 		modificaPassword.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// operazione di modifica della password dell'account
 				ViewModificaPassword viewModificaPassword = new ViewModificaPassword(emailInserita);
-				;
+
 				viewModificaPassword.setLocationRelativeTo(null);
 				viewModificaPassword.setVisible(true);
 			}
@@ -431,6 +395,7 @@ public class ViewDashboardAdmin extends JFrame {
 
 		// Evento per mostrare il menù al clic sull'immagine
 		lblUser.addMouseListener(new java.awt.event.MouseAdapter() {
+			@Override
 			public void mousePressed(java.awt.event.MouseEvent evt) {
 				if (evt.getButton() == java.awt.event.MouseEvent.BUTTON1) {
 					menuUtente.show(lblUser, evt.getX(), evt.getY());
@@ -553,6 +518,7 @@ public class ViewDashboardAdmin extends JFrame {
 
 		// Evento per mostrare il menù al clic sull'immagine
 		lblAggiungiUtente.addMouseListener(new java.awt.event.MouseAdapter() {
+			@Override
 			public void mousePressed(java.awt.event.MouseEvent evt) {
 				if (evt.getButton() == java.awt.event.MouseEvent.BUTTON1) {
 					menuAggiungiUtente.show(lblAggiungiUtente, evt.getX(), evt.getY());
