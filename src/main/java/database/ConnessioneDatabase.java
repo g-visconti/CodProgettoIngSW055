@@ -1,10 +1,13 @@
 package database;
 
+import java.net.UnknownHostException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.swing.JOptionPane;
 
 /**
  * La classe ConnessioneDatabase gestisce la connessione al database PostgreSQL
@@ -20,7 +23,7 @@ public class ConnessioneDatabase {
 	private static final String DRIVER = "org.postgresql.Driver";
 
 	// Connessione
-	public Connection connection;
+	private Connection connection;
 
 	// Logger per la gestione degli errori
 	private static final Logger logger = Logger.getLogger(ConnessioneDatabase.class.getName());
@@ -30,14 +33,34 @@ public class ConnessioneDatabase {
 		try {
 			// Carica il driver PostgreSQL
 			Class.forName(DRIVER);
+
 			// Crea la connessione
 			connection = DriverManager.getConnection(url, nome, password);
+			logger.info("Connessione al database avvenuta con successo.");
+
 		} catch (ClassNotFoundException e) {
 			logger.log(Level.SEVERE, "Driver PostgreSQL non trovato.", e);
+			JOptionPane.showMessageDialog(null,
+					"Errore interno: driver PostgreSQL non trovato.\nContattare l'amministratore del sistema.",
+					"Errore di connessione", JOptionPane.ERROR_MESSAGE);
 			throw new SQLException("Errore durante il caricamento del driver", e);
+
 		} catch (SQLException e) {
-			logger.log(Level.SEVERE, "Errore di connessione al database.", e);
-			throw e; // Rilancia l'eccezione per gestirla più in alto nella catena
+			// Controlla se la causa è UnknownHostException (nessuna rete o host non valido)
+			if (e.getCause() instanceof UnknownHostException) {
+				logger.log(Level.SEVERE, "Host del database non raggiungibile.", e);
+				JOptionPane.showMessageDialog(null,
+						"Attenzione: il database al momento non è raggiungibile.\n" +
+						"Verifica la connessione di rete e riprova.",
+						"Connessione non disponibile", JOptionPane.WARNING_MESSAGE);
+			} else {
+				logger.log(Level.SEVERE, "Errore di connessione al database.", e);
+				JOptionPane.showMessageDialog(null,
+						"Si è verificato un errore durante la connessione al database.\n" +
+						"Controlla la connessione Internet o riprova più tardi.",
+						"Errore di connessione", JOptionPane.ERROR_MESSAGE);
+			}
+			throw e; // rilancia per permettere gestione a livello superiore, se serve
 		}
 	}
 
@@ -60,7 +83,7 @@ public class ConnessioneDatabase {
 	public static ConnessioneDatabase getInstance() throws SQLException {
 		if (instance == null) {
 			instance = new ConnessioneDatabase();
-		} else if (instance.connection.isClosed()) {
+		} else if (instance.connection == null || instance.connection.isClosed()) {
 			instance = new ConnessioneDatabase();
 		}
 		return instance;
@@ -73,6 +96,7 @@ public class ConnessioneDatabase {
 		try {
 			if (connection != null && !connection.isClosed()) {
 				connection.close();
+				logger.info("Connessione al database chiusa correttamente.");
 			}
 		} catch (SQLException e) {
 			logger.log(Level.WARNING, "Errore durante la chiusura della connessione.", e);

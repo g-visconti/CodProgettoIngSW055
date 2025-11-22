@@ -53,7 +53,7 @@ public class ViewDashboard extends JFrame {
 	/**
 	 * Create the frame ViewDashboardAdmin.
 	 */
-	public ViewDashboard(String emailInserita) {
+	public ViewDashboard(String emailCliente) {
 		// Imposta l'icona di DietiEstates25 alla finestra in uso
 		GuiUtils.setIconaFinestra(this);
 		setTitle("DietiEstates25 - Dashboard per l'utente");
@@ -96,10 +96,10 @@ public class ViewDashboard extends JFrame {
 		JScrollPane scrollPane = new JScrollPane();
 		sl_risultatiDaRicerca.putConstraint(SpringLayout.NORTH, scrollPane, 47, SpringLayout.NORTH, risultatiDaRicerca);
 		sl_risultatiDaRicerca.putConstraint(SpringLayout.WEST, scrollPane, 10, SpringLayout.WEST, risultatiDaRicerca);
-		sl_risultatiDaRicerca.putConstraint(SpringLayout.SOUTH, scrollPane, -10, SpringLayout.SOUTH,
-				risultatiDaRicerca);
+		sl_risultatiDaRicerca.putConstraint(SpringLayout.SOUTH, scrollPane, -10, SpringLayout.SOUTH,risultatiDaRicerca);
 		sl_risultatiDaRicerca.putConstraint(SpringLayout.EAST, scrollPane, -10, SpringLayout.EAST, risultatiDaRicerca);
-		scrollPane.setBackground(new Color(255, 255, 255));
+		scrollPane.getViewport().setBackground(new Color(255, 255, 255)); // Imposta il background della viewport
+		scrollPane.setBorder(null); // Rimuove eventuali bordi grigi
 		risultatiDaRicerca.add(scrollPane);
 
 		// Crea la JTable
@@ -109,66 +109,6 @@ public class ViewDashboard extends JFrame {
 		tableRisultati.setRowHeight(100);
 		tableRisultati.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		tableRisultati.setSelectionBackground(new Color(226, 226, 226));
-
-		// Crea il modello della tabella (con colonne: immagine, tipologia, descrizione,
-		// prezzo)
-		DefaultTableModel model = new DefaultTableModel(
-				new String[] { "", "Titolo dell'annuncio", "Descrizione", "Prezzo (€)" }, 0 // 0 righe iniziali
-				) {
-			private static final long serialVersionUID = 1L;
-
-			@SuppressWarnings("rawtypes")
-			Class[] columnTypes = new Class[] { Object.class, String.class, String.class, String.class };
-
-			@Override
-			public Class<?> getColumnClass(int columnIndex) {
-				return columnTypes[columnIndex];
-			}
-
-			@Override
-			public boolean isCellEditable(int row, int column) {
-				return false; // tutte le celle non modificabili
-			}
-		};
-
-		// Assegna il modello alla tabella
-		tableRisultati.setModel(model);
-
-		tableRisultati.getColumnModel().getColumn(0).setResizable(false);
-		tableRisultati.getColumnModel().getColumn(1).setResizable(false);
-		tableRisultati.getColumnModel().getColumn(1).setPreferredWidth(170);
-		tableRisultati.getColumnModel().getColumn(2).setResizable(false);
-		tableRisultati.getColumnModel().getColumn(2).setPreferredWidth(450);
-		tableRisultati.getColumnModel().getColumn(3).setResizable(false);
-
-		// Nel mouse listener
-		tableRisultati.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				if (e.getClickCount() == 1) {
-					String idAccount = null; // DICHIARAZIONE QUI
-
-					try {
-						Controller controller = new Controller();
-						idAccount = controller.getIdSession(emailInserita); // ASSEGNAZIONE QUI
-						System.out.println("ID account: " + idAccount);
-					} catch (SQLException ex) {
-						ex.printStackTrace();
-					}
-
-					int row = tableRisultati.rowAtPoint(e.getPoint());
-					if (row >= 0) {
-						long idImmobile = (Long) tableRisultati.getValueAt(row, 0);
-						ViewImmobile finestra = new ViewImmobile(idImmobile, idAccount);
-						finestra.setLocationRelativeTo(null);
-						finestra.setVisible(true);
-					}
-				}
-			}
-
-		});
-
-		// blocco finito
 
 		scrollPane.setViewportView(tableRisultati);
 
@@ -192,7 +132,7 @@ public class ViewDashboard extends JFrame {
 		btnStoricoMieOfferte.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				ViewOfferteProposte viewOfferte = new ViewOfferteProposte(emailInserita);
+				ViewStoricoCliente viewOfferte = new ViewStoricoCliente(emailCliente);
 				viewOfferte.setLocationRelativeTo(null);
 				viewOfferte.setVisible(true);
 			}
@@ -359,7 +299,7 @@ public class ViewDashboard extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// visualizza il profilo dell'account
-				ViewAccount viewAccount = new ViewAccount(emailInserita);
+				ViewAccount viewAccount = new ViewAccount(emailCliente);
 				viewAccount.setLocationRelativeTo(null);
 				viewAccount.setVisible(true);
 			}
@@ -369,7 +309,7 @@ public class ViewDashboard extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// operazione di modifica della password dell'account
-				ViewModificaPassword viewModificaPassword = new ViewModificaPassword(emailInserita);
+				ViewModificaPassword viewModificaPassword = new ViewModificaPassword(emailCliente);
 
 				viewModificaPassword.setLocationRelativeTo(null);
 				viewModificaPassword.setVisible(true);
@@ -412,7 +352,7 @@ public class ViewDashboard extends JFrame {
 		sl_ricerca.putConstraint(SpringLayout.SOUTH, lblEmailAccesso, 0, SpringLayout.SOUTH, lblLogout);
 		sl_ricerca.putConstraint(SpringLayout.EAST, lblEmailAccesso, 0, SpringLayout.EAST, lblBenvenuto);
 		lblEmailAccesso.setHorizontalAlignment(SwingConstants.RIGHT);
-		lblEmailAccesso.setText(emailInserita + " ");
+		lblEmailAccesso.setText(emailCliente + " ");
 		lblEmailAccesso.setFont(new Font("Yu Gothic UI Semibold", Font.ITALIC, 11));
 		ricerca.add(lblEmailAccesso);
 
@@ -454,15 +394,41 @@ public class ViewDashboard extends JFrame {
 			JOptionPane.showMessageDialog(null, "Scrivere qualcosa prima di iniziare la ricerca!", "Attenzione",
 					JOptionPane.INFORMATION_MESSAGE);
 		} else {
-			// effettuo la ricerca e riempio la tabella
-
-			// capitolizzo la parola (o stringa) che l'utente ha inserito da tastiera
 			campoPieno = InputUtils.capitalizzaParole(campoPieno);
 
 			ViewFiltri viewFiltri = new ViewFiltri(tipologiaAppartamento);
 			Filtri filtri = viewFiltri.getFiltriSelezionati();
-			numeroRisultatiTrovati = controller.riempiTableRisultati(tableRisultati, campoPieno, tipologiaAppartamento,
-					filtri);
+
+			// CREA IL MODELLO SOLO QUANDO SERVE
+			DefaultTableModel model = new DefaultTableModel(
+					new String[] { "", "Titolo dell'annuncio", "Descrizione", "Prezzo (€)" }, 0) {
+				private static final long serialVersionUID = 1L;
+
+				@SuppressWarnings("rawtypes")
+				Class[] columnTypes = new Class[] { Object.class, String.class, String.class, String.class };
+
+				@Override
+				public Class<?> getColumnClass(int columnIndex) {
+					return columnTypes[columnIndex];
+				}
+
+				@Override
+				public boolean isCellEditable(int row, int column) {
+					return false;
+				}
+			};
+
+			tableRisultati.setModel(model);
+
+			// Configura le colonne
+			tableRisultati.getColumnModel().getColumn(0).setResizable(false);
+			tableRisultati.getColumnModel().getColumn(1).setResizable(false);
+			tableRisultati.getColumnModel().getColumn(1).setPreferredWidth(170);
+			tableRisultati.getColumnModel().getColumn(2).setResizable(false);
+			tableRisultati.getColumnModel().getColumn(2).setPreferredWidth(450);
+			tableRisultati.getColumnModel().getColumn(3).setResizable(false);
+
+			numeroRisultatiTrovati = controller.riempiTableRisultati(tableRisultati, campoPieno, tipologiaAppartamento, filtri);
 			lblRisultati.setText("Immobili trovati: " + numeroRisultatiTrovati);
 		}
 	}

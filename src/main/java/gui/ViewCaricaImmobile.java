@@ -57,7 +57,7 @@ public class ViewCaricaImmobile extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public ViewCaricaImmobile(String email) {
+	public ViewCaricaImmobile(String emailAgente) {
 		super("Schermata di caricamento immobile");
 		setTitle("DietiEstates25 - Schermata di caricamento immobile");
 		setResizable(false);
@@ -288,18 +288,18 @@ public class ViewCaricaImmobile extends JFrame {
 
 					Immobile immobile;
 					Controller controller = new Controller();
-					String agenteAssociato = controller.getIdSession(email);
+					String idAgenteAssociato = controller.getIdAccountByEmail(emailAgente);
 
-					if ("undef".equals(agenteAssociato)) {
+					if ("undef".equals(idAgenteAssociato)) {
 						JOptionPane.showMessageDialog(null, "Agente non trovato, impossibile associare immobile.");
 						return;
 					}
 					if ("Affitto".equalsIgnoreCase(tipologia)) {
 						immobile = new ImmobileInAffitto(titolo, indirizzo, localita, dimensione, descrizione,
-								tipologia, filtri, agenteAssociato, prezzo);
+								tipologia, filtri, idAgenteAssociato, prezzo);
 					} else if ("Vendita".equalsIgnoreCase(tipologia)) {
 						immobile = new ImmobileInVendita(titolo, indirizzo, localita, dimensione, descrizione,
-								tipologia, filtri, agenteAssociato, prezzo);
+								tipologia, filtri, idAgenteAssociato, prezzo);
 					} else {
 						JOptionPane.showMessageDialog(null, "Tipologia non valida");
 						return;

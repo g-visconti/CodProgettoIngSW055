@@ -3,8 +3,8 @@ package gui;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.SystemColor;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -19,7 +19,7 @@ import javax.swing.border.EmptyBorder;
 import controller.Controller;
 import util.GuiUtils;
 
-public class ViewProponiOfferta extends JFrame {
+public class ViewOffertaIniziale extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
@@ -29,7 +29,7 @@ public class ViewProponiOfferta extends JFrame {
 	 * Launch the application.
 	 */
 
-	public ViewProponiOfferta(long idimmobile, String idAccount) {
+	public ViewOffertaIniziale(long idImmobile, String idCliente) {
 		// Imposta l'icona di DietiEstates25 alla finestra in uso
 		GuiUtils.setIconaFinestra(this);
 		setTitle("DietiEstates25 - Proposta per un immobile");
@@ -62,12 +62,13 @@ public class ViewProponiOfferta extends JFrame {
 		contentPane.add(lblProposta);
 
 		JButton btnConferma = new JButton("Conferma");
+		getRootPane().setDefaultButton(btnConferma);
 		btnConferma.setForeground(new Color(255, 255, 255));
 		btnConferma.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 11));
 		btnConferma.setBackground(SystemColor.textHighlight);
-		btnConferma.addMouseListener(new MouseAdapter() {
+		btnConferma.addActionListener(new ActionListener() {
 			@Override
-			public void mouseClicked(MouseEvent e) {
+			public void actionPerformed(ActionEvent e) {
 				double offertaProposta;
 
 				try {
@@ -83,14 +84,14 @@ public class ViewProponiOfferta extends JFrame {
 					return;
 				}
 
-				Controller con = new Controller();
-				boolean successo = con.InserisciOfferta(offertaProposta, idAccount, idimmobile);
+				Controller controller = new Controller();
+				boolean offertaInserita = controller.inserisciOffertaIniziale(offertaProposta, idCliente, idImmobile);
 
-				if (successo) {
-					JOptionPane.showMessageDialog(null, "Offerta inviata con successo!");
+				if (offertaInserita) {
+					JOptionPane.showMessageDialog(null, "Offerta proposta con successo!");
 					dispose();
 				} else {
-					JOptionPane.showMessageDialog(null, "Errore nell'invio dell'offerta. Riprova.");
+					JOptionPane.showMessageDialog(null, "Errore durante la proposta dell'offerta. Riprova.");
 				}
 			}
 

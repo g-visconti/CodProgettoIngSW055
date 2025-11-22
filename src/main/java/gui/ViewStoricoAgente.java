@@ -8,6 +8,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -23,19 +24,19 @@ import javax.swing.table.TableColumn;
 import controller.Controller;
 import util.GuiUtils;
 
-public class ViewOfferteProposte extends JFrame {
+public class ViewStoricoAgente extends JFrame {
 
 	private static final long serialVersionUID = 1L;
-	private JTable tableOfferteProposte;
+	private JTable tableStoricoOfferte;
 	private JPanel contentPane;
 
 	/**
 	 * Create the frame ViewOfferte.
 	 */
-	public ViewOfferteProposte(String emailUtente) {
+	public ViewStoricoAgente(String emailUtente) {
 		// Imposta l'icona di DietiEstates25 alla finestra in uso
 		GuiUtils.setIconaFinestra(this);
-		setTitle("DietiEstates25 - Le tue proposte");
+		setTitle("DietiEstates25 - Storico offerte");
 
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 1248, 946);
@@ -65,7 +66,7 @@ public class ViewOfferteProposte extends JFrame {
 		lblTitolo.setFont(new Font("Tahoma", Font.BOLD, 30));
 		panelComandi.add(lblTitolo);
 
-		JLabel lblDescrizione = new JLabel("Seleziona un immobile per vedere la risposta dell'agente");
+		JLabel lblDescrizione = new JLabel("Di seguito è riportato l'elenco delle offerte");
 		sl_panelComandi.putConstraint(SpringLayout.SOUTH, lblTitolo, -13, SpringLayout.NORTH, lblDescrizione);
 		sl_panelComandi.putConstraint(SpringLayout.NORTH, lblDescrizione, 97, SpringLayout.NORTH, panelComandi);
 		sl_panelComandi.putConstraint(SpringLayout.SOUTH, lblDescrizione, -8, SpringLayout.SOUTH, panelComandi);
@@ -128,17 +129,18 @@ public class ViewOfferteProposte extends JFrame {
 		scrollPane.setBackground(Color.WHITE);
 		panelRisultati.add(scrollPane);
 
-		// Crea il modello dati della tabella (rimosse colonne Immagini e Descrizione)
+		// Crea il modello dati della tabella
+		@SuppressWarnings("serial")
 		DefaultTableModel model = new DefaultTableModel(new Object[][] {},
-				new String[] { "Categoria", "Tipologia", "Prezzo (€)" } // Solo 3 colonne
-		) {
-			private static final long serialVersionUID = 1L;
-			Class<?>[] columnTypes = new Class[] { Object.class, String.class, String.class // Aggiornato per 3 colonne
-			};
-
+				new String[] { "Foto", "Categoria", "Descrizione", "Prezzo proposto", "Stato" }
+				) {
 			@Override
 			public Class<?> getColumnClass(int columnIndex) {
-				return columnTypes[columnIndex];
+				return switch (columnIndex) {
+				case 0 -> String.class; // Base64 immagini
+				case 1, 2, 3, 4 -> String.class;
+				default -> Object.class;
+				};
 			}
 
 			@Override
@@ -148,26 +150,62 @@ public class ViewOfferteProposte extends JFrame {
 		};
 
 		// Crea e configura la JTable
-		tableOfferteProposte = new JTable(model);
-		tableOfferteProposte.setRowHeight(100);
-		tableOfferteProposte.setShowGrid(false);
-		tableOfferteProposte.setShowVerticalLines(false);
-		tableOfferteProposte.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		tableOfferteProposte.setSelectionBackground(new Color(226, 226, 226));
+		tableStoricoOfferte = new JTable(model);
+		tableStoricoOfferte.setRowHeight(100);
+		tableStoricoOfferte.setShowGrid(false);
+		tableStoricoOfferte.setShowVerticalLines(false);
+		tableStoricoOfferte.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		tableStoricoOfferte.setSelectionBackground(new Color(226, 226, 226));
 
 		// Configura larghezze colonne (aggiornate per 3 colonne)
-		int[] preferredWidths = { 200, 300, 150 }; // Larghezze ridistribuite
+		int[] preferredWidths = { 100, 100, 400, 120, 80 };
 		for (int i = 0; i < preferredWidths.length; i++) {
-			TableColumn col = tableOfferteProposte.getColumnModel().getColumn(i);
+			TableColumn col = tableStoricoOfferte.getColumnModel().getColumn(i);
 			col.setPreferredWidth(preferredWidths[i]);
 			col.setResizable(false);
 		}
 
 		// Inserisci la tabella nello scroll pane
-		scrollPane.setViewportView(tableOfferteProposte);
+		scrollPane.setViewportView(tableStoricoOfferte);
 
 		// Popola la tabella con i dati tramite il controller
 		Controller controller = new Controller();
-		controller.riempiTableOfferteProposte(tableOfferteProposte, emailUtente);
+		controller.riempiTableOfferteProposte(tableStoricoOfferte, emailUtente);
+
+		// Azione al clic di uno dei risultati
+		tableStoricoOfferte.getSelectionModel().addListSelectionListener(e -> {
+			if (!e.getValueIsAdjusting()) {
+				int selectedRow = tableStoricoOfferte.getSelectedRow();
+				if (selectedRow != -1) {
+					String stato = (String) tableStoricoOfferte.getValueAt(selectedRow, 4);
+					System.out.println("Stato offerta selezionata: " + stato);
+
+					// Puoi usare lo stato per varie azioni:
+					switch(stato) {
+					case "Accettata":
+						JOptionPane.showMessageDialog(null, "L'agente ha accettato la sua proposta", "Messaggio informativo",
+								JOptionPane.INFORMATION_MESSAGE);
+						break;
+					case "Rifiutata":
+						JOptionPane.showMessageDialog(null, "Mi dispiace, la sua proposta è stata rifiutata", "Messaggio informativo",
+								JOptionPane.INFORMATION_MESSAGE);
+						break;
+					case "In attesa":
+						JOptionPane.showMessageDialog(null, "La proposta è ancora in attesa di essere valutata dall'agente", "Messaggio informativo",
+								JOptionPane.INFORMATION_MESSAGE);
+						break;
+					case "Controproposta":
+						// recupera id immobile
+						// mostra l'elenco delle offerte che l'agente ha ricevuto
+						//ViewOffertaProposta offertaProposta = new ViewOffertaProposta(idImmobile, idAgente);
+
+						JOptionPane.showMessageDialog(null, "Controproposta dell'agente", "Messaggio informativo",
+								JOptionPane.INFORMATION_MESSAGE);
+						break;
+					}
+				}
+			}
+		});
+
 	}
 }

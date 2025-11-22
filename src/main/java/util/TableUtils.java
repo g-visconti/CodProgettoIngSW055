@@ -1,48 +1,38 @@
 package util;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Image;
-
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
 import javax.swing.JTable;
-import javax.swing.SwingConstants;
-import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableColumn;
 
 public class TableUtils {
-	@SuppressWarnings("serial")
-	public static void setImageRenderer(JTable table, int columnIndex) {
-		table.getColumnModel().getColumn(columnIndex).setCellRenderer(new DefaultTableCellRenderer() {
-			@Override
-			public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-					boolean hasFocus, int row, int column) {
-
-				JLabel label = new JLabel();
-				label.setOpaque(true);
-
-				// Allineamento e padding
-				label.setHorizontalAlignment(SwingConstants.CENTER);
-				label.setVerticalAlignment(SwingConstants.CENTER);
-				label.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-
-				if (value instanceof ImageIcon icon) {
-					// Ottieni dimensioni della cella
-					int width = table.getColumnModel().getColumn(column).getWidth();
-					int height = table.getRowHeight(row);
-
-					// Ridimensiona immagine alla cella
-					Image img = icon.getImage().getScaledInstance(width - 10, height - 10, Image.SCALE_SMOOTH);
-					label.setIcon(new ImageIcon(img));
-					label.setText("");
-				} else {
-					label.setText("Nessuna foto");
-					label.setForeground(Color.GRAY);
-				}
-
-				return label;
-			}
-		});
+	/**
+	 * Nasconde una colonna
+	 */
+	public static void nascondiColonna(JTable tabella, int indice) {
+		TableColumn colonna = tabella.getColumnModel().getColumn(indice);
+		colonna.setMinWidth(0);
+		colonna.setMaxWidth(0);
+		colonna.setWidth(0);
+		colonna.setPreferredWidth(0);
 	}
+
+	/**
+	 * Fissa una colonna
+	 */
+	public static void fissaColonna(JTable tabella, int indice, int larghezza) {
+		TableColumn colonna = tabella.getColumnModel().getColumn(indice);
+		colonna.setPreferredWidth(larghezza);
+		colonna.setMinWidth(larghezza);
+		colonna.setMaxWidth(larghezza);
+		colonna.setResizable(false);
+	}
+
+	/**
+	 * Imposta la larghezza di una colonna
+	 */
+	public static void larghezzaColonna(JTable tabella, int indice, int larghezza) {
+		TableColumn colonna = tabella.getColumnModel().getColumn(indice);
+		colonna.setPreferredWidth(larghezza);
+	}
+
 }
+

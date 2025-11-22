@@ -5,10 +5,10 @@ import java.awt.Component;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import javax.swing.ImageIcon;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -23,7 +23,8 @@ import dao.AmministratoreDAO;
 import dao.AmministratoreDiSupportoDAO;
 import dao.ClienteDAO;
 import dao.ImmobileDAO;
-import dao.OffertaDAO;
+import dao.OffertaInizialeDAO;
+import dao.RispostaOffertaDAO;
 import database.ConnessioneDatabase;
 import model.Account;
 import model.AgenteImmobiliare;
@@ -33,9 +34,9 @@ import model.Filtri;
 import model.Immobile;
 import model.ImmobileInAffitto;
 import model.ImmobileInVendita;
-import model.Offerta;
+import model.OffertaIniziale;
+import model.RispostaOfferta;
 import util.Base64ImageRenderer;
-import util.ImageUtils;
 import util.TableUtils;
 import util.TextAreaRenderer;
 import util.TextBoldRenderer;
@@ -111,16 +112,10 @@ public class Controller {
 		return agenzia;
 	}
 
-	public String getIdSession(String email) throws SQLException {
+	public String getIdAccountByEmail(String email) throws SQLException {
 		Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
 		AccountDAO accountDAO = new AccountDAO(connAWS);
-		String idResult = "undef";
-
-		// recupero dal db la stringa ottenuta (DAO)
-		idResult = accountDAO.getSession(email);
-		System.out.println("idResult: " + idResult);
-
-		return idResult;
+		return accountDAO.getIdAccountByEmail(email);
 	}
 
 	// recupera le informazioni del profilo
@@ -139,7 +134,7 @@ public class Controller {
 
 	/**
 	 * Applica un renderer alla colonna "Stato" che cambia colore in base al testo.
-	 * 
+	 *
 	 * COLORI PER LO STATO DELLA PROPOSTA: "Rifiutata" = (255, 68, 68) "Attesa" =
 	 * (243, 182, 80) "Accettata" = (103, 235, 88) "Controproposta" = (7, 170, 248)
 	 * default = (0, 0, 0)
@@ -147,7 +142,7 @@ public class Controller {
 	private void impostaRendererStato(JTable table, int colonnaStatoIndex) {
 		DefaultTableCellRenderer rendererStato = new DefaultTableCellRenderer() {
 			/**
-			 * 
+			 *
 			 */
 			private static final long serialVersionUID = 8565820085308350483L;
 
@@ -167,7 +162,7 @@ public class Controller {
 					case "Rifiutata":
 						c.setForeground(new Color(255, 68, 68));
 						break;
-					case "Attesa":
+					case "In attesa":
 						c.setForeground(new Color(243, 182, 80));
 						break;
 					case "Accettata":
@@ -202,92 +197,125 @@ public class Controller {
 		table.getColumnModel().getColumn(colonnaStatoIndex).setCellRenderer(rendererStato);
 	}
 
-	public boolean InserisciOfferta(double offertaProposta, String idAccount, long idImmobile) {
+	// inizio
+
+	public boolean inserisciOffertaIniziale(double offertaProposta, String idCliente, long idImmobile) {
 		try {
 			Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
-			OffertaDAO offertaDAO = new OffertaDAO(connAWS);
-
-			Offerta offerta = new Offerta(offertaProposta, idAccount, idImmobile); // CREA OGGETTO OFFERTA
-			return offertaDAO.inserisciOfferta(offerta); // PASSA OGGETTO AL DAO
-
+			OffertaInizialeDAO offertaInizialeDAO = new OffertaInizialeDAO(connAWS);
+			OffertaIniziale offerta = new OffertaIniziale(offertaProposta, idCliente, idImmobile);
+			return offertaInizialeDAO.inserisciOffertaIniziale(offerta);
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return false;
 		}
 	}
 
-	private void popolaTabellaOfferteProposte(JTable tableOfferteProposte, List<Object[]> datiOfferte) {
-	    // Intestazioni della tabella
-	    String[] nomiColonne = { "Foto", "Categoria", "Descrizione", "Prezzo da me proposto", "Stato" };
+	public boolean inserisciRispostaOfferta(long idOfferta, String idAgente, String tipoRisposta, Double importoControproposta) {
+		try {
+			Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
+			RispostaOffertaDAO rispostaDAO = new RispostaOffertaDAO(connAWS);
 
-	    // Modello della tabella - ✅ CORREZIONE: colonna 0 come String.class
-	    @SuppressWarnings("serial")
-	    DefaultTableModel model = new DefaultTableModel(nomiColonne, 0) {
-	        @Override
-	        public Class<?> getColumnClass(int columnIndex) {
-	            return switch (columnIndex) {
-	                case 0 -> String.class; // ✅ CAMBIATO: da ImageIcon a String
-	                case 1, 2, 3, 4 -> String.class;
-	                default -> Object.class;
-	            };
-	        }
+			// Disattiva risposte precedenti
+			rispostaDAO.disattivaRispostePrecedenti(idOfferta);
 
-	        @Override
-	        public boolean isCellEditable(int row, int column) {
-	            return false;
-	        }
-	    };
+			// Crea e inserisci nuova risposta (senza note)
+			RispostaOfferta risposta = new RispostaOfferta(idOfferta, idAgente, tipoRisposta, importoControproposta);
+			boolean successo = rispostaDAO.inserisciRispostaOfferta(risposta);
 
-	    NumberFormat format = NumberFormat.getNumberInstance(Locale.ITALY);
-	    format.setGroupingUsed(true);
-	    format.setMaximumFractionDigits(0);
-	    format.setMinimumFractionDigits(0);
+			// Se l'inserimento è riuscito, aggiorna lo stato dell'offerta
+			if (successo) {
+				OffertaInizialeDAO offertaDAO = new OffertaInizialeDAO(connAWS);
+				offertaDAO.aggiornaStatoOfferta(idOfferta, tipoRisposta);
+			}
 
-	    // Riempimento del modello
-	    for (Object[] riga : datiOfferte) {
-	        Object[] rigaFormattata = new Object[5];
-
-	        // ✅ Salva il Base64 (già corretto)
-	        String base64 = (riga[0] instanceof String) ? (String) riga[0] : "";
-	        
-	        rigaFormattata[0] = base64; // Base64 come stringa
-	        rigaFormattata[1] = (String) riga[1];
-	        rigaFormattata[2] = (String) riga[2];
-	        rigaFormattata[3] = "€ " + format.format(riga[3]);
-	        rigaFormattata[4] = (String) riga[4];
-
-	        model.addRow(rigaFormattata);
-	    }
-
-	    // Imposta il modello
-	    tableOfferteProposte.setModel(model);
-
-	    // ✅ IMPOSTA ALTEZZA DOPO aver settato il modello
-	    tableOfferteProposte.setRowHeight(100);
-
-	    // Configurazione larghezze colonne
-	    TableColumnModel columnModel = tableOfferteProposte.getColumnModel();
-	    columnModel.getColumn(0).setPreferredWidth(100); // ✅ Aumentata per immagini
-	    columnModel.getColumn(1).setPreferredWidth(100);
-	    columnModel.getColumn(2).setPreferredWidth(400);
-	    columnModel.getColumn(3).setPreferredWidth(120);
-	    columnModel.getColumn(4).setPreferredWidth(80);
-
-	    // ✅ RENDERER PER IMMAGINI - Deve essere il PRIMO ad essere impostato
-	    columnModel.getColumn(0).setCellRenderer(new Base64ImageRenderer());
-	    
-	    // Renderer per testi e stili
-	    columnModel.getColumn(1).setCellRenderer(new TextBoldRenderer(true, new Color(50, 133, 177)));
-	    columnModel.getColumn(2).setCellRenderer(new TextAreaRenderer());
-	    columnModel.getColumn(3).setCellRenderer(new TextBoldRenderer(true, new Color(0, 0, 0)));
-	    impostaRendererStato(tableOfferteProposte, 4);
-
-	    // ✅ FORZA AGGIORNAMENTO VISUALE
-	    tableOfferteProposte.repaint();
-	    tableOfferteProposte.revalidate();
+			return successo;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
 
+	public List<OffertaIniziale> getOfferteByCliente(String idCliente) {
+		try {
+			Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
+			OffertaInizialeDAO offertaDAO = new OffertaInizialeDAO(connAWS);
+			return offertaDAO.getOfferteByCliente(idCliente);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return new ArrayList<>();
+		}
+	}
 
+	public List<RispostaOfferta> getRisposteByOfferta(long idOfferta) {
+		try {
+			Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
+			RispostaOffertaDAO rispostaDAO = new RispostaOffertaDAO(connAWS);
+			return rispostaDAO.getRisposteByOfferta(idOfferta);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return new ArrayList<>();
+		}
+	}
+
+	private void popolaTabellaOfferteProposte(JTable tableOfferteProposte, List<Object[]> datiOfferte) {
+		String[] nomiColonne = { "ID", "Foto", "Categoria", "Descrizione", "Prezzo proposto", "Stato" };
+
+		@SuppressWarnings("serial")
+		DefaultTableModel model = new DefaultTableModel(nomiColonne, 0) {
+			@Override
+			public Class<?> getColumnClass(int columnIndex) {
+				return switch (columnIndex) {
+				case 0 -> Long.class;
+				case 1 -> String.class;
+				case 2, 3, 4, 5 -> String.class;
+				default -> Object.class;
+				};
+			}
+
+			@Override
+			public boolean isCellEditable(int row, int column) {
+				return false;
+			}
+		};
+
+		NumberFormat format = NumberFormat.getNumberInstance(Locale.ITALY);
+		format.setGroupingUsed(true);
+		format.setMaximumFractionDigits(0);
+		format.setMinimumFractionDigits(0);
+
+		for (Object[] riga : datiOfferte) {
+			Object[] rigaFormattata = new Object[6];
+
+			rigaFormattata[0] = riga[0];
+			rigaFormattata[1] = riga[1];
+			rigaFormattata[2] = riga[2];
+			rigaFormattata[3] = riga[3];
+			rigaFormattata[4] = "€ " + format.format(riga[4]);
+			rigaFormattata[5] = riga[5];
+
+			model.addRow(rigaFormattata);
+		}
+
+		tableOfferteProposte.setModel(model);
+		tableOfferteProposte.getTableHeader().setReorderingAllowed(false);
+		tableOfferteProposte.setRowHeight(160);
+
+		TableUtils.nascondiColonna(tableOfferteProposte, 0);		// idOfferta nascosto
+		TableUtils.fissaColonna(tableOfferteProposte, 1, 200);		// Foto
+		TableUtils.fissaColonna(tableOfferteProposte, 2, 120);		// Categoria
+		TableUtils.larghezzaColonna(tableOfferteProposte, 3, 400);	// Descrizione
+		TableUtils.fissaColonna(tableOfferteProposte, 4, 150);		// Prezzo proposto
+		TableUtils.fissaColonna(tableOfferteProposte, 5, 120);		// Stato
+
+		TableColumnModel columnModel = tableOfferteProposte.getColumnModel();
+		columnModel.getColumn(1).setCellRenderer(new Base64ImageRenderer());
+		columnModel.getColumn(2).setCellRenderer(new TextBoldRenderer(true, new Color(50, 133, 177)));
+		columnModel.getColumn(3).setCellRenderer(new TextAreaRenderer());
+		columnModel.getColumn(4).setCellRenderer(new TextBoldRenderer(true, new Color(0, 0, 0)));
+		impostaRendererStato(tableOfferteProposte, 5);
+	}
+	// fine
 
 	public Immobile recuperaDettagli(long idImmobile) {
 		try {
@@ -521,13 +549,15 @@ public class Controller {
 
 			String[] colonne = { "ID", "Immagini", "Titolo dell'annuncio", "Descrizione",
 					tipologia.equals("Vendita") ? "Prezzo Totale" : "Prezzo Mensile" };
+
+			// ✅ CAMBIO: Modello con colonna Immagini come String invece di ImageIcon
 			@SuppressWarnings("serial")
 			DefaultTableModel model = new DefaultTableModel(colonne, 0) {
 				@Override
 				public Class<?> getColumnClass(int columnIndex) {
 					return switch (columnIndex) {
 					case 0 -> Integer.class;
-					case 1 -> ImageIcon.class;
+					case 1 -> String.class; // ✅ CAMBIATO: da ImageIcon a String
 					case 2 -> String.class;
 					case 3 -> String.class;
 					case 4 -> String.class;
@@ -537,55 +567,56 @@ public class Controller {
 
 				@Override
 				public boolean isCellEditable(int row, int column) {
-					return false; // tutte le celle non editabili
+					return false;
 				}
 			};
 
 			if (tipologia.equals("Affitto")) {
 				immobileDAO.getImmobiliAffitto(campoPieno, filtri).forEach(imm -> {
-					int imgWidth = tableRisultati.getColumnModel().getColumn(1).getWidth();
-					int imgHeight = tableRisultati.getRowHeight();
-					ImageIcon immagine = ImageUtils.decodeToIcon(imm.getIcon(), imgWidth, imgHeight);
-
-					model.addRow(new Object[] { imm.getId(), immagine, imm.getTitolo(), imm.getDescrizione(),
-							"€ " + format.format(imm.getPrezzoMensile()) });
+					// ✅ CAMBIO: Salva direttamente il Base64 invece di convertire in ImageIcon
+					String base64 = imm.getIcon(); // Presumendo che getIcon() restituisca il Base64
+					model.addRow(new Object[] {
+							imm.getId(),
+							base64, // ✅ Base64 come stringa
+							imm.getTitolo(),
+							imm.getDescrizione(),
+							"€ " + format.format(imm.getPrezzoMensile())
+					});
 				});
 			} else if (tipologia.equals("Vendita")) {
 				immobileDAO.getImmobiliVendita(campoPieno, filtri).forEach(imm -> {
-					int imgWidth = tableRisultati.getColumnModel().getColumn(1).getWidth();
-					int imgHeight = tableRisultati.getRowHeight();
-					ImageIcon immagine = ImageUtils.decodeToIcon(imm.getIcon(), imgWidth, imgHeight);
-
-					model.addRow(new Object[] { imm.getId(), immagine, imm.getTitolo(), imm.getDescrizione(),
-							"€ " + format.format(imm.getPrezzoTotale()) });
+					// ✅ CAMBIO: Salva direttamente il Base64 invece di convertire in ImageIcon
+					String base64 = imm.getIcon(); // Presumendo che getIcon() restituisca il Base64
+					model.addRow(new Object[] {
+							imm.getId(),
+							base64, // ✅ Base64 come stringa
+							imm.getTitolo(),
+							imm.getDescrizione(),
+							"€ " + format.format(imm.getPrezzoTotale())
+					});
 				});
 			}
 
 			tableRisultati.setModel(model);
 
-			// Configura colonne
-			TableColumnModel columnModel = tableRisultati.getColumnModel();
-			columnModel.getColumn(0).setMinWidth(0);
-			columnModel.getColumn(0).setMaxWidth(0);
-			columnModel.getColumn(0).setWidth(0);
-			columnModel.getColumn(0).setPreferredWidth(0);
-			columnModel.getColumn(1).setPreferredWidth(150);
-			columnModel.getColumn(2).setPreferredWidth(170);
-			columnModel.getColumn(3).setPreferredWidth(450);
-			columnModel.getColumn(4).setPreferredWidth(75);
+			// Ordinamento colonne fissato
+			tableRisultati.getTableHeader().setReorderingAllowed(false);
 
-			DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
-			centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+			// Altezza di ogni riga
+			tableRisultati.setRowHeight(160);
 
-			// Renderer per il titolo dell'annuncio (grassetto e più grande)
-			columnModel.getColumn(2).setCellRenderer(new TextBoldRenderer(false, new Color(50, 133, 177))); // blu scuro
-			columnModel.getColumn(3).setCellRenderer(new TextAreaRenderer());
-			// columnModel.getColumn(4).setCellRenderer(centerRenderer);
-			columnModel.getColumn(4).setCellRenderer(new TextBoldRenderer(true, new Color(0, 0, 0))); // nero
-			tableRisultati.setRowHeight(100);
+			// Larghezza di ogni singola colonna
+			TableUtils.nascondiColonna(tableRisultati, 0);           // Nascondi ID dell'immobile
+			TableUtils.fissaColonna(tableRisultati, 1, 180);         // Immagine
+			TableUtils.larghezzaColonna(tableRisultati, 2, 170);	 // Titolo
+			TableUtils.larghezzaColonna(tableRisultati, 3, 450);	 // Descrizione
+			TableUtils.fissaColonna(tableRisultati, 4, 100);         // Prezzo
 
-			// Imposto il render nella tabella, sulla colonna delle immagini
-			TableUtils.setImageRenderer(tableRisultati, 1);
+			// Renderer
+			tableRisultati.getColumnModel().getColumn(1).setCellRenderer(new Base64ImageRenderer());
+			tableRisultati.getColumnModel().getColumn(2).setCellRenderer(new TextBoldRenderer(false, new Color(50, 133, 177)));
+			tableRisultati.getColumnModel().getColumn(3).setCellRenderer(new TextAreaRenderer());
+			tableRisultati.getColumnModel().getColumn(4).setCellRenderer(new TextBoldRenderer(true, new Color(0, 0, 0)));
 
 			return model.getRowCount();
 

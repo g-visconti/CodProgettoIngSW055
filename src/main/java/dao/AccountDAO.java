@@ -152,7 +152,7 @@ public class AccountDAO {
 							null, // indirizzo
 							"Supporto", // ruolo
 							agenzia // agenzia
-					);
+							);
 				} else if (agenzia != null) {
 					return new AgenteImmobiliare(id, email, null, nome, cognome, null, numeroTelefono, null, null,
 							"Agente", agenzia);
@@ -246,8 +246,8 @@ public class AccountDAO {
 		}
 	}
 
-	public String getSession(String email) throws SQLException {
-		String result = "undef";
+	public String getIdAccountByEmail(String email) throws SQLException {
+		String idAccount = "undef";
 		String query = "SELECT \"idAccount\" FROM \"Account\" WHERE email = ?";
 
 		try (PreparedStatement stmt = connection.prepareStatement(query)) {
@@ -255,15 +255,35 @@ public class AccountDAO {
 			ResultSet rs = stmt.executeQuery();
 
 			if (rs.next()) {
-				result = rs.getString("idAccount");
+				idAccount = rs.getString("idAccount");
 			}
 
-			rs.close(); // buona pratica
+			rs.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 
-		return result;
+		return idAccount;
+	}
+
+	public String getAgenteAssociato(long idImmobile) {
+		String agenteAssociato = "inesistente";
+		String query = "SELECT \"agenteAssociato\" FROM \"Immobile\" WHERE \"idImmobile\" = ?";
+
+		try (PreparedStatement stmt = connection.prepareStatement(query)) {
+			stmt.setLong(1, idImmobile);
+			ResultSet rs = stmt.executeQuery();
+
+			if (rs.next()) {
+				agenteAssociato = rs.getString("agenteAssociato");
+			}
+
+			rs.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return agenteAssociato;
 	}
 
 }

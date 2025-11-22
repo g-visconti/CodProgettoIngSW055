@@ -66,8 +66,9 @@ public class ViewAccesso extends JFrame {
 				// jsonObject.get("last_name").getAsString() : null;
 
 				return new Account(email, facebookAccessToken);
-			} else
+			} else {
 				System.out.println("Errore nel recupero dati: " + response.body().string());
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -93,8 +94,9 @@ public class ViewAccesso extends JFrame {
 				// jsonObject.get("family_name").getAsString() : null;
 
 				return new Account(email, googleAccessToken);
-			} else
+			} else {
 				System.out.println("Errore nel recupero dati da Google: " + response.body().string());
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -170,8 +172,9 @@ public class ViewAccesso extends JFrame {
 			@Override
 			public void keyTyped(KeyEvent e) {
 				campoPieno = txtEmail.getText();
-				if (campoPieno.equals("Email"))
+				if (campoPieno.equals("Email")) {
 					txtEmail.setText("");
+				}
 			}
 		});
 		txtEmail.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
@@ -209,7 +212,45 @@ public class ViewAccesso extends JFrame {
 		lblGitHub.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
+
 				loginWithGitHub();
+
+				JFrame confirmFrame = new JFrame("Conferma Accesso");
+				confirmFrame.setSize(300, 150);
+				confirmFrame.setLocationRelativeTo(null); // centra la finestra
+
+				JButton btnConferma = new JButton("Completa il Login");
+
+				btnConferma.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+
+						try {
+							Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+							tokentest = (String) clipboard.getData(DataFlavor.stringFlavor);
+
+							if (tokentest != null && !tokentest.isEmpty()) {
+								//handleGitHubToken(tokentest);
+							} else {
+								JOptionPane.showMessageDialog(null, "Nessun token", "Attenzione",
+										JOptionPane.INFORMATION_MESSAGE);
+							}
+
+						} catch (Exception ex) {
+							ex.printStackTrace();
+							JOptionPane.showMessageDialog(null, "Errore", "Attenzione",
+									JOptionPane.INFORMATION_MESSAGE);
+						}
+
+						confirmFrame.dispose(); // chiude il frame di conferma
+					}
+				});
+
+				JPanel panel = new JPanel();
+				panel.add(btnConferma);
+
+				confirmFrame.getContentPane().add(panel);
+				confirmFrame.setVisible(true);
 			}
 
 			@Override
@@ -254,11 +295,12 @@ public class ViewAccesso extends JFrame {
 							Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 							tokentest = (String) clipboard.getData(DataFlavor.stringFlavor);
 
-							if (tokentest != null && !tokentest.isEmpty())
+							if (tokentest != null && !tokentest.isEmpty()) {
 								handleGoogleToken(tokentest);
-							else
+							} else {
 								JOptionPane.showMessageDialog(null, "Nessun token", "Attenzione",
 										JOptionPane.INFORMATION_MESSAGE);
+							}
 
 						} catch (Exception ex) {
 							ex.printStackTrace();
@@ -320,11 +362,12 @@ public class ViewAccesso extends JFrame {
 							Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 							tokentest = (String) clipboard.getData(DataFlavor.stringFlavor);
 
-							if (tokentest != null && !tokentest.isEmpty())
+							if (tokentest != null && !tokentest.isEmpty()) {
 								handleFacebookToken(tokentest);
-							else
+							} else {
 								JOptionPane.showMessageDialog(null, "Nessun token", "Attenzione",
 										JOptionPane.INFORMATION_MESSAGE);
+							}
 
 						} catch (Exception ex) {
 							ex.printStackTrace();
@@ -461,9 +504,9 @@ public class ViewAccesso extends JFrame {
 	}
 
 	private void handleFacebookToken(String token) {
-		if (token == null || token.isEmpty())
+		if (token == null || token.isEmpty()) {
 			JOptionPane.showMessageDialog(null, "Login Facebook annullato.");
-		else {
+		} else {
 
 			boolean success = CognitoApp.authenticateWithFacebook(token);
 
@@ -475,15 +518,16 @@ public class ViewAccesso extends JFrame {
 				ViewDashboard viewDashboard = new ViewDashboard(emailtest);
 				viewDashboard.setVisible(true);
 				viewDashboard.setLocationRelativeTo(null);
-			} else
+			} else {
 				JOptionPane.showMessageDialog(null, "Autenticazione fallita.");
+			}
 		}
 	}
 
 	private void handleGoogleToken(String authCode) {
-		if (authCode == null || authCode.isEmpty())
-			JOptionPane.showMessageDialog(null, "Login Facebook annullato.");
-		else {
+		if (authCode == null || authCode.isEmpty()) {
+			JOptionPane.showMessageDialog(null, "Login Google annullato.");
+		} else {
 
 			boolean success = CognitoApp.authenticateWithFacebook(authCode);
 
@@ -495,8 +539,9 @@ public class ViewAccesso extends JFrame {
 				ViewDashboard viewDashboard = new ViewDashboard(emailtest);
 				viewDashboard.setVisible(true);
 				viewDashboard.setLocationRelativeTo(null);
-			} else
+			} else {
 				JOptionPane.showMessageDialog(null, "Autenticazione fallita.");
+			}
 		}
 	}
 
@@ -528,10 +573,11 @@ public class ViewAccesso extends JFrame {
 			// l'implicito (spoiler: non lo
 			// supporta pienamente)
 
-			if (Desktop.isDesktopSupported())
+			if (Desktop.isDesktopSupported()) {
 				Desktop.getDesktop().browse(new URI(githubLoginUrl));
-			else
+			} else {
 				JOptionPane.showMessageDialog(this, "Il browser predefinito non è supportato dal sistema.");
+			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			JOptionPane.showMessageDialog(this, "Errore nel tentativo di login con GitHub.");
@@ -545,10 +591,11 @@ public class ViewAccesso extends JFrame {
 					+ "&redirect_uri=https://manubxx.github.io/google-callback-redirect/callbackgoogle"
 					+ "&response_type=token" + "&scope=openid%20profile%20email";
 
-			if (Desktop.isDesktopSupported())
+			if (Desktop.isDesktopSupported()) {
 				Desktop.getDesktop().browse(new URI(googleLoginUrl));
-			else
+			} else {
 				JOptionPane.showMessageDialog(this, "Il browser predefinito non è supportato dal sistema.");
+			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			JOptionPane.showMessageDialog(this, "Errore nel tentativo di login con Google.");

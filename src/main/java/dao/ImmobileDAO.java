@@ -94,7 +94,7 @@ public class ImmobileDAO {
 			stmt.close();
 
 			// Inserimento specifico per affitto
-			String query2 = "INSERT INTO \"ImmobileinAffitto\" (\"idImmobile\", \"prezzoMensile\") VALUES (?, ?)";
+			String query2 = "INSERT INTO \"ImmobileInAffitto\" (\"idImmobile\", \"prezzoMensile\") VALUES (?, ?)";
 			try (PreparedStatement stmt2 = connection.prepareStatement(query2)) {
 				stmt2.setInt(1, generatedId);
 				stmt2.setDouble(2, immobile.getPrezzoMensile());
@@ -143,7 +143,7 @@ public class ImmobileDAO {
 			stmt.close();
 
 			// Inserimento specifico per vendita
-			String query2 = "INSERT INTO \"ImmobileinVendita\" (\"idImmobile\", \"prezzoTotale\") VALUES (?, ?)";
+			String query2 = "INSERT INTO \"ImmobileInVendita\" (\"idImmobile\", \"prezzoTotale\") VALUES (?, ?)";
 			try (PreparedStatement stmt2 = connection.prepareStatement(query2)) {
 				stmt2.setInt(1, generatedId);
 				stmt2.setDouble(2, immobile.getPrezzoTotale());
@@ -153,12 +153,12 @@ public class ImmobileDAO {
 	}
 
 	public List<Object[]> getDatiOfferteProposte(String emailUtente) {
-		String query = "SELECT i.\"immagini\" as \"Foto\", i.\"tipologia\" as \"Categoria\", i.\"descrizione\" as \"Descrizione\", "
-				+ "o.\"importo\" as \"Prezzo da me proposto\", o.\"stato\" as \"Stato\" "
+		String query = "SELECT i.\"idOfferta\" as \"idOfferta\" i.\"immagini\" as \"Foto\", i.\"tipologia\" as \"Categoria\", i.\"descrizione\" as \"Descrizione\", "
+				+ "oi.\"importoProposto\" as \"Prezzo proposto\", oi.\"stato\" as \"Stato\" "
 				+ "FROM \"Immobile\" i "
-				+ "INNER JOIN \"Offerta\" o ON i.\"idImmobile\" = o.\"immobileAssociato\" "
-				+ "INNER JOIN \"Cliente\" c ON o.\"accountAssociato\" = c.\"id\" "
-				+ "WHERE c.\"email\" = ?";
+				+ "INNER JOIN \"OffertaIniziale\" oi ON i.\"idImmobile\" = oi.\"immobileAssociato\" "
+				+ "INNER JOIN \"Account\" a ON oi.\"clienteAssociato\" = a.\"idAccount\" "
+				+ "WHERE a.\"email\" = ?";
 
 		List<Object[]> risultati = new ArrayList<>();
 
@@ -167,7 +167,9 @@ public class ImmobileDAO {
 			ResultSet rs = stmt.executeQuery();
 
 			while (rs.next()) {
-				Object[] riga = new Object[5];
+				Object[] riga = new Object[6];
+
+				riga[0] = rs.getLong("idOfferta");
 
 				// ✅ Leggi il JSON con le immagini (stringa)
 				String immaginiJson = rs.getString("Foto");
@@ -176,8 +178,7 @@ public class ImmobileDAO {
 				if (immaginiJson != null && !immaginiJson.isBlank()) {
 					try {
 						JSONArray array = new JSONArray(immaginiJson);
-						if (array.length() > 0)
-						{
+						if (array.length() > 0) {
 							primaImmagineBase64 = array.getString(0); // prendi solo la prima immagine
 						}
 					} catch (Exception e) {
@@ -185,11 +186,11 @@ public class ImmobileDAO {
 					}
 				}
 
-				riga[0] = primaImmagineBase64;
-				riga[1] = rs.getString("Categoria");
-				riga[2] = rs.getString("Descrizione");
-				riga[3] = rs.getBigDecimal("Prezzo da me proposto");
-				riga[4] = rs.getString("Stato");
+				riga[1] = primaImmagineBase64;
+				riga[2] = rs.getString("Categoria");
+				riga[3] = rs.getString("Descrizione");
+				riga[4] = rs.getBigDecimal("Prezzo proposto");
+				riga[5] = rs.getString("Stato");
 
 				risultati.add(riga);
 			}
@@ -252,7 +253,7 @@ public class ImmobileDAO {
 
 				// Recupera prezzo specifico
 				if (immobile instanceof ImmobileInAffitto) {
-					String sqlPrezzoAffitto = "SELECT \"prezzoMensile\" FROM \"ImmobileinAffitto\" WHERE \"idImmobile\" = ?";
+					String sqlPrezzoAffitto = "SELECT \"prezzoMensile\" FROM \"ImmobileInAffitto\" WHERE \"idImmobile\" = ?";
 					try (PreparedStatement psPrezzo = connection.prepareStatement(sqlPrezzoAffitto)) {
 						psPrezzo.setLong(1, idimmobile);
 						ResultSet rsPrezzo = psPrezzo.executeQuery();
@@ -261,7 +262,7 @@ public class ImmobileDAO {
 						}
 					}
 				} else if (immobile instanceof ImmobileInVendita) {
-					String sqlPrezzoVendita = "SELECT \"prezzoTotale\" FROM \"ImmobileinVendita\" WHERE \"idImmobile\" = ?";
+					String sqlPrezzoVendita = "SELECT \"prezzoTotale\" FROM \"ImmobileInVendita\" WHERE \"idImmobile\" = ?";
 					try (PreparedStatement psPrezzo = connection.prepareStatement(sqlPrezzoVendita)) {
 						psPrezzo.setLong(1, idimmobile);
 						ResultSet rsPrezzo = psPrezzo.executeQuery();
@@ -280,7 +281,7 @@ public class ImmobileDAO {
 	public List<ImmobileInAffitto> getImmobiliAffitto(String campoPieno, Filtri filtri) {
 		List<ImmobileInAffitto> immobili = new ArrayList<>();
 		String query = " SELECT i.\"idImmobile\", i.\"immagini\" \"Immagini\", i.\"titolo\" \"Tipologia\", i.\"descrizione\" \"Descrizione\", a.\"prezzoMensile\" \"Prezzo Totale (€)\" "
-				+ " FROM \"Immobile\" i JOIN \"ImmobileinAffitto\" a " + " ON i.\"idImmobile\" = a.\"idImmobile\" "
+				+ " FROM \"Immobile\" i JOIN \"ImmobileInAffitto\" a " + " ON i.\"idImmobile\" = a.\"idImmobile\" "
 				+ " WHERE ( " + " i.\"titolo\" ILIKE '%' || ? || '%' OR " + " i.\"localita\" ILIKE '%' || ? || '%' OR "
 				+ " i.\"descrizione\" ILIKE '%' || ? || '%' " + " ) " + " AND i.\"tipologia\" = 'Affitto' ";
 
@@ -314,6 +315,9 @@ public class ImmobileDAO {
 		if (filtri.climatizzazione != null) {
 			query += " AND (i.\"filtri\"->>'climatizzazione')::boolean = ?";
 		}
+
+		// ordino i risultati dal più recente al più vecchio
+		query+= " ORDER BY i.\"idImmobile\" DESC ";
 
 		try (PreparedStatement ps = connection.prepareStatement(query)) {
 			int i = 1;
@@ -404,7 +408,7 @@ public class ImmobileDAO {
 	public List<ImmobileInVendita> getImmobiliVendita(String campoPieno, Filtri filtri) {
 		List<ImmobileInVendita> immobili = new ArrayList<>();
 		String query = " SELECT i.\"idImmobile\", i.\"immagini\" \"Immagini\", i.\"titolo\" \"Tipologia\", i.\"descrizione\" \"Descrizione\", v.\"prezzoTotale\" \"Prezzo Totale (€)\" "
-				+ " FROM \"Immobile\" i JOIN \"ImmobileinVendita\" v " + " ON i.\"idImmobile\" = v.\"idImmobile\" "
+				+ " FROM \"Immobile\" i JOIN \"ImmobileInVendita\" v " + " ON i.\"idImmobile\" = v.\"idImmobile\" "
 				+ " WHERE ( " + " i.\"titolo\" ILIKE '%' || ? || '%' OR " + " i.\"localita\" ILIKE '%' || ? || '%' OR "
 				+ " i.\"descrizione\" ILIKE '%' || ? || '%' " + " ) " + " AND i.\"tipologia\" = 'Vendita' ";
 
@@ -438,6 +442,9 @@ public class ImmobileDAO {
 		if (filtri.climatizzazione != null) {
 			query += " AND (i.\"filtri\"->>'climatizzazione')::boolean = ?";
 		}
+
+		// ordino i risultati dal più recente al più vecchio
+		query+= " ORDER BY i.\"idImmobile\" DESC ";
 
 		try (PreparedStatement ps = connection.prepareStatement(query)) {
 			int i = 1;
