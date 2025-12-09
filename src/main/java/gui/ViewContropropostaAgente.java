@@ -5,7 +5,6 @@ import java.awt.Font;
 import java.awt.SystemColor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.time.format.DateTimeFormatter;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -77,9 +76,10 @@ public class ViewContropropostaAgente extends JFrame {
 
 		if(risposta != null) {
 			lblDatiAgente.setText("L'agente "+risposta.getNomeAgente()+" "+risposta.getCognomeAgente());
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-			String dataFormattata = risposta.getDataRisposta().format(formatter);
-			lblDataRisposta.setText("in data: "+dataFormattata);
+
+			String dataFormattata = TableUtils.formattaData(risposta.getDataRisposta());
+			lblDataRisposta.setText("in data: " + dataFormattata);
+
 			String importoFormattato = TableUtils.formattaPrezzo(risposta.getImportoControproposta());
 			lblValoreControproposta.setText(importoFormattato);
 		}

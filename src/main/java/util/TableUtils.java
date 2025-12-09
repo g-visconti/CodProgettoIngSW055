@@ -1,6 +1,8 @@
 package util;
 
 import java.text.NumberFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
 import javax.swing.JTable;
@@ -40,7 +42,6 @@ public class TableUtils {
 	/**
 	 * Imposta il formato italiano al prezzo
 	 */
-
 	public static String formattaPrezzo(Object importo) {
 		NumberFormat format = NumberFormat.getNumberInstance(Locale.ITALY);
 		format.setGroupingUsed(true);
@@ -51,6 +52,19 @@ public class TableUtils {
 			return "€ " + format.format(importo);
 		}
 		return "€ 0"; // o un valore di default
+	}
+
+	/**
+	 * Formattazione della data
+	 */
+	public static String formattaData(LocalDateTime data) {
+		if (data == null) {
+			return "";
+		}
+		else {
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+			return data.format(formatter);
+		}
 	}
 }
 

@@ -154,7 +154,7 @@ public class ImmobileDAO {
 
 	public List<Object[]> getDatiOfferteProposte(String emailUtente) {
 		String query = "SELECT oi.\"idOfferta\" as \"idOfferta\", i.\"immagini\" as \"Foto\", i.\"tipologia\" as \"Categoria\", i.\"descrizione\" as \"Descrizione\", "
-				+ "oi.\"importoProposto\" as \"Prezzo proposto\", oi.\"stato\" as \"Stato\" "
+				+ "oi.\"dataOfferta\" as \"Data\", oi.\"importoProposto\" as \"Prezzo proposto\", oi.\"stato\" as \"Stato\" "
 				+ "FROM \"Immobile\" i "
 				+ "INNER JOIN \"OffertaIniziale\" oi ON i.\"idImmobile\" = oi.\"immobileAssociato\" "
 				+ "INNER JOIN \"Account\" a ON oi.\"clienteAssociato\" = a.\"idAccount\" "
@@ -167,7 +167,7 @@ public class ImmobileDAO {
 			ResultSet rs = stmt.executeQuery();
 
 			while (rs.next()) {
-				Object[] riga = new Object[6];
+				Object[] riga = new Object[7];
 
 				riga[0] = rs.getLong("idOfferta");
 
@@ -189,8 +189,12 @@ public class ImmobileDAO {
 				riga[1] = primaImmagineBase64;
 				riga[2] = rs.getString("Categoria");
 				riga[3] = rs.getString("Descrizione");
-				riga[4] = rs.getBigDecimal("Prezzo proposto");
-				riga[5] = rs.getString("Stato");
+
+				java.sql.Timestamp timestamp = rs.getTimestamp("Data");
+				riga[4] = (timestamp != null) ? timestamp.toLocalDateTime() : null;
+
+				riga[5] = rs.getBigDecimal("Prezzo proposto");
+				riga[6] = rs.getString("Stato");
 
 				risultati.add(riga);
 			}

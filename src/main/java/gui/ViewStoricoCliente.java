@@ -136,13 +136,13 @@ public class ViewStoricoCliente extends JFrame {
 		// Crea il modello dati della tabella
 		@SuppressWarnings("serial")
 		DefaultTableModel model = new DefaultTableModel(new Object[][] {},
-				new String[] { "Foto", "Categoria", "Descrizione", "Prezzo proposto", "Stato" }
+				new String[] { "Foto", "Categoria", "Descrizione", "Data", "Prezzo proposto", "Stato" }
 				) {
 			@Override
 			public Class<?> getColumnClass(int columnIndex) {
 				return switch (columnIndex) {
 				case 0 -> String.class; // Base64 immagini
-				case 1, 2, 3, 4 -> String.class;
+				case 1, 2, 3, 4, 5 -> String.class;
 				default -> Object.class;
 				};
 			}
@@ -162,7 +162,7 @@ public class ViewStoricoCliente extends JFrame {
 		tableStoricoOfferte.setSelectionBackground(new Color(226, 226, 226));
 
 		// Configura larghezze colonne (aggiornate per 3 colonne)
-		int[] preferredWidths = { 100, 100, 400, 120, 80 };
+		int[] preferredWidths = { 100, 100, 400, 120, 120, 80 };
 		for (int i = 0; i < preferredWidths.length; i++) {
 			TableColumn col = tableStoricoOfferte.getColumnModel().getColumn(i);
 			col.setPreferredWidth(preferredWidths[i]);
@@ -176,12 +176,14 @@ public class ViewStoricoCliente extends JFrame {
 		Controller controller = new Controller();
 		controller.riempiTableOfferteProposte(tableStoricoOfferte, emailUtente);
 
-		// Azione al clic di uno dei risultati
+		// IMPORTANTE: Ora aggiungi il listener DOPO che la tabella è stata popolata
 		tableStoricoOfferte.getSelectionModel().addListSelectionListener(e -> {
 			if (!e.getValueIsAdjusting()) {
 				int selectedRow = tableStoricoOfferte.getSelectedRow();
 				if (selectedRow != -1) {
-					String stato = (String) tableStoricoOfferte.getValueAt(selectedRow, 5);
+					// NOTA: Ora la tabella ha 7 colonne (0-6) invece di 6 (0-5)
+					// perché nel Controller viene aggiunta anche la colonna ID nascosta
+					String stato = (String) tableStoricoOfferte.getValueAt(selectedRow, 6); // Stato è alla colonna 6
 
 					// Puoi usare lo stato per varie azioni:
 					switch(stato) {
@@ -198,8 +200,7 @@ public class ViewStoricoCliente extends JFrame {
 								JOptionPane.INFORMATION_MESSAGE);
 						break;
 					case "Controproposta":
-						// recupera id immobile
-						// mostra ViewContropropostaAgente
+						// L'idOfferta è nascosto alla colonna 0
 						Long idOfferta = (Long) tableStoricoOfferte.getValueAt(selectedRow, 0);
 						String idCliente = "undef";
 						try {
