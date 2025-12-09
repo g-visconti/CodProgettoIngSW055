@@ -20,7 +20,8 @@ import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 
-import controller.Controller;
+import controller.AccountController;
+
 import util.GuiUtils;
 
 public class ViewModificaPassword extends JFrame {
@@ -193,7 +194,7 @@ public class ViewModificaPassword extends JFrame {
 				String pass = passwordField.getText();
 				String confermaPass = confermaPasswordField.getText();
 				// passo al controller
-				Controller con = new Controller();
+				AccountController con = new AccountController();
 				try {
 					if (con.updatePassword(emailAssociata, pass, confermaPass)) {
 						// accesso con password

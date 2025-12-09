@@ -32,7 +32,9 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.json.JSONObject;
 
-import controller.Controller;
+import controller.AccountController;
+
+import controller.ImmobileController;
 import model.Immobile;
 import model.ImmobileInAffitto;
 import model.ImmobileInVendita;
@@ -239,7 +241,7 @@ public class ViewCaricaImmobile extends JFrame {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				try {
-					Controller con = new Controller();
+					ImmobileController con = new ImmobileController();
 
 					String titolo = titolofield.getText();
 					String indirizzo = indirizzofield.getText();
@@ -287,7 +289,7 @@ public class ViewCaricaImmobile extends JFrame {
 					filtri.put("numeroLocali", locali);
 
 					Immobile immobile;
-					Controller controller = new Controller();
+					AccountController controller = new AccountController();
 					String idAgenteAssociato = controller.getIdAccountByEmail(emailAgente);
 
 					if ("undef".equals(idAgenteAssociato)) {

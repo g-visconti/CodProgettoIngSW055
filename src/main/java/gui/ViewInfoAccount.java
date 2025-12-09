@@ -16,7 +16,8 @@ import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 
-import controller.Controller;
+import controller.AccountController;
+
 import util.GuiUtils;
 
 public class ViewInfoAccount extends JFrame {
@@ -120,7 +121,7 @@ public class ViewInfoAccount extends JFrame {
 		panel.add(lblIndirizzoRes);
 
 		// codice per il riempimento dell'interfaccia
-		Controller controller = new Controller();
+		AccountController controller = new AccountController();
 		try {
 			infoProfilo = controller.getInfoProfilo(emailUtente);
 		} catch (SQLException e) {

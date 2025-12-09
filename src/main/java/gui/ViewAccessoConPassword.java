@@ -24,7 +24,9 @@ import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 
-import controller.Controller;
+import controller.AccessController;
+import controller.AccountController;
+
 import util.GuiUtils;
 
 public class ViewAccessoConPassword extends JFrame {
@@ -177,7 +179,7 @@ public class ViewAccessoConPassword extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// Condizione da inserire
-				Controller con = new Controller();
+				AccessController con = new AccessController();
 				@SuppressWarnings("deprecation")
 				String passwordInserita = passwordField.getText();
 				try {
@@ -188,7 +190,8 @@ public class ViewAccessoConPassword extends JFrame {
 						 */
 						// Guardo com'è strutturato l'id associato alla email, uso un metodo nel
 						// controller
-						String ruolo = con.getRuoloByEmail(emailInserita);
+						AccountController con1 = new AccountController();
+						String ruolo = con1.getRuoloByEmail(emailInserita);
 
 						switch (ruolo) {
 						case "Cliente":

@@ -21,7 +21,8 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
-import controller.Controller;
+
+import controller.OfferteController;
 import util.GuiUtils;
 
 public class ViewStoricoAgente extends JFrame {
@@ -169,7 +170,7 @@ public class ViewStoricoAgente extends JFrame {
 		scrollPane.setViewportView(tableStoricoOfferte);
 
 		// Popola la tabella con i dati tramite il controller
-		Controller controller = new Controller();
+		OfferteController controller = new OfferteController();
 		controller.riempiTableOfferteProposte(tableStoricoOfferte, emailUtente);
 
 		// Azione al clic di uno dei risultati

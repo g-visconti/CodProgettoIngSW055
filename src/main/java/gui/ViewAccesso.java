@@ -37,7 +37,9 @@ import javax.swing.border.LineBorder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import controller.Controller;
+import controller.AccessController;
+import controller.AccountController;
+
 import model.Account;
 import model.CognitoApp;
 import okhttp3.OkHttpClient;
@@ -416,7 +418,7 @@ public class ViewAccesso extends JFrame {
 			public void mouseClicked(MouseEvent e) {
 				String Email_Utente = txtEmail.getText();
 
-				Controller con = new Controller();
+				AccessController con = new AccessController();
 				// discrimino esistenza
 				try {
 					if (con.checkUtente(Email_Utente)) {
@@ -455,7 +457,7 @@ public class ViewAccesso extends JFrame {
 					return;
 				}
 
-				Controller con = new Controller();
+				AccessController con = new AccessController();
 				try {
 					if (con.checkUtente(Email_Utente)) {
 						// accesso con password
@@ -493,9 +495,9 @@ public class ViewAccesso extends JFrame {
 			if (success) {
 				Account account = getFacebookAccount(token);
 				emailtest = account.getEmail();
-				Controller con = new Controller();
+				AccessController con1 = new AccessController();
 				String ruolo="Cliente";
-				con.registraNuovoUtente(emailtest, token, ruolo);
+				con1.registraNuovoUtente(emailtest, token, ruolo);
 				ViewDashboard viewDashboard = new ViewDashboard(emailtest);
 				viewDashboard.setVisible(true);
 				viewDashboard.setLocationRelativeTo(null);
@@ -515,7 +517,7 @@ public class ViewAccesso extends JFrame {
 			if (success) {
 				Account account = getGoogleAccount(authCode);
 				emailtest = account.getEmail();
-				Controller con = new Controller();
+				AccessController con = new AccessController();
 				String ruolo="Cliente";
 				con.registraNuovoUtente(emailtest, authCode, ruolo);
 				ViewDashboard viewDashboard = new ViewDashboard(emailtest);

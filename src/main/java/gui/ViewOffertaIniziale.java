@@ -16,7 +16,8 @@ import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 
-import controller.Controller;
+
+import controller.OfferteController;
 import util.GuiUtils;
 
 public class ViewOffertaIniziale extends JFrame {
@@ -84,7 +85,7 @@ public class ViewOffertaIniziale extends JFrame {
 					return;
 				}
 
-				Controller controller = new Controller();
+				OfferteController controller = new OfferteController();
 				boolean offertaInserita = controller.inserisciOffertaIniziale(offertaProposta, idCliente, idImmobile);
 
 				if (offertaInserita) {

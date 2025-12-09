@@ -22,7 +22,8 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
-import controller.Controller;
+import controller.AccountController;
+import controller.OfferteController;
 import util.GuiUtils;
 
 public class ViewStoricoCliente extends JFrame {
@@ -173,7 +174,7 @@ public class ViewStoricoCliente extends JFrame {
 		scrollPane.setViewportView(tableStoricoOfferte);
 
 		// Popola la tabella con i dati tramite il controller
-		Controller controller = new Controller();
+		OfferteController controller = new OfferteController();
 		controller.riempiTableOfferteProposte(tableStoricoOfferte, emailUtente);
 
 		// IMPORTANTE: Ora aggiungi il listener DOPO che la tabella è stata popolata
@@ -204,7 +205,8 @@ public class ViewStoricoCliente extends JFrame {
 						Long idOfferta = (Long) tableStoricoOfferte.getValueAt(selectedRow, 0);
 						String idCliente = "undef";
 						try {
-							idCliente = controller.emailToId(emailUtente);
+							AccountController controller1 = new AccountController();
+							idCliente = controller1.emailToId(emailUtente);
 						} catch (SQLException e1) {
 							JOptionPane.showMessageDialog(null, "Non è stato possibile recuperare l'id del cliente", "Errore",
 									JOptionPane.INFORMATION_MESSAGE);

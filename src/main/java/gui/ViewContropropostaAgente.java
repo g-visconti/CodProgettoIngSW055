@@ -13,7 +13,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
-import controller.Controller;
+import controller.OfferteController;
 import model.RispostaOfferta;
 import util.GuiUtils;
 import util.TableUtils;
@@ -69,7 +69,7 @@ public class ViewContropropostaAgente extends JFrame {
 
 		// recupero il valore della controproposta
 
-		Controller controller = new Controller();
+		OfferteController controller = new OfferteController();
 		//datiControproposta = controller.getControproposta(idOfferta, idCliente);
 
 		RispostaOfferta risposta = controller.getDettagliRispostaAttiva(idOfferta);

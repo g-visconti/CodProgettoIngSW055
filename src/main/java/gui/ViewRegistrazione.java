@@ -24,7 +24,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 
-import controller.Controller;
+import controller.AccessController;
+
 import model.CognitoApp;
 import util.GuiUtils;
 
@@ -279,7 +280,7 @@ public class ViewRegistrazione extends JFrame {
 				boolean success = CognitoApp.registerUser(Email_Utente, passwordUtente, Email_Utente);
 
 				if (success) {
-					Controller cont1 = new Controller();
+					AccessController cont1 = new AccessController();
 					cont1.registraNuovoCliente(Email_Utente, passwordUtente, nome, cognome, citta, telefono, cap,
 							indirizzo, ruolo);
 					ViewDashboard viewDashboard = new ViewDashboard(Email_Utente);

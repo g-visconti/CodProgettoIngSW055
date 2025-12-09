@@ -31,7 +31,9 @@ import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
-import controller.Controller;
+import controller.AccountController;
+
+import controller.ImmobileController;
 import database.ConnessioneDatabase;
 import model.Filtri;
 import util.GuiUtils;
@@ -80,7 +82,7 @@ public class ViewDashboardDietiEstates extends JFrame {
 		dashboard.setLayout(sl_dashboard);
 
 		// Definisco la dashborad da visualizzare in base al ruolo di amministrazione
-		Controller controller = new Controller();
+		AccountController controller = new AccountController();
 		try {
 			ruoloDietiEstates = controller.getRuoloByEmail(emailAgente);
 		} catch (SQLException e) {
@@ -248,7 +250,7 @@ public class ViewDashboardDietiEstates extends JFrame {
 					SwingUtilities.invokeLater(new Runnable() {
 						@Override
 						public void run() {
-							Controller con2 = new Controller();
+							AccountController con2 = new AccountController();
 							String agenzia = con2.getAgenzia(emailAgente);
 
 							ViewInserimentoEmail view = new ViewInserimentoEmail(agenzia,
@@ -274,7 +276,7 @@ public class ViewDashboardDietiEstates extends JFrame {
 				SwingUtilities.invokeLater(new Runnable() {
 					@Override
 					public void run() {
-						Controller con1 = new Controller();
+						AccountController con1 = new AccountController();
 						String agenzia = con1.getAgenzia(emailAgente);
 
 						ViewInserimentoEmail view = new ViewInserimentoEmail(agenzia,
@@ -624,7 +626,7 @@ public class ViewDashboardDietiEstates extends JFrame {
 
 	private void ottieniIdAccount(String emailAgente) {
 		if(idAgente == null) {
-			Controller controller = new Controller();
+			AccountController controller = new AccountController();
 			try {
 				idAgente = controller.getIdAccountByEmail(emailAgente);
 			} catch (SQLException ex) {
@@ -637,7 +639,7 @@ public class ViewDashboardDietiEstates extends JFrame {
 	}
 
 	private void ricercaImmobili() {
-		Controller controller = new Controller();
+		ImmobileController controller = new ImmobileController();
 		String tipologiaAppartamento = (String) comboBoxAppartamento.getSelectedItem();
 		campoPieno = campoRicerca.getText();
 		if (campoPieno.equals("Cerca scrivendo una via, una zona o una parola chiave") || campoPieno.equals(campoVuoto)) {

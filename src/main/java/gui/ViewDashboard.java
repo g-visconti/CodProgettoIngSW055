@@ -31,7 +31,9 @@ import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
-import controller.Controller;
+import controller.AccountController;
+
+import controller.ImmobileController;
 import database.ConnessioneDatabase;
 import model.Filtri;
 import util.GuiUtils;
@@ -430,7 +432,7 @@ public class ViewDashboard extends JFrame {
 
 	private void ottieniIdAccount(String emailAgente) {
 		if(idCliente == null) {
-			Controller controller = new Controller();
+			AccountController controller = new AccountController();
 			try {
 				idCliente = controller.getIdAccountByEmail(emailAgente);
 			} catch (SQLException ex) {
@@ -443,7 +445,7 @@ public class ViewDashboard extends JFrame {
 	}
 
 	private void ricercaImmobili() {
-		Controller controller = new Controller();
+		ImmobileController controller = new ImmobileController();
 		String tipologiaAppartamento = (String) comboBoxAppartamento.getSelectedItem();
 		campoPieno = campoRicerca.getText();
 		if (campoPieno.equals("Cerca scrivendo una via, una zona o una parola chiave")

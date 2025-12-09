@@ -24,12 +24,12 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 
-import controller.Controller;
-import controller.ControllerImmobile;
+import controller.AccountController;
+
+import controller.ImmobileController;
 import model.Account;
 import model.Immobile;
 import model.ImmobileInAffitto;
@@ -104,34 +104,29 @@ public class ViewOffertaProposta extends JFrame {
 		contentPane.add(lblVicinanza);
 
 		// GOOGLE MAPS
-		ControllerImmobile controller = new ControllerImmobile("LA_TUA_API_KEY");
+		
 		lblMaps.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		lblMaps.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				String testoCompleto = lblTitolo.getText();
+		    @Override
+		    public void mouseClicked(MouseEvent e) {
+		        String testoCompleto = lblTitolo.getText();
 
-				String[] parole = testoCompleto.split(" ", 2);
-				String indirizzo = parole.length > 1 ? parole[1] : testoCompleto;
+		        String[] parole = testoCompleto.split(" ", 2);
+		        String indirizzo = parole.length > 1 ? parole[1] : testoCompleto;
 
-				String url = "https://www.google.com/maps/search/?api=1&query=" + indirizzo.replace(" ", "+");
+		        String url = "https://www.google.com/maps/search/?api=1&query=" + indirizzo.replace(" ", "+");
 
-				try {
-					Desktop.getDesktop().browse(new URI(url));
-				} catch (Exception ex) {
-					ex.printStackTrace();
-					JOptionPane.showMessageDialog(null, "Errore nell'apertura del browser");
-				}
+		        try {
+		            Desktop.getDesktop().browse(new URI(url));
+		        } catch (Exception ex) {
+		            ex.printStackTrace();
+		            JOptionPane.showMessageDialog(null, "Errore nell'apertura del browser");
+		        }
 
-				// 🔁 Qui chiami il controller per ottenere i luoghi vicini
-				new Thread(() -> {
-					String luoghi = controller.getLuoghiVicini(indirizzo);
-					SwingUtilities.invokeLater(() -> {
-						lblVicinanza.setText(luoghi); // aggiorna la label con i luoghi trovati
-					});
-				}).start();
-			}
+		       
+		    }
 		});
+
 
 		URL pathDEimage1 = this.getClass().getClassLoader().getResource("images/mapslogo.png");
 		lblMaps.setIcon(new ImageIcon(pathDEimage1));
@@ -357,7 +352,7 @@ public class ViewOffertaProposta extends JFrame {
 		panelPrezzoImmobile.add(lblPrezzo);
 		lblPrezzo.setFont(new Font("Segoe UI", Font.BOLD, 16));
 
-		Controller controllerImmobile = new Controller();
+		ImmobileController controllerImmobile = new ImmobileController();
 		Immobile immobile = controllerImmobile.recuperaDettagli(idImmobile);
 
 		if (immobile != null) {
@@ -389,8 +384,8 @@ public class ViewOffertaProposta extends JFrame {
 				lblPrezzo.setText("<html><div style='text-align: center;'>Prezzo: Non disponibile</div></html>");
 			}
 			System.out.println("DEBUG: immobile.getAgenteAssociato() = " + immobile.getAgenteAssociato());
-
-			Account account = controllerImmobile.recuperaDettagliAgente(immobile.getAgenteAssociato());
+			AccountController controllerAccount = new AccountController();
+			Account account = controllerAccount.recuperaDettagliAgente(immobile.getAgenteAssociato());
 			System.out.println("DEBUG: account = " + account);
 			/*
 			if ((account != null) && (account != null)) {
