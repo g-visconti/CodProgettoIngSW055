@@ -29,9 +29,10 @@ public class Account {
 	}
 
 	// Costruttore con 2 parametri
-	public Account(String email, String password) {
+	public Account(String email, String password,String ruolo) {
 		this.email = email;
 		this.password = password;
+		this.ruolo= ruolo;
 	}
 
 	public String getIdAccount() {

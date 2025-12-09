@@ -10,14 +10,14 @@ public class Cliente extends Account {
 	}
 
 	// Costruttore con 3 parametri
-	public Cliente(String email, String password, String idCliente) {
-		super(email, password);
+	public Cliente(String email, String password, String ruolo, String idCliente) {
+		super(email, password, ruolo);
 
 	}
 
 	// Nuovo costruttore con 2 parametri (email e password)
-	public Cliente(String email, String password) {
-		super(email, password);
+	public Cliente(String email, String password, String ruolo) {
+		super(email, password, ruolo);
 
 	}
 
