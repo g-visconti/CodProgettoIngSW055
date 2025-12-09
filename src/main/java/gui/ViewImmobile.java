@@ -48,7 +48,7 @@ public class ViewImmobile extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public ViewImmobile(long idImmobile, String idAccount) {
+	public ViewImmobile(long idImmobile, String idCliente) {
 		setTitle("DietiEstates25 - Dettagli dell'immobile selezionato");
 
 		// Imposta l'icona di DietiEstates25 alla finestra in uso
@@ -155,7 +155,7 @@ public class ViewImmobile extends JFrame {
 		btnProponiOfferta.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				ViewOffertaIniziale guiOfferta = new ViewOffertaIniziale(idImmobile, idAccount);
+				ViewOffertaIniziale guiOfferta = new ViewOffertaIniziale(idImmobile, idCliente);
 				guiOfferta.setLocationRelativeTo(null);
 				guiOfferta.setVisible(true);
 			}

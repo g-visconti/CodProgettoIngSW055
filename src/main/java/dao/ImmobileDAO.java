@@ -153,7 +153,7 @@ public class ImmobileDAO {
 	}
 
 	public List<Object[]> getDatiOfferteProposte(String emailUtente) {
-		String query = "SELECT i.\"idOfferta\" as \"idOfferta\" i.\"immagini\" as \"Foto\", i.\"tipologia\" as \"Categoria\", i.\"descrizione\" as \"Descrizione\", "
+		String query = "SELECT oi.\"idOfferta\" as \"idOfferta\", i.\"immagini\" as \"Foto\", i.\"tipologia\" as \"Categoria\", i.\"descrizione\" as \"Descrizione\", "
 				+ "oi.\"importoProposto\" as \"Prezzo proposto\", oi.\"stato\" as \"Stato\" "
 				+ "FROM \"Immobile\" i "
 				+ "INNER JOIN \"OffertaIniziale\" oi ON i.\"idImmobile\" = oi.\"immobileAssociato\" "

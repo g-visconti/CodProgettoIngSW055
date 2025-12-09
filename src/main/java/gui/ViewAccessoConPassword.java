@@ -101,8 +101,9 @@ public class ViewAccessoConPassword extends JFrame {
 			@Override
 			public void keyTyped(KeyEvent e) {
 				campoPieno = passwordField.getText();
-				if (campoPieno.equals("******"))
+				if (campoPieno.equals("******")) {
 					passwordField.setText(campoVuoto);
+				}
 			}
 		});
 		passwordField.setVerifyInputWhenFocusTarget(false);
@@ -118,8 +119,9 @@ public class ViewAccessoConPassword extends JFrame {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				campoPieno = passwordField.getText();
-				if (campoPieno.equals("******"))
+				if (campoPieno.equals("******")) {
 					passwordField.setText(campoVuoto);
+				}
 			}
 		});
 
@@ -129,8 +131,9 @@ public class ViewAccessoConPassword extends JFrame {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				campoPieno = passwordField.getText();
-				if (campoPieno.equals(campoVuoto))
+				if (campoPieno.equals(campoVuoto)) {
 					passwordField.setText("******");
+				}
 			}
 		});
 
@@ -147,8 +150,9 @@ public class ViewAccessoConPassword extends JFrame {
 		panelAccesso.add(lblEmail);
 
 		JLabel lblEmailAttuale = new JLabel("<email>");
-		if (!(emailInserita.equals("Email")))
+		if (!(emailInserita.equals("Email"))) {
 			lblEmailAttuale.setText(emailInserita);
+		}
 		lblEmailAttuale.setHorizontalAlignment(SwingConstants.CENTER);
 		lblEmailAttuale.setFont(new Font("Tahoma", Font.BOLD, 11));
 		lblEmailAttuale.setBounds(144, 88, 178, 20);
@@ -187,37 +191,29 @@ public class ViewAccessoConPassword extends JFrame {
 						String ruolo = con.getRuoloByEmail(emailInserita);
 
 						switch (ruolo) {
-						case "Cliente" -> {
+						case "Cliente":
 							ViewDashboard viewDashboard = new ViewDashboard(emailInserita);
 							viewDashboard.setLocationRelativeTo(null);
 							viewDashboard.setVisible(true);
 							dispose();
-						}
-						case "Agente" -> {
-							ViewDashboardAgente viewDashboardAgente = new ViewDashboardAgente(emailInserita);
-							viewDashboardAgente.setLocationRelativeTo(null);
-							viewDashboardAgente.setVisible(true);
+							break;
+						case "Agente":
+						case "Supporto":
+						case "Admin":
+							ViewDashboardDietiEstates viewDashboardDietiEstates = new ViewDashboardDietiEstates(emailInserita);
+							viewDashboardDietiEstates.setLocationRelativeTo(null);
+							viewDashboardDietiEstates.setVisible(true);
 							dispose();
-						}
-						case "Supporto" -> {
-							ViewDashboardSupporto viewDashboardSupporto = new ViewDashboardSupporto(emailInserita);
-							viewDashboardSupporto.setLocationRelativeTo(null);
-							viewDashboardSupporto.setVisible(true);
-							dispose();
-						}
-						case "Admin" -> {
-							ViewDashboardAdmin viewDashboardAdmin = new ViewDashboardAdmin(emailInserita);
-							viewDashboardAdmin.setLocationRelativeTo(null);
-							viewDashboardAdmin.setVisible(true);
-							dispose();
-						}
-						default -> JOptionPane.showMessageDialog(null, "Ruolo non riconosciuto", "Errore",
+							break;
+						default: JOptionPane.showMessageDialog(null, "Ruolo non riconosciuto", "Errore",
 								JOptionPane.INFORMATION_MESSAGE);
 						}
-					} else
+
+					} else {
 						// password errata
 						JOptionPane.showMessageDialog(null, "La password inserita non è corretta, riprova!",
 								"Errore inserimento dei dati", JOptionPane.INFORMATION_MESSAGE);
+					}
 				} catch (SQLException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();

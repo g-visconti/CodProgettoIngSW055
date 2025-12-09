@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -40,6 +41,9 @@ public class ViewStoricoCliente extends JFrame {
 
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 1248, 946);
+
+		// Imposta la finestra a schermo intero
+		setExtendedState(JFrame.MAXIMIZED_BOTH);
 
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -177,7 +181,7 @@ public class ViewStoricoCliente extends JFrame {
 			if (!e.getValueIsAdjusting()) {
 				int selectedRow = tableStoricoOfferte.getSelectedRow();
 				if (selectedRow != -1) {
-					String stato = (String) tableStoricoOfferte.getValueAt(selectedRow, 4);
+					String stato = (String) tableStoricoOfferte.getValueAt(selectedRow, 5);
 
 					// Puoi usare lo stato per varie azioni:
 					switch(stato) {
@@ -197,11 +201,17 @@ public class ViewStoricoCliente extends JFrame {
 						// recupera id immobile
 						// mostra ViewContropropostaAgente
 						Long idOfferta = (Long) tableStoricoOfferte.getValueAt(selectedRow, 0);
-						String idCliente = controller.emailToId(emailUtente);
+						String idCliente = "undef";
+						try {
+							idCliente = controller.emailToId(emailUtente);
+						} catch (SQLException e1) {
+							JOptionPane.showMessageDialog(null, "Non è stato possibile recuperare l'id del cliente", "Errore",
+									JOptionPane.INFORMATION_MESSAGE);
+							e1.printStackTrace();
+						}
 						ViewContropropostaAgente viewControproposta = new ViewContropropostaAgente(idOfferta, idCliente);
 						viewControproposta.setLocationRelativeTo(null);
 						viewControproposta.setVisible(true);
-						//JOptionPane.showMessageDialog(null, "Controproposta dell'agente", "Messaggio informativo",JOptionPane.INFORMATION_MESSAGE);
 						break;
 					}
 				}

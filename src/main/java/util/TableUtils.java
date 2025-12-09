@@ -1,5 +1,8 @@
 package util;
 
+import java.text.NumberFormat;
+import java.util.Locale;
+
 import javax.swing.JTable;
 import javax.swing.table.TableColumn;
 
@@ -34,5 +37,20 @@ public class TableUtils {
 		colonna.setPreferredWidth(larghezza);
 	}
 
+	/**
+	 * Imposta il formato italiano al prezzo
+	 */
+
+	public static String formattaPrezzo(Object importo) {
+		NumberFormat format = NumberFormat.getNumberInstance(Locale.ITALY);
+		format.setGroupingUsed(true);
+		format.setMaximumFractionDigits(0);
+		format.setMinimumFractionDigits(0);
+
+		if (importo instanceof Number) {
+			return "€ " + format.format(importo);
+		}
+		return "€ 0"; // o un valore di default
+	}
 }
 

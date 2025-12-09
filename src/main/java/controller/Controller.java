@@ -4,10 +4,8 @@ import java.awt.Color;
 import java.awt.Component;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
@@ -211,7 +209,7 @@ public class Controller {
 		}
 	}
 
-	public boolean inserisciRispostaOfferta(long idOfferta, String idAgente, String tipoRisposta, Double importoControproposta) {
+	public boolean inserisciRispostaOfferta(long idOfferta, String idAgente, String nome, String cognome, String tipoRisposta, Double importoControproposta) {
 		try {
 			Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
 			RispostaOffertaDAO rispostaDAO = new RispostaOffertaDAO(connAWS);
@@ -220,7 +218,7 @@ public class Controller {
 			rispostaDAO.disattivaRispostePrecedenti(idOfferta);
 
 			// Crea e inserisci nuova risposta (senza note)
-			RispostaOfferta risposta = new RispostaOfferta(idOfferta, idAgente, tipoRisposta, importoControproposta);
+			RispostaOfferta risposta = new RispostaOfferta(idOfferta, idAgente, nome, cognome, tipoRisposta, importoControproposta);
 			boolean successo = rispostaDAO.inserisciRispostaOfferta(risposta);
 
 			// Se l'inserimento è riuscito, aggiorna lo stato dell'offerta
@@ -258,6 +256,17 @@ public class Controller {
 		}
 	}
 
+	public RispostaOfferta getDettagliRispostaAttiva(Long idOfferta) {
+		try {
+			Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
+			RispostaOffertaDAO rispostaDAO = new RispostaOffertaDAO(connAWS);
+			return rispostaDAO.getDettagliRispostaAttiva(idOfferta);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
 	private void popolaTabellaOfferteProposte(JTable tableOfferteProposte, List<Object[]> datiOfferte) {
 		String[] nomiColonne = { "ID", "Foto", "Categoria", "Descrizione", "Prezzo proposto", "Stato" };
 
@@ -279,11 +288,6 @@ public class Controller {
 			}
 		};
 
-		NumberFormat format = NumberFormat.getNumberInstance(Locale.ITALY);
-		format.setGroupingUsed(true);
-		format.setMaximumFractionDigits(0);
-		format.setMinimumFractionDigits(0);
-
 		for (Object[] riga : datiOfferte) {
 			Object[] rigaFormattata = new Object[6];
 
@@ -291,7 +295,7 @@ public class Controller {
 			rigaFormattata[1] = riga[1];
 			rigaFormattata[2] = riga[2];
 			rigaFormattata[3] = riga[3];
-			rigaFormattata[4] = "€ " + format.format(riga[4]);
+			rigaFormattata[4] = TableUtils.formattaPrezzo(riga[4]);
 			rigaFormattata[5] = riga[5];
 
 			model.addRow(rigaFormattata);
@@ -489,8 +493,7 @@ public class Controller {
 		}
 	}
 
-	// Registrazione terze parti
-	public void registraNuovoUtente(String email, String password) {
+	public void registraNuovoUtente(String email, String password, String ruolo) {
 		try {
 			Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
 			AccountDAO accountDAO = new AccountDAO(connAWS);
@@ -501,7 +504,7 @@ public class Controller {
 				return;
 			}
 
-			Cliente nuovoCliente = new Cliente(email, password);
+			Cliente nuovoCliente = new Cliente(email, password, ruolo);
 
 			// Inserisci in Account e recupera idAccount generato
 			String idGenerato = accountDAO.insertAccount(nuovoCliente);
@@ -541,12 +544,6 @@ public class Controller {
 			Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
 			ImmobileDAO immobileDAO = new ImmobileDAO(connAWS);
 
-			// Settaggi vari
-			NumberFormat format = NumberFormat.getNumberInstance(Locale.ITALY);
-			format.setGroupingUsed(true);
-			format.setMaximumFractionDigits(0);
-			format.setMinimumFractionDigits(0);
-
 			String[] colonne = { "ID", "Immagini", "Titolo dell'annuncio", "Descrizione",
 					tipologia.equals("Vendita") ? "Prezzo Totale" : "Prezzo Mensile" };
 
@@ -580,7 +577,7 @@ public class Controller {
 							base64, // ✅ Base64 come stringa
 							imm.getTitolo(),
 							imm.getDescrizione(),
-							"€ " + format.format(imm.getPrezzoMensile())
+							TableUtils.formattaPrezzo(imm.getPrezzoMensile())
 					});
 				});
 			} else if (tipologia.equals("Vendita")) {
@@ -592,7 +589,7 @@ public class Controller {
 							base64, // ✅ Base64 come stringa
 							imm.getTitolo(),
 							imm.getDescrizione(),
-							"€ " + format.format(imm.getPrezzoTotale())
+							TableUtils.formattaPrezzo(imm.getPrezzoTotale())
 					});
 				});
 			}
@@ -638,4 +635,12 @@ public class Controller {
 		return resultCheck;
 	}
 
+	/*
+	public String[] getControproposta(Long idOfferta, String idCliente) throws SQLException {
+		try(Connection connAWS = ConnessioneDatabase.getInstance().getConnection()) {
+			RispostaOffertaDAO rispostaOffertaDAO = new RispostaOffertaDAO(connAWS);
+			return rispostaOffertaDAO.getContropropostaDAO(idOfferta, idCliente);
+		}
+	}
+	 */
 }

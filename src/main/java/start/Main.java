@@ -1,6 +1,8 @@
 package start;
 
+
 import gui.ViewDashboard;
+
 
 public class Main {
 
@@ -10,12 +12,13 @@ public class Main {
 		// ViewAccesso frame = new ViewAccesso();
 
 		// Admin
-		// ViewDashboardAdmin frame = new
-		// ViewDashboardAdmin("admimmobiliare@immobiliare.it");
+		//ViewDashboardDietiEstates frame = new ViewDashboardDietiEstates("admimmobiliare@immobiliare.it");
+
+		// Supporto
+		//ViewDashboardDietiEstates frame = new ViewDashboardDietiEstates("claudiagallo@de25.it");
 
 		// Agente
-		// ViewDashboardAgente frame = new
-		// ViewDashboardAgente("lucamagnini@immobiliare.it");
+		//ViewDashboardDietiEstates frame = new ViewDashboardDietiEstates("lucamagnini@immobiliare.it");
 
 		// Utente
 		ViewDashboard frame = new ViewDashboard("marioros@gmail.com");

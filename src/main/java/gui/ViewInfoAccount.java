@@ -19,7 +19,7 @@ import javax.swing.border.EmptyBorder;
 import controller.Controller;
 import util.GuiUtils;
 
-public class ViewAccount extends JFrame {
+public class ViewInfoAccount extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
@@ -30,7 +30,7 @@ public class ViewAccount extends JFrame {
 	 * 
 	 * @throws SQLException
 	 */
-	public ViewAccount(String emailUtente) {
+	public ViewInfoAccount(String emailUtente) {
 		setTitle("DietiEstates25 - Informazioni sull'account");
 		// Imposta l'icona di DietiEstates25 alla finestra in uso
 		GuiUtils.setIconaFinestra(this);
