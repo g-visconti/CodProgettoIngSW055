@@ -1,4 +1,4 @@
-package gui;
+package gui.amministrazione;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -32,9 +32,13 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
 import controller.AccountController;
-
 import controller.ImmobileController;
 import database.ConnessioneDatabase;
+import gui.ViewAccesso;
+import gui.ViewFiltri;
+import gui.ViewInfoAccount;
+import gui.ViewModificaPassword;
+import gui.utenza.ViewImmobile;
 import model.entity.Filtri;
 import util.GuiUtils;
 import util.InputUtils;
@@ -431,7 +435,7 @@ public class ViewDashboardDietiEstates extends JFrame {
 		btnVediOfferteProposte.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				ViewStoricoCliente viewOfferte = new ViewStoricoCliente(emailAgente);
+				ViewStoricoAgente viewOfferte = new ViewStoricoAgente(emailAgente);
 				viewOfferte.setLocationRelativeTo(null);
 				viewOfferte.setVisible(true);
 			}

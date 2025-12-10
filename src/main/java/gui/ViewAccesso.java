@@ -36,6 +36,8 @@ import javax.swing.border.LineBorder;
 
 import controller.AccessController;
 import controller.OAuthController;
+import gui.utenza.ViewDashboard;
+import gui.utenza.ViewRegistrazione;
 import util.GuiUtils;
 
 public class ViewAccesso extends JFrame {

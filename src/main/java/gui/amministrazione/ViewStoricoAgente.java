@@ -1,4 +1,4 @@
-package gui;
+package gui.amministrazione;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -20,7 +20,6 @@ import javax.swing.border.EmptyBorder;
 //import javax.swing.table.DefaultTableModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
-
 
 import controller.OfferteController;
 import util.GuiUtils;
@@ -183,19 +182,11 @@ public class ViewStoricoAgente extends JFrame {
 
 					// Puoi usare lo stato per varie azioni:
 					switch(stato) {
-					case "Accettata":
-						JOptionPane.showMessageDialog(null, "L'agente ha accettato la sua proposta", "Messaggio informativo",
-								JOptionPane.INFORMATION_MESSAGE);
-						break;
-					case "Rifiutata":
-						JOptionPane.showMessageDialog(null, "Mi dispiace, la sua proposta è stata rifiutata", "Messaggio informativo",
+					case "Valutata":
+						JOptionPane.showMessageDialog(null, "La proposta è stata già valutata", "Messaggio informativo",
 								JOptionPane.INFORMATION_MESSAGE);
 						break;
 					case "In attesa":
-						JOptionPane.showMessageDialog(null, "La proposta è ancora in attesa di essere valutata dall'agente", "Messaggio informativo",
-								JOptionPane.INFORMATION_MESSAGE);
-						break;
-					case "Controproposta":
 						// recupera id immobile
 						// mostra l'elenco delle offerte che l'agente ha ricevuto
 						//ViewOffertaProposta offertaProposta = new ViewOffertaProposta(idImmobile, idAgente);

@@ -1,4 +1,4 @@
-package gui;
+package gui.utenza;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -27,6 +27,7 @@ import javax.swing.border.EmptyBorder;
 import auth.CognitoAuthService;
 import auth.CognitoAuthServiceImpl;
 import controller.AccessController;
+import gui.ViewAccesso;
 import util.GuiUtils;
 
 public class ViewRegistrazione extends JFrame {
@@ -340,7 +341,6 @@ public class ViewRegistrazione extends JFrame {
 		lblDietiEstatesmini.setBounds(83, 286, 190, 174);
 		panelLogo.add(lblDietiEstatesmini);
 		lblDietiEstatesmini.setIcon(new ImageIcon(pathlogo2));
-
 		lblDieti = new JLabel("DietiEstates25");
 		lblDieti.setHorizontalAlignment(SwingConstants.CENTER);
 		lblDieti.setFont(new Font("Tahoma", Font.BOLD, 30));

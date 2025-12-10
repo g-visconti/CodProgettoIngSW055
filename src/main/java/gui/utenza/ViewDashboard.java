@@ -1,4 +1,4 @@
-package gui;
+package gui.utenza;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -32,9 +32,12 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
 import controller.AccountController;
-
 import controller.ImmobileController;
 import database.ConnessioneDatabase;
+import gui.ViewAccesso;
+import gui.ViewFiltri;
+import gui.ViewInfoAccount;
+import gui.ViewModificaPassword;
 import model.entity.Filtri;
 import util.GuiUtils;
 import util.InputUtils;

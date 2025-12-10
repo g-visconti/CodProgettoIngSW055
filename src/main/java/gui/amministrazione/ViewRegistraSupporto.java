@@ -1,4 +1,4 @@
-package gui;
+package gui.amministrazione;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -25,9 +25,10 @@ import javax.swing.border.EmptyBorder;
 import auth.CognitoAuthService;
 import auth.CognitoAuthServiceImpl;
 import controller.AccessController;
+import gui.utenza.ViewDashboard;
 import util.GuiUtils;
 
-public class ViewRegistraAgente extends JFrame {
+public class ViewRegistraSupporto extends JFrame {
 
 	/**
 	 *
@@ -50,16 +51,16 @@ public class ViewRegistraAgente extends JFrame {
 	private JLabel lblTelefonoError;
 	private JLabel lblCapError;
 	private JLabel lblIndirizzoError;
-	private String ruolo = "Agente";
+	private String ruolo = "Supporto";
 
 	/**
 	 * Create the frame.
 	 */
 
-	public ViewRegistraAgente(String Email_Utente, String agenzia) {
+	public ViewRegistraSupporto(String Email_Utente, String agenzia) {
 		authService = new CognitoAuthServiceImpl();
 
-		setTitle("DietiEstates25 - Registra un nuovo agente immobiliare");
+		setTitle("DietiEstates25 - Registra un nuovo amministratore di supporto");
 		setResizable(false);
 
 		// Imposta l'icona di DietiEstates25 alla finestra in uso
@@ -221,7 +222,7 @@ public class ViewRegistraAgente extends JFrame {
 		lblIndirizzoError.setBounds(68, 217, 134, 14);
 		panel.add(lblIndirizzoError);
 
-		JButton btnNewButton = new JButton("Registra agente");
+		JButton btnNewButton = new JButton("Registra supporto");
 		btnNewButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -285,7 +286,7 @@ public class ViewRegistraAgente extends JFrame {
 
 				if (success) {
 					AccessController cont1 = new AccessController();
-					cont1.registraNuovoAgente(Email_Utente, passwordUtente, nome, cognome, citta, telefono, cap,
+					cont1.registraNuovoSupporto(Email_Utente, passwordUtente, nome, cognome, citta, telefono, cap,
 							indirizzo, ruolo, agenzia);
 
 					dispose();
@@ -303,7 +304,7 @@ public class ViewRegistraAgente extends JFrame {
 		btnNewButton.setForeground(Color.WHITE);
 		btnNewButton.setBackground(SystemColor.textHighlight);
 		btnNewButton.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 13));
-		btnNewButton.setBounds(128, 420, 200, 25);
+		btnNewButton.setBounds(128, 435, 200, 25);
 		panel.add(btnNewButton);
 	}
 

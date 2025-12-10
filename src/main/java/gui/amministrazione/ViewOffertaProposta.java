@@ -1,4 +1,4 @@
-package gui;
+package gui.amministrazione;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -28,15 +28,15 @@ import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 
 import controller.AccountController;
+
 import controller.ImmobileController;
 import model.entity.Account;
-import model.entity.AgenteImmobiliare;
 import model.entity.Immobile;
 import model.entity.ImmobileInAffitto;
 import model.entity.ImmobileInVendita;
 import util.GuiUtils;
 
-public class ViewImmobile extends JFrame {
+public class ViewOffertaProposta extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
@@ -47,7 +47,7 @@ public class ViewImmobile extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public ViewImmobile(long idImmobile, String idCliente) {
+	public ViewOffertaProposta(long idImmobile, String idAccount) {
 		setTitle("DietiEstates25 - Dettagli dell'immobile selezionato");
 
 		// Imposta l'icona di DietiEstates25 alla finestra in uso
@@ -95,37 +95,38 @@ public class ViewImmobile extends JFrame {
 		JLabel lblMaps = new JLabel("");
 		lblMaps.setBackground(SystemColor.text);
 		lblMaps.setOpaque(true);
-		lblMaps.setBounds(854, 482, 277, 132);
+		lblMaps.setBounds(854, 432, 277, 132);
 		contentPane.add(lblMaps);
 
 		JLabel lblVicinanza = new JLabel("Vicino a:");
 		lblVicinanza.setFont(new Font("Segoe UI", Font.BOLD, 12));
-		lblVicinanza.setBounds(854, 625, 277, 30);
+		lblVicinanza.setBounds(854, 575, 277, 30);
 		contentPane.add(lblVicinanza);
 
 		// GOOGLE MAPS
-
+		
 		lblMaps.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		lblMaps.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				String testoCompleto = lblTitolo.getText();
+		    @Override
+		    public void mouseClicked(MouseEvent e) {
+		        String testoCompleto = lblTitolo.getText();
 
-				String[] parole = testoCompleto.split(" ", 2);
-				String indirizzo = parole.length > 1 ? parole[1] : testoCompleto;
+		        String[] parole = testoCompleto.split(" ", 2);
+		        String indirizzo = parole.length > 1 ? parole[1] : testoCompleto;
 
-				String url = "https://www.google.com/maps/search/?api=1&query=" + indirizzo.replace(" ", "+");
+		        String url = "https://www.google.com/maps/search/?api=1&query=" + indirizzo.replace(" ", "+");
 
-				try {
-					Desktop.getDesktop().browse(new URI(url));
-				} catch (Exception ex) {
-					ex.printStackTrace();
-					JOptionPane.showMessageDialog(null, "Errore nell'apertura del browser");
-				}
+		        try {
+		            Desktop.getDesktop().browse(new URI(url));
+		        } catch (Exception ex) {
+		            ex.printStackTrace();
+		            JOptionPane.showMessageDialog(null, "Errore nell'apertura del browser");
+		        }
 
-
-			}
+		       
+		    }
 		});
+
 
 		URL pathDEimage1 = this.getClass().getClassLoader().getResource("images/mapslogo.png");
 		lblMaps.setIcon(new ImageIcon(pathDEimage1));
@@ -133,73 +134,41 @@ public class ViewImmobile extends JFrame {
 		JLabel lblDescrizionePosizione = new JLabel("Controlla la posizione dell'immobile");
 		lblDescrizionePosizione.setHorizontalAlignment(SwingConstants.CENTER);
 		lblDescrizionePosizione.setFont(new Font("Tahoma", Font.BOLD, 13));
-		lblDescrizionePosizione.setBounds(854, 453, 277, 23);
+		lblDescrizionePosizione.setBounds(854, 403, 277, 23);
 		contentPane.add(lblDescrizionePosizione);
 
 		JPanel panelProponiOfferta = new JPanel();
 		panelProponiOfferta.setBackground(new Color(240, 248, 255));
-		panelProponiOfferta.setBounds(854, 11, 277, 422);
+		panelProponiOfferta.setBounds(854, 57, 277, 205);
 		contentPane.add(panelProponiOfferta);
 		panelProponiOfferta.setLayout(null);
 
-		JButton btnProponiOfferta = new JButton("Proponi un'offerta");
-		btnProponiOfferta.setFocusable(false);
-		btnProponiOfferta.setForeground(Color.WHITE);
-		btnProponiOfferta.addMouseListener(new MouseAdapter() {
+		JButton btnRispondiCliente = new JButton("Rispondi al cliente");
+		btnRispondiCliente.setFocusable(false);
+		btnRispondiCliente.setForeground(Color.WHITE);
+		btnRispondiCliente.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				ViewOffertaIniziale guiOfferta = new ViewOffertaIniziale(idImmobile, idCliente);
+				ViewRispostaOfferte guiOfferta = new ViewRispostaOfferte(idImmobile, idAccount);
 				guiOfferta.setLocationRelativeTo(null);
 				guiOfferta.setVisible(true);
 			}
 		});
-		btnProponiOfferta.setBackground(new Color(204, 0, 0));
-		btnProponiOfferta.setBounds(36, 99, 204, 37);
-		panelProponiOfferta.add(btnProponiOfferta);
+		btnRispondiCliente.setBackground(new Color(204, 0, 0));
+		btnRispondiCliente.setBounds(36, 131, 204, 37);
+		panelProponiOfferta.add(btnRispondiCliente);
 
-		JLabel lblAltreInfo = new JLabel("Oppure contatta l'agente:");
-		lblAltreInfo.setHorizontalAlignment(SwingConstants.CENTER);
-		lblAltreInfo.setFont(new Font("Tahoma", Font.BOLD, 12));
-		lblAltreInfo.setBounds(40, 194, 196, 21);
-		panelProponiOfferta.add(lblAltreInfo);
+		JLabel lblValoreProposta = new JLabel("valore proposta");
+		lblValoreProposta.setHorizontalAlignment(SwingConstants.CENTER);
+		lblValoreProposta.setFont(new Font("Tahoma", Font.BOLD, 12));
+		lblValoreProposta.setBounds(40, 73, 196, 21);
+		panelProponiOfferta.add(lblValoreProposta);
 
-		JLabel lblNomeAgente = new JLabel("Nome");
-		lblNomeAgente.setBounds(14, 258, 124, 21);
-		panelProponiOfferta.add(lblNomeAgente);
-
-		JLabel lblEmailAgente = new JLabel("email");
-		lblEmailAgente.setBounds(14, 319, 253, 21);
-		panelProponiOfferta.add(lblEmailAgente);
-
-		JLabel lblTelefonoAgente = new JLabel("Telefono");
-		lblTelefonoAgente.setBounds(153, 381, 121, 21);
-		panelProponiOfferta.add(lblTelefonoAgente);
-
-		JLabel lblAgenziaAgente = new JLabel("Agenzia");
-		lblAgenziaAgente.setBounds(14, 381, 253, 21);
-		panelProponiOfferta.add(lblAgenziaAgente);
-
-		JLabel lblDescrizioneProponiOfferta = new JLabel("Ti interessa questo immobile?");
-		lblDescrizioneProponiOfferta.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		lblDescrizioneProponiOfferta.setHorizontalAlignment(SwingConstants.CENTER);
-		lblDescrizioneProponiOfferta.setBounds(49, 41, 179, 21);
-		panelProponiOfferta.add(lblDescrizioneProponiOfferta);
-
-		JLabel lblCognomeAgente = new JLabel("Cognome");
-		lblCognomeAgente.setBounds(153, 258, 124, 21);
-		panelProponiOfferta.add(lblCognomeAgente);
-
-		JLabel lblEmail = new JLabel("Email:");
-		lblEmail.setBounds(14, 297, 253, 21);
-		panelProponiOfferta.add(lblEmail);
-
-		JLabel lblTelefono = new JLabel("Telefono:");
-		lblTelefono.setBounds(153, 359, 94, 21);
-		panelProponiOfferta.add(lblTelefono);
-
-		JLabel lblAgenzia = new JLabel("Agenzia:");
-		lblAgenzia.setBounds(14, 359, 253, 21);
-		panelProponiOfferta.add(lblAgenzia);
+		JLabel lblDescrizioneValoreProposta = new JLabel("Il cliente propone:");
+		lblDescrizioneValoreProposta.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		lblDescrizioneValoreProposta.setHorizontalAlignment(SwingConstants.CENTER);
+		lblDescrizioneValoreProposta.setBounds(49, 41, 179, 21);
+		panelProponiOfferta.add(lblDescrizioneValoreProposta);
 
 		JPanel panelDettagliImmobile = new JPanel() {
 
@@ -415,11 +384,10 @@ public class ViewImmobile extends JFrame {
 				lblPrezzo.setText("<html><div style='text-align: center;'>Prezzo: Non disponibile</div></html>");
 			}
 			System.out.println("DEBUG: immobile.getAgenteAssociato() = " + immobile.getAgenteAssociato());
-
 			AccountController controllerAccount = new AccountController();
 			Account account = controllerAccount.recuperaDettagliAgente(immobile.getAgenteAssociato());
 			System.out.println("DEBUG: account = " + account);
-
+			/*
 			if ((account != null) && (account != null)) {
 				lblNomeAgente.setText(account.getNome());
 				lblCognomeAgente.setText(account.getCognome());
@@ -432,7 +400,7 @@ public class ViewImmobile extends JFrame {
 				} else {
 					lblAgenziaAgente.setText("Agenzia: N/A");
 				}
-			}
+			}*/
 
 			// Visualizza immagini
 			immagini = immobile.getImmagini();
