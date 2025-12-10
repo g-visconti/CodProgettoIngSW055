@@ -8,10 +8,10 @@ import java.sql.SQLException;
 
 import org.mindrot.jbcrypt.BCrypt;
 
-import model.Account;
-import model.AgenteImmobiliare;
-import model.AmministratoreDiSupporto;
-import model.Cliente;
+import model.entity.Account;
+import model.entity.AgenteImmobiliare;
+import model.entity.AmministratoreDiSupporto;
+import model.entity.Cliente;
 
 public class AccountDAO {
 

@@ -66,5 +66,5 @@ public class TableUtils {
 			return data.format(formatter);
 		}
 	}
-}
 
+}

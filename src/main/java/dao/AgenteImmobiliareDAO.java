@@ -4,7 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import model.AgenteImmobiliare;
+import model.entity.AgenteImmobiliare;
 
 public class AgenteImmobiliareDAO {
 	private Connection conn;

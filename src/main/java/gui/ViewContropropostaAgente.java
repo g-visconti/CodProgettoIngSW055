@@ -14,7 +14,7 @@ import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
 import controller.OfferteController;
-import model.RispostaOfferta;
+import model.entity.RispostaOfferta;
 import util.GuiUtils;
 import util.TableUtils;
 

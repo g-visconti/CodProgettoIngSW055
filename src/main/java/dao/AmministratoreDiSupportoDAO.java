@@ -4,7 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import model.AmministratoreDiSupporto;
+import model.entity.AmministratoreDiSupporto;
 
 public class AmministratoreDiSupportoDAO {
 	private Connection conn;

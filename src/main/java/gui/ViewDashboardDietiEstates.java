@@ -35,7 +35,7 @@ import controller.AccountController;
 
 import controller.ImmobileController;
 import database.ConnessioneDatabase;
-import model.Filtri;
+import model.entity.Filtri;
 import util.GuiUtils;
 import util.InputUtils;
 

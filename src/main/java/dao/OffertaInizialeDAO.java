@@ -8,7 +8,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
-import model.OffertaIniziale;
+import model.entity.OffertaIniziale;
 
 public class OffertaInizialeDAO {
 	private Connection connection;

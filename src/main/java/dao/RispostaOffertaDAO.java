@@ -7,7 +7,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import model.RispostaOfferta;
+import model.entity.RispostaOfferta;
 
 public class RispostaOffertaDAO {
 	private Connection connection;

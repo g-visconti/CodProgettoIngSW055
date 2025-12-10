@@ -1,7 +1,7 @@
 package start;
 
 
-import gui.ViewDashboard;
+import gui.ViewAccesso;
 
 
 public class Main {
@@ -9,7 +9,7 @@ public class Main {
 	public static void main(String[] args) {
 
 		// Accesso generico
-		// ViewAccesso frame = new ViewAccesso();
+		ViewAccesso frame = new ViewAccesso();
 
 		// Admin
 		//ViewDashboardDietiEstates frame = new ViewDashboardDietiEstates("admimmobiliare@immobiliare.it");
@@ -21,7 +21,7 @@ public class Main {
 		//ViewDashboardDietiEstates frame = new ViewDashboardDietiEstates("lucamagnini@immobiliare.it");
 
 		// Utente
-		ViewDashboard frame = new ViewDashboard("marioros@gmail.com");
+		//ViewDashboard frame = new ViewDashboard("marioros@gmail.com");
 
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);

@@ -22,7 +22,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 
-import model.Filtri;
+import model.entity.Filtri;
 import util.GuiUtils;
 import util.InputUtils;
 

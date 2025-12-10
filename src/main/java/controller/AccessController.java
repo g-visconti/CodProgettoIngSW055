@@ -8,9 +8,9 @@ import dao.AgenteImmobiliareDAO;
 import dao.AmministratoreDiSupportoDAO;
 import dao.ClienteDAO;
 import database.ConnessioneDatabase;
-import model.AgenteImmobiliare;
-import model.AmministratoreDiSupporto;
-import model.Cliente;
+import model.entity.AgenteImmobiliare;
+import model.entity.AmministratoreDiSupporto;
+import model.entity.Cliente;
 
 public class AccessController {
 

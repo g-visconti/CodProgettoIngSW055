@@ -4,7 +4,9 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Desktop;
 import java.awt.Font;
+import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.SystemColor;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
@@ -15,10 +17,8 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.sql.SQLException;
 
 import javax.swing.BorderFactory;
@@ -34,93 +34,28 @@ import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-
 import controller.AccessController;
-import controller.AccountController;
-
-import model.Account;
-import model.CognitoApp;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
+import controller.OAuthController;
 import util.GuiUtils;
 
 public class ViewAccesso extends JFrame {
 	private static final long serialVersionUID = 1L;
-
-	public static Account getFacebookAccount(String facebookAccessToken) {
-		OkHttpClient client = new OkHttpClient();
-
-		String url = "https://graph.facebook.com/me?fields=email,first_name,last_name&access_token="
-				+ facebookAccessToken;
-
-		Request request = new Request.Builder().url(url).get().build();
-
-		try (Response response = client.newCall(request).execute()) {
-			if (response.isSuccessful()) {
-				String responseBody = response.body().string();
-				JsonObject jsonObject = JsonParser.parseString(responseBody).getAsJsonObject();
-
-				String email = jsonObject.has("email") ? jsonObject.get("email").getAsString() : null;
-				// String nome = jsonObject.has("first_name") ?
-				// jsonObject.get("first_name").getAsString() : null;
-				// String cognome = jsonObject.has("last_name") ?
-				// jsonObject.get("last_name").getAsString() : null;
-				String ruolo = "Cliente";
-				return new Account(email, facebookAccessToken, ruolo);
-			} else {
-				System.out.println("Errore nel recupero dati: " + response.body().string());
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		return null;
-	}
-
-	public static Account getGoogleAccount(String googleAccessToken) {
-		OkHttpClient client = new OkHttpClient();
-
-		Request request = new Request.Builder().url("https://www.googleapis.com/oauth2/v3/userinfo")
-				.addHeader("Authorization", "Bearer " + googleAccessToken).get().build();
-
-		try (Response response = client.newCall(request).execute()) {
-			if (response.isSuccessful()) {
-				String responseBody = response.body().string();
-				JsonObject jsonObject = JsonParser.parseString(responseBody).getAsJsonObject();
-
-				String email = jsonObject.has("email") ? jsonObject.get("email").getAsString() : null;
-				// String nome = jsonObject.has("given_name") ?
-				// jsonObject.get("given_name").getAsString() : null;
-				// String cognome = jsonObject.has("family_name") ?
-				// jsonObject.get("family_name").getAsString() : null;
-				String ruolo = "Cliente";
-
-				return new Account(email, googleAccessToken, ruolo);
-			} else {
-				System.out.println("Errore nel recupero dati da Google: " + response.body().string());
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		return null;
-	}
-
+	private final OAuthController oauthController;
 	private JPanel contentPane;
 	private JTextField txtEmail;
 	private JTextField txtAccediORegistrati;
 	private JTextField txtOppure;
+	String ruoloDefault = "Cliente";
 	String campoPieno;
 	String tokentest = "";
-	String emailtest = "";
+	String emailUtente = "";
 
 	/**
 	 * Create the frame.
 	 */
 	public ViewAccesso() {
+		oauthController = new OAuthController();
+
 		// Imposta l'icona di DietiEstates25 alla finestra in uso
 		GuiUtils.setIconaFinestra(this);
 
@@ -185,7 +120,7 @@ public class ViewAccesso extends JFrame {
 		txtEmail.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 		txtEmail.setHorizontalAlignment(SwingConstants.LEFT);
 		txtEmail.setText("Email");
-		txtEmail.setBounds(76, 95, 205, 20);
+		txtEmail.setBounds(80, 130, 205, 20);
 		panelAccessoRegistrazione.add(txtEmail);
 		txtEmail.setColumns(10);
 
@@ -198,7 +133,7 @@ public class ViewAccesso extends JFrame {
 		txtAccediORegistrati.setBorder(new EmptyBorder(0, 0, 0, 0));
 		txtAccediORegistrati.setHorizontalAlignment(SwingConstants.CENTER);
 		txtAccediORegistrati.setText("Accedi o registrati con");
-		txtAccediORegistrati.setBounds(6, 36, 344, 39);
+		txtAccediORegistrati.setBounds(13, 40, 344, 39);
 		panelAccessoRegistrazione.add(txtAccediORegistrati);
 		txtAccediORegistrati.setColumns(10);
 
@@ -210,14 +145,14 @@ public class ViewAccesso extends JFrame {
 		txtOppure.setText("oppure");
 		txtOppure.setHorizontalAlignment(SwingConstants.CENTER);
 		txtOppure.setColumns(10);
-		txtOppure.setBounds(6, 191, 344, 20);
+		txtOppure.setBounds(13, 240, 344, 20);
 		panelAccessoRegistrazione.add(txtOppure);
 
-		JLabel lblGitHub = new JLabel("Github");
+		/*JLabel lblGitHub = new JLabel("Github");
 		lblGitHub.setToolTipText("Non disponibile attualmente");
 		lblGitHub.addMouseListener(new MouseAdapter() {
-			
-			
+
+
 
 			@Override
 			public void mouseEntered(MouseEvent e) {
@@ -238,65 +173,21 @@ public class ViewAccesso extends JFrame {
 		lblGitHub.setBackground(new Color(255, 140, 0));
 		lblGitHub.setHorizontalAlignment(SwingConstants.CENTER);
 		lblGitHub.setBounds(105, 341, 146, 23);
-		panelAccessoRegistrazione.add(lblGitHub);
+		panelAccessoRegistrazione.add(lblGitHub);*/
 
 		JLabel lblGoogle = new JLabel("Google");
 		lblGoogle.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-			    loginWithGoogle();
-
-			    JFrame confirmFrame = new JFrame("Conferma Accesso");
-			    confirmFrame.setSize(300, 150);
-			    confirmFrame.setLocationRelativeTo(null); // centra la finestra
-
-			    // Creo il panel PRIMA
-			    JPanel panel = new JPanel();
-			    panel.setLayout(new GridBagLayout()); // centro il pulsante
-
-			    // Creo il pulsante
-			    JButton btnConferma = new JButton("Completa il Login");
-			    btnConferma.setFocusPainted(false);
-			    btnConferma.setBackground(new Color(66, 133, 244)); // blu Google
-			    btnConferma.setForeground(Color.WHITE);
-			    btnConferma.setFont(new Font("Tahoma", Font.BOLD, 14));
-			    btnConferma.setCursor(new Cursor(Cursor.HAND_CURSOR));
-			    btnConferma.setBorder(BorderFactory.createEmptyBorder(8, 20, 8, 20));
-
-			    panel.add(btnConferma); // aggiungo il pulsante al panel
-			    confirmFrame.getContentPane().add(panel); // aggiungo il panel al frame
-			    confirmFrame.setVisible(true);
-
-			    // Azione del pulsante
-			    btnConferma.addActionListener(new ActionListener() {
-			        @Override
-			        public void actionPerformed(ActionEvent e) {
-			            try {
-			                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-			                tokentest = (String) clipboard.getData(DataFlavor.stringFlavor);
-
-			                if (tokentest != null && !tokentest.isEmpty()) {
-			                    handleGoogleToken(tokentest);
-			                } else {
-			                    JOptionPane.showMessageDialog(null, "Nessun token", "Attenzione",
-			                            JOptionPane.INFORMATION_MESSAGE);
-			                }
-
-			            } catch (Exception ex) {
-			                ex.printStackTrace();
-			                JOptionPane.showMessageDialog(null, "Errore", "Attenzione",
-			                        JOptionPane.INFORMATION_MESSAGE);
-			            }
-
-			            confirmFrame.dispose(); // chiude il frame di conferma
-			        }
-			    });
-			}
-
 
 			@Override
 			public void mouseEntered(MouseEvent e) {
 				lblGoogle.setForeground(Color.BLACK);
+				lblGoogle.addMouseListener(new MouseAdapter() {
+					@Override
+					public void mouseClicked(MouseEvent e) {
+						loginWithGoogle();
+						showTokenConfirmationDialog("Google");
+					}
+				});
 
 			}
 
@@ -312,99 +203,57 @@ public class ViewAccesso extends JFrame {
 		lblGoogle.setForeground(Color.WHITE);
 		lblGoogle.setFont(new Font("Yu Gothic UI Semibold", Font.BOLD, 11));
 		lblGoogle.setBackground(new Color(178, 34, 34));
-		lblGoogle.setBounds(105, 295, 146, 23);
+		lblGoogle.setBounds(109, 374, 146, 23);
 		panelAccessoRegistrazione.add(lblGoogle);
 
 		JLabel lblFacebook = new JLabel("Facebook");
 		lblFacebook.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-			    loginWithFacebook();
-
-			    JFrame confirmFrame = new JFrame("Conferma Accesso");
-			    confirmFrame.setSize(300, 150);
-			    confirmFrame.setLocationRelativeTo(null); // centra la finestra
-
-			    // Creo il panel PRIMA
-			    JPanel panel = new JPanel();
-			    panel.setLayout(new GridBagLayout()); // centro il pulsante
-
-			    // Creo il pulsante
-			    JButton btnConferma = new JButton("Completa il Login");
-			    btnConferma.setFocusPainted(false);
-			    btnConferma.setBackground(new Color(59, 89, 152)); // blu Facebook
-			    btnConferma.setForeground(Color.WHITE);
-			    btnConferma.setFont(new Font("Tahoma", Font.BOLD, 14));
-			    btnConferma.setCursor(new Cursor(Cursor.HAND_CURSOR));
-			    btnConferma.setBorder(BorderFactory.createEmptyBorder(8, 20, 8, 20));
-
-			    panel.add(btnConferma); // aggiungo il pulsante al panel
-			    confirmFrame.getContentPane().add(panel); // aggiungo il panel al frame
-			    confirmFrame.setVisible(true);
-
-			    // Azione del pulsante
-			    btnConferma.addActionListener(new ActionListener() {
-			        @Override
-			        public void actionPerformed(ActionEvent e) {
-			            try {
-			                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-			                tokentest = (String) clipboard.getData(DataFlavor.stringFlavor);
-
-			                if (tokentest != null && !tokentest.isEmpty()) {
-			                    handleFacebookToken(tokentest);
-			                } else {
-			                    JOptionPane.showMessageDialog(null, "Nessun token", "Attenzione",
-			                            JOptionPane.INFORMATION_MESSAGE);
-			                }
-
-			            } catch (Exception ex) {
-			                ex.printStackTrace();
-			                JOptionPane.showMessageDialog(null, "Errore", "Attenzione",
-			                        JOptionPane.INFORMATION_MESSAGE);
-			            }
-
-			            confirmFrame.dispose(); // chiude il frame di conferma
-			        }
-			    });
-			}
 
 			@Override
 			public void mouseEntered(MouseEvent e) {
-
 				lblFacebook.setForeground(Color.BLACK);
+				lblFacebook.addMouseListener(new MouseAdapter() {
+					@Override
+					public void mouseClicked(MouseEvent e) {
+						loginWithFacebook();
+						showTokenConfirmationDialog("Facebook");
+					}
+				});
 
 			}
 
 			@Override
 			public void mouseExited(MouseEvent e) {
-				lblFacebook.setForeground(Color.WHITE);
+				lblFacebook.setForeground(Color.WHITE); // Torna normale quando il mouse esce
+
 			}
 		});
+
 		lblFacebook.setBorder(new LineBorder(SystemColor.textHighlight, 1, true));
 		lblFacebook.setOpaque(true);
 		lblFacebook.setHorizontalAlignment(SwingConstants.CENTER);
 		lblFacebook.setForeground(Color.WHITE);
 		lblFacebook.setFont(new Font("Yu Gothic UI Semibold", Font.BOLD, 11));
 		lblFacebook.setBackground(SystemColor.textHighlight);
-		lblFacebook.setBounds(105, 249, 146, 23);
+		lblFacebook.setBounds(109, 328, 146, 23);
 		panelAccessoRegistrazione.add(lblFacebook);
 
-		JLabel lblGitHublogo = new JLabel("");
+		/* JLabel lblGitHublogo = new JLabel("");
 		lblGitHublogo.setBounds(70, 342, 27, 22);
 		panelAccessoRegistrazione.add(lblGitHublogo);
 
 		URL GitHublogo = getClass().getClassLoader().getResource("images/GitHublogo.png");
-		lblGitHublogo.setIcon(new ImageIcon(GitHublogo));
+		lblGitHublogo.setIcon(new ImageIcon(GitHublogo));*/
 
 		JLabel lblGooglelogo = new JLabel("");
-		lblGooglelogo.setBounds(70, 295, 27, 23);
+		lblGooglelogo.setBounds(74, 374, 27, 23);
 		panelAccessoRegistrazione.add(lblGooglelogo);
 
 		URL Googlelogo = getClass().getClassLoader().getResource("images/Googlelogo.png");
 		lblGooglelogo.setIcon(new ImageIcon(Googlelogo));
 
 		JLabel lblFacebooklogo = new JLabel("");
-		lblFacebooklogo.setBounds(70, 249, 27, 23);
+		lblFacebooklogo.setBounds(74, 328, 27, 23);
 		panelAccessoRegistrazione.add(lblFacebooklogo);
 
 		URL Facebooklogo = getClass().getClassLoader().getResource("images/Facebooklogo.png");
@@ -416,19 +265,19 @@ public class ViewAccesso extends JFrame {
 		btnAccedi.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				String Email_Utente = txtEmail.getText();
+				String emailDaTastiera = txtEmail.getText();
 
 				AccessController con = new AccessController();
 				// discrimino esistenza
 				try {
-					if (con.checkUtente(Email_Utente)) {
+					if (con.checkUtente(emailDaTastiera)) {
 						// accesso con password
-						ViewAccessoConPassword viewAccessoConPassword = new ViewAccessoConPassword(Email_Utente);
+						ViewAccessoConPassword viewAccessoConPassword = new ViewAccessoConPassword(emailDaTastiera);
 						viewAccessoConPassword.setLocationRelativeTo(null);
 						viewAccessoConPassword.setVisible(true);
 					} else {
 						// registrazione
-						ViewRegistrazione viewRegistrazione = new ViewRegistrazione(Email_Utente);
+						ViewRegistrazione viewRegistrazione = new ViewRegistrazione(emailDaTastiera);
 						viewRegistrazione.setLocationRelativeTo(null);
 						viewRegistrazione.setVisible(true);
 					}
@@ -447,10 +296,10 @@ public class ViewAccesso extends JFrame {
 		btnProsegui.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				String Email_Utente = txtEmail.getText().trim();
+				String emailDaTastiera = txtEmail.getText().trim();
 
 				// Validazione preliminare
-				if (Email_Utente.isEmpty()) {
+				if (emailDaTastiera.isEmpty()) {
 					JOptionPane.showMessageDialog(null, "Inserire un indirizzo email", "Campo obbligatorio",
 							JOptionPane.WARNING_MESSAGE);
 					txtEmail.requestFocus();
@@ -459,14 +308,14 @@ public class ViewAccesso extends JFrame {
 
 				AccessController con = new AccessController();
 				try {
-					if (con.checkUtente(Email_Utente)) {
+					if (con.checkUtente(emailDaTastiera)) {
 						// accesso con password
-						ViewAccessoConPassword viewAccessoConPassword = new ViewAccessoConPassword(Email_Utente);
+						ViewAccessoConPassword viewAccessoConPassword = new ViewAccessoConPassword(emailDaTastiera);
 						viewAccessoConPassword.setLocationRelativeTo(null);
 						viewAccessoConPassword.setVisible(true);
 					} else {
 						// registrazione
-						ViewRegistrazione viewRegistrazione = new ViewRegistrazione(Email_Utente);
+						ViewRegistrazione viewRegistrazione = new ViewRegistrazione(emailDaTastiera);
 						viewRegistrazione.setLocationRelativeTo(null);
 						viewRegistrazione.setVisible(true);
 					}
@@ -481,51 +330,27 @@ public class ViewAccesso extends JFrame {
 		btnProsegui.setForeground(Color.WHITE);
 		btnProsegui.setFont(new Font("Yu Gothic UI Semibold", Font.BOLD, 11));
 		btnProsegui.setBackground(SystemColor.textHighlight);
-		btnProsegui.setBounds(105, 126, 146, 25);
+		btnProsegui.setBounds(109, 161, 146, 25);
 		panelAccessoRegistrazione.add(btnProsegui);
 	}
 
-	private void handleFacebookToken(String token) {
+	private void handleProviderToken(String token, String provider) {
 		if (token == null || token.isEmpty()) {
-			JOptionPane.showMessageDialog(null, "Login Facebook annullato.");
-		} else {
-
-			boolean success = CognitoApp.authenticateWithFacebook(token);
-
-			if (success) {
-				Account account = getFacebookAccount(token);
-				emailtest = account.getEmail();
-				AccessController con1 = new AccessController();
-				String ruolo="Cliente";
-				con1.registraNuovoUtente(emailtest, token, ruolo);
-				ViewDashboard viewDashboard = new ViewDashboard(emailtest);
-				viewDashboard.setVisible(true);
-				viewDashboard.setLocationRelativeTo(null);
-			} else {
-				JOptionPane.showMessageDialog(null, "Autenticazione fallita.");
-			}
+			JOptionPane.showMessageDialog(null, "Nessun token rilevato",
+					"Attenzione", JOptionPane.WARNING_MESSAGE);
+			return;
 		}
-	}
 
-	private void handleGoogleToken(String authCode) {
-		if (authCode == null || authCode.isEmpty()) {
-			JOptionPane.showMessageDialog(null, "Login Google annullato.");
-		} else {
+		// Usa il controller per gestire l'intero processo
+		String email = oauthController.handleOAuthLogin(token, provider);
 
-			boolean success = CognitoApp.authenticateWithFacebook(authCode);
-
-			if (success) {
-				Account account = getGoogleAccount(authCode);
-				emailtest = account.getEmail();
-				AccessController con = new AccessController();
-				String ruolo="Cliente";
-				con.registraNuovoUtente(emailtest, authCode, ruolo);
-				ViewDashboard viewDashboard = new ViewDashboard(emailtest);
-				viewDashboard.setVisible(true);
-				viewDashboard.setLocationRelativeTo(null);
-			} else {
-				JOptionPane.showMessageDialog(null, "Autenticazione fallita.");
-			}
+		if (email != null && !email.isEmpty()) {
+			// Login riuscito, apri la dashboard
+			ViewDashboard viewDashboard = new ViewDashboard(email);
+			viewDashboard.setVisible(true);
+			viewDashboard.setLocationRelativeTo(null);
+			viewDashboard.setMaximumSize(getMaximumSize());
+			dispose();
 		}
 	}
 
@@ -545,29 +370,6 @@ public class ViewAccesso extends JFrame {
 		}
 	}
 
-	private void loginWithGitHub() {
-		try {
-			String clientId = "Ov23liiPkBEnvPNXer7V"; // Inserisci il client ID GitHub
-			String redirectUri = "https://g-visconti.github.io/callback-github/githubcallback";
-			String scope = "openid read:user user:email"; // Aggiungi altri scope se ti servono
-
-			String githubLoginUrl = "https://github.com/login/oauth/authorize?" + "client_id=" + clientId
-					+ "&redirect_uri=" + URLEncoder.encode(redirectUri, "UTF-8") + "&scope="
-					+ URLEncoder.encode(scope, "UTF-8") + "&response_type=code"; // solo se GitHub supportasse
-			// l'implicito (spoiler: non lo
-			// supporta pienamente)
-
-			if (Desktop.isDesktopSupported()) {
-				Desktop.getDesktop().browse(new URI(githubLoginUrl));
-			} else {
-				JOptionPane.showMessageDialog(this, "Il browser predefinito non è supportato dal sistema.");
-			}
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			JOptionPane.showMessageDialog(this, "Errore nel tentativo di login con GitHub.");
-		}
-	}
-
 	private void loginWithGoogle() {
 		try {
 			String googleLoginUrl = "https://accounts.google.com/o/oauth2/v2/auth?"
@@ -584,5 +386,74 @@ public class ViewAccesso extends JFrame {
 			ex.printStackTrace();
 			JOptionPane.showMessageDialog(this, "Errore nel tentativo di login con Google.");
 		}
+	}
+
+	/**
+	 * Mostra una finestra di dialogo per confermare l'accesso
+	 */
+	private void showTokenConfirmationDialog(String provider) {
+		JFrame confirmFrame = new JFrame("Conferma Accesso " + provider);
+		GuiUtils.setIconaFinestra(confirmFrame);
+
+		confirmFrame.setSize(350, 150);
+		confirmFrame.setLocationRelativeTo(this);
+		confirmFrame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+
+		JPanel panel = new JPanel();
+		panel.setLayout(new GridBagLayout());
+		panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.gridwidth = GridBagConstraints.REMAINDER;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.insets = new Insets(5, 5, 5, 5);
+
+		JLabel label = new JLabel("Incolla il token dalla clipboard e clicca Conferma");
+		label.setHorizontalAlignment(SwingConstants.CENTER);
+		panel.add(label, gbc);
+
+		JButton btnConferma = new JButton("Conferma Accesso");
+		btnConferma.setFocusPainted(false);
+
+		// Colore in base al provider - CORREGGI:
+		switch (provider.toLowerCase()) {
+		case "facebook":
+		case "google":
+			btnConferma.setBackground(new Color(66, 133, 244)); // Blu
+			break;
+		default:
+			btnConferma.setBackground(SystemColor.textHighlight);
+		}
+
+		btnConferma.setForeground(Color.WHITE);
+		btnConferma.setFont(new Font("Tahoma", Font.BOLD, 12));
+		btnConferma.setCursor(new Cursor(Cursor.HAND_CURSOR));
+		btnConferma.setBorder(BorderFactory.createEmptyBorder(8, 20, 8, 20));
+
+		panel.add(btnConferma, gbc);
+		confirmFrame.getContentPane().add(panel);
+		confirmFrame.setVisible(true);
+
+		// Azione del pulsante
+		btnConferma.addActionListener(_ -> {
+			try {
+				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+				String token = (String) clipboard.getData(DataFlavor.stringFlavor);
+
+				if (token != null && !token.isEmpty()) {
+					handleProviderToken(token, provider);
+				} else {
+					JOptionPane.showMessageDialog(confirmFrame,
+							"Nessun token rilevato nella clipboard",
+							"Attenzione", JOptionPane.INFORMATION_MESSAGE);
+				}
+			} catch (Exception ex) {
+				ex.printStackTrace();
+				JOptionPane.showMessageDialog(confirmFrame,
+						"Errore nella lettura del token: " + ex.getMessage(),
+						"Errore", JOptionPane.ERROR_MESSAGE);
+			}
+			confirmFrame.dispose();
+		});
 	}
 }

@@ -30,10 +30,10 @@ import javax.swing.border.EmptyBorder;
 import controller.AccountController;
 
 import controller.ImmobileController;
-import model.Account;
-import model.Immobile;
-import model.ImmobileInAffitto;
-import model.ImmobileInVendita;
+import model.entity.Account;
+import model.entity.Immobile;
+import model.entity.ImmobileInAffitto;
+import model.entity.ImmobileInVendita;
 import util.GuiUtils;
 
 public class ViewOffertaProposta extends JFrame {

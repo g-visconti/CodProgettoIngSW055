@@ -24,18 +24,16 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 
 import controller.AccountController;
-
 import controller.ImmobileController;
-import model.Account;
-import model.AgenteImmobiliare;
-import model.Immobile;
-import model.ImmobileInAffitto;
-import model.ImmobileInVendita;
+import model.entity.Account;
+import model.entity.AgenteImmobiliare;
+import model.entity.Immobile;
+import model.entity.ImmobileInAffitto;
+import model.entity.ImmobileInVendita;
 import util.GuiUtils;
 
 public class ViewImmobile extends JFrame {
@@ -106,27 +104,27 @@ public class ViewImmobile extends JFrame {
 		contentPane.add(lblVicinanza);
 
 		// GOOGLE MAPS
-		
+
 		lblMaps.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		lblMaps.addMouseListener(new MouseAdapter() {
-		    @Override
-		    public void mouseClicked(MouseEvent e) {
-		        String testoCompleto = lblTitolo.getText();
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				String testoCompleto = lblTitolo.getText();
 
-		        String[] parole = testoCompleto.split(" ", 2);
-		        String indirizzo = parole.length > 1 ? parole[1] : testoCompleto;
+				String[] parole = testoCompleto.split(" ", 2);
+				String indirizzo = parole.length > 1 ? parole[1] : testoCompleto;
 
-		        String url = "https://www.google.com/maps/search/?api=1&query=" + indirizzo.replace(" ", "+");
+				String url = "https://www.google.com/maps/search/?api=1&query=" + indirizzo.replace(" ", "+");
 
-		        try {
-		            Desktop.getDesktop().browse(new URI(url));
-		        } catch (Exception ex) {
-		            ex.printStackTrace();
-		            JOptionPane.showMessageDialog(null, "Errore nell'apertura del browser");
-		        }
+				try {
+					Desktop.getDesktop().browse(new URI(url));
+				} catch (Exception ex) {
+					ex.printStackTrace();
+					JOptionPane.showMessageDialog(null, "Errore nell'apertura del browser");
+				}
 
-		        
-		    }
+
+			}
 		});
 
 		URL pathDEimage1 = this.getClass().getClassLoader().getResource("images/mapslogo.png");

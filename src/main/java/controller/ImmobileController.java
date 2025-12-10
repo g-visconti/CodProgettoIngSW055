@@ -9,10 +9,10 @@ import javax.swing.table.DefaultTableModel;
 
 import dao.ImmobileDAO;
 import database.ConnessioneDatabase;
-import model.Filtri;
-import model.Immobile;
-import model.ImmobileInAffitto;
-import model.ImmobileInVendita;
+import model.entity.Filtri;
+import model.entity.Immobile;
+import model.entity.ImmobileInAffitto;
+import model.entity.ImmobileInVendita;
 import util.Base64ImageRenderer;
 import util.TableUtils;
 import util.TextAreaRenderer;

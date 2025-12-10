@@ -18,10 +18,10 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.postgresql.util.PGobject;
 
-import model.Filtri;
-import model.Immobile;
-import model.ImmobileInAffitto;
-import model.ImmobileInVendita;
+import model.entity.Filtri;
+import model.entity.Immobile;
+import model.entity.ImmobileInAffitto;
+import model.entity.ImmobileInVendita;
 
 public class ImmobileDAO {
 	@SuppressWarnings("serial")

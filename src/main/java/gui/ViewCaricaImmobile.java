@@ -35,9 +35,9 @@ import org.json.JSONObject;
 import controller.AccountController;
 
 import controller.ImmobileController;
-import model.Immobile;
-import model.ImmobileInAffitto;
-import model.ImmobileInVendita;
+import model.entity.Immobile;
+import model.entity.ImmobileInAffitto;
+import model.entity.ImmobileInVendita;
 import util.GuiUtils;
 
 public class ViewCaricaImmobile extends JFrame {

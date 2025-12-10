@@ -6,7 +6,7 @@ import java.sql.SQLException;
 import dao.AccountDAO;
 import dao.AmministratoreDAO;
 import database.ConnessioneDatabase;
-import model.Account;
+import model.entity.Account;
 
 public class AccountController {
 

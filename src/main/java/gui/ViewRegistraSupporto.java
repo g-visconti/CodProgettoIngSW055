@@ -22,9 +22,9 @@ import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 
+import auth.CognitoAuthService;
+import auth.CognitoAuthServiceImpl;
 import controller.AccessController;
-
-import model.CognitoApp;
 import util.GuiUtils;
 
 public class ViewRegistraSupporto extends JFrame {
@@ -33,6 +33,7 @@ public class ViewRegistraSupporto extends JFrame {
 	 *
 	 */
 	private static final long serialVersionUID = 1L;
+	private final CognitoAuthService authService;
 	private JPanel contentPane;
 	private JTextField Nome_Utente;
 	private JTextField Cognome_Utente;
@@ -56,6 +57,8 @@ public class ViewRegistraSupporto extends JFrame {
 	 */
 
 	public ViewRegistraSupporto(String Email_Utente, String agenzia) {
+		authService = new CognitoAuthServiceImpl();
+
 		setTitle("DietiEstates25 - Registra un nuovo amministratore di supporto");
 		setResizable(false);
 
@@ -227,22 +230,25 @@ public class ViewRegistraSupporto extends JFrame {
 				if (!nome.matches("[a-zA-Z�-�\\s]+")) {
 					lblNameError.setVisible(true);
 					Nome_Utente.setText("Nome");
-				} else
+				} else {
 					lblNameError.setVisible(false);
+				}
 
 				String cognome = Cognome_Utente.getText();
 				if (!cognome.matches("[a-zA-Z�-�\\s]+")) {
 					lblCognomeError.setVisible(true);
 					Cognome_Utente.setText("Cognome");
-				} else
+				} else {
 					lblCognomeError.setVisible(false);
+				}
 
 				String citta = Citta_Utente.getText();
 				if (!citta.matches("[a-zA-Z�-�\\s]+")) {
 					lblCittaError.setVisible(true);
 					Citta_Utente.setText("Citt�");
-				} else
+				} else {
 					lblCittaError.setVisible(false);
+				}
 
 				String telefono = Telefono_Utente.getText().trim();
 
@@ -250,8 +256,9 @@ public class ViewRegistraSupporto extends JFrame {
 
 					lblTelefonoError.setVisible(true);
 					Telefono_Utente.setText("Telefono");
-				} else
+				} else {
 					lblTelefonoError.setVisible(false);
+				}
 
 				String cap = Cap_Utente.getText().trim();
 
@@ -259,20 +266,22 @@ public class ViewRegistraSupporto extends JFrame {
 
 					lblCapError.setVisible(true);
 					Cap_Utente.setText("CAP");
-				} else
+				} else {
 					lblCapError.setVisible(false);
+				}
 
 				String indirizzo = Indirizzo_Utente.getText();
 				if (!indirizzo.matches("[a-zA-Z�-�\\s]+")) {
 					lblIndirizzoError.setVisible(true);
 					Indirizzo_Utente.setText("Indirizzo");
-				} else
+				} else {
 					lblIndirizzoError.setVisible(false);
+				}
 
 				char[] passwordChar = Password_Utente.getPassword();
 				String passwordUtente = new String(passwordChar);
 
-				boolean success = CognitoApp.registerUser(Email_Utente, passwordUtente, Email_Utente);
+				boolean success = authService.registerUser(Email_Utente, passwordUtente, Email_Utente);
 
 				if (success) {
 					AccessController cont1 = new AccessController();
@@ -280,9 +289,10 @@ public class ViewRegistraSupporto extends JFrame {
 							indirizzo, ruolo, agenzia);
 
 					dispose();
-				} else
+				} else {
 					JOptionPane.showMessageDialog(null, "La registrazione � fallita. Riprova con i dati corretti.",
 							"Errore nella registrazione", JOptionPane.ERROR_MESSAGE);
+				}
 
 				ViewDashboard schermata = new ViewDashboard(Email_Utente);
 				schermata.setVisible(true);
@@ -303,14 +313,16 @@ public class ViewRegistraSupporto extends JFrame {
 		field.addFocusListener(new FocusAdapter() {
 			@Override
 			public void focusGained(FocusEvent e) {
-				if (field.getText().equals(text))
+				if (field.getText().equals(text)) {
 					field.setText("");
+				}
 			}
 
 			@Override
 			public void focusLost(FocusEvent e) {
-				if (field.getText().trim().isEmpty())
+				if (field.getText().trim().isEmpty()) {
 					field.setText(text);
+				}
 			}
 		});
 	}
