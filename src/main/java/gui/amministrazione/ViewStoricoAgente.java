@@ -36,7 +36,7 @@ public class ViewStoricoAgente extends JFrame {
 	public ViewStoricoAgente(String emailUtente) {
 		// Imposta l'icona di DietiEstates25 alla finestra in uso
 		GuiUtils.setIconaFinestra(this);
-		setTitle("DietiEstates25 - Storico offerte");
+		setTitle("DietiEstates25 - Storico agente");
 
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 1248, 946);
@@ -66,7 +66,7 @@ public class ViewStoricoAgente extends JFrame {
 		lblTitolo.setFont(new Font("Tahoma", Font.BOLD, 30));
 		panelComandi.add(lblTitolo);
 
-		JLabel lblDescrizione = new JLabel("Di seguito è riportato l'elenco delle offerte");
+		JLabel lblDescrizione = new JLabel("Di seguito è riportato l'elenco delle offerte proposte dai clienti");
 		sl_panelComandi.putConstraint(SpringLayout.SOUTH, lblTitolo, -13, SpringLayout.NORTH, lblDescrizione);
 		sl_panelComandi.putConstraint(SpringLayout.NORTH, lblDescrizione, 97, SpringLayout.NORTH, panelComandi);
 		sl_panelComandi.putConstraint(SpringLayout.SOUTH, lblDescrizione, -8, SpringLayout.SOUTH, panelComandi);
@@ -132,13 +132,13 @@ public class ViewStoricoAgente extends JFrame {
 		// Crea il modello dati della tabella
 		@SuppressWarnings("serial")
 		DefaultTableModel model = new DefaultTableModel(new Object[][] {},
-				new String[] { "Foto", "Categoria", "Descrizione", "Prezzo proposto", "Stato" }
+				new String[] { "Foto", "Categoria", "Descrizione", "Data", "Prezzo proposto", "Stato" }
 				) {
 			@Override
 			public Class<?> getColumnClass(int columnIndex) {
 				return switch (columnIndex) {
 				case 0 -> String.class; // Base64 immagini
-				case 1, 2, 3, 4 -> String.class;
+				case 1, 2, 3, 4, 5 -> String.class;
 				default -> Object.class;
 				};
 			}
@@ -158,7 +158,7 @@ public class ViewStoricoAgente extends JFrame {
 		tableStoricoOfferte.setSelectionBackground(new Color(226, 226, 226));
 
 		// Configura larghezze colonne (aggiornate per 3 colonne)
-		int[] preferredWidths = { 100, 100, 400, 120, 80 };
+		int[] preferredWidths = { 100, 100, 400, 120, 120, 80 };
 		for (int i = 0; i < preferredWidths.length; i++) {
 			TableColumn col = tableStoricoOfferte.getColumnModel().getColumn(i);
 			col.setPreferredWidth(preferredWidths[i]);

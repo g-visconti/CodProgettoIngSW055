@@ -1,6 +1,7 @@
 package dao;
 
 import java.awt.Component;
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -18,6 +19,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.postgresql.util.PGobject;
 
+import model.dto.StoricoClienteDTO;
 import model.entity.Filtri;
 import model.entity.Immobile;
 import model.entity.ImmobileInAffitto;
@@ -152,7 +154,7 @@ public class ImmobileDAO {
 		}
 	}
 
-	public List<Object[]> getDatiOfferteProposte(String emailUtente) {
+	public List<StoricoClienteDTO> getDatiOfferteProposte(String emailUtente) {
 		String query = "SELECT oi.\"idOfferta\" as \"idOfferta\", i.\"immagini\" as \"Foto\", i.\"tipologia\" as \"Categoria\", i.\"descrizione\" as \"Descrizione\", "
 				+ "oi.\"dataOfferta\" as \"Data\", oi.\"importoProposto\" as \"Prezzo proposto\", oi.\"stato\" as \"Stato\" "
 				+ "FROM \"Immobile\" i "
@@ -160,18 +162,20 @@ public class ImmobileDAO {
 				+ "INNER JOIN \"Account\" a ON oi.\"clienteAssociato\" = a.\"idAccount\" "
 				+ "WHERE a.\"email\" = ?";
 
-		List<Object[]> risultati = new ArrayList<>();
+		List<StoricoClienteDTO> risultati = new ArrayList<>();
 
 		try (PreparedStatement stmt = connection.prepareStatement(query)) {
 			stmt.setString(1, emailUtente);
 			ResultSet rs = stmt.executeQuery();
 
 			while (rs.next()) {
-				Object[] riga = new Object[7];
+				// Crea un nuovo DTO per ogni riga
+				StoricoClienteDTO dto = new StoricoClienteDTO();
 
-				riga[0] = rs.getLong("idOfferta");
+				// ID Offerta
+				dto.setIdOfferta(rs.getLong("idOfferta"));
 
-				// ✅ Leggi il JSON con le immagini (stringa)
+				// Estrai la prima immagine dal JSON
 				String immaginiJson = rs.getString("Foto");
 				String primaImmagineBase64 = "";
 
@@ -179,27 +183,35 @@ public class ImmobileDAO {
 					try {
 						JSONArray array = new JSONArray(immaginiJson);
 						if (array.length() > 0) {
-							primaImmagineBase64 = array.getString(0); // prendi solo la prima immagine
+							primaImmagineBase64 = array.getString(0);
 						}
 					} catch (Exception e) {
-						e.printStackTrace();
+						// Log errore ma continua
+						System.err.println("Errore parsing JSON immagini: " + e.getMessage());
 					}
 				}
+				dto.setPrimaImmagineBase64(primaImmagineBase64);
 
-				riga[1] = primaImmagineBase64;
-				riga[2] = rs.getString("Categoria");
-				riga[3] = rs.getString("Descrizione");
+				// Altri campi
+				dto.setCategoria(rs.getString("Categoria"));
+				dto.setDescrizione(rs.getString("Descrizione"));
 
+				// Data
 				java.sql.Timestamp timestamp = rs.getTimestamp("Data");
-				riga[4] = (timestamp != null) ? timestamp.toLocalDateTime() : null;
+				dto.setDataOfferta(timestamp != null ? timestamp.toLocalDateTime() : null);
 
-				riga[5] = rs.getBigDecimal("Prezzo proposto");
-				riga[6] = rs.getString("Stato");
+				// Prezzo proposto
+				BigDecimal importoProposto = rs.getBigDecimal("Prezzo proposto");
+				dto.setImportoProposto(importoProposto != null ? importoProposto : BigDecimal.ZERO);
 
-				risultati.add(riga);
+				// Stato
+				dto.setStato(rs.getString("Stato"));
+
+				risultati.add(dto);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw new RuntimeException("Errore nel recupero storico offerte per: " + emailUtente, e);
 		}
 
 		return risultati;

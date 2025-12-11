@@ -71,7 +71,7 @@ public class ViewStoricoCliente extends JFrame {
 		lblTitolo.setFont(new Font("Tahoma", Font.BOLD, 30));
 		panelComandi.add(lblTitolo);
 
-		JLabel lblDescrizione = new JLabel("Di seguito è riportato l'elenco delle offerte");
+		JLabel lblDescrizione = new JLabel("Di seguito è riportato l'elenco delle tue offerte proposte");
 		sl_panelComandi.putConstraint(SpringLayout.SOUTH, lblTitolo, -13, SpringLayout.NORTH, lblDescrizione);
 		sl_panelComandi.putConstraint(SpringLayout.NORTH, lblDescrizione, 97, SpringLayout.NORTH, panelComandi);
 		sl_panelComandi.putConstraint(SpringLayout.SOUTH, lblDescrizione, -8, SpringLayout.SOUTH, panelComandi);

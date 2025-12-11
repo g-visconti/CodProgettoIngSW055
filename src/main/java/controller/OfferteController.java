@@ -4,10 +4,10 @@ import java.awt.Color;
 import java.awt.Component;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -18,6 +18,7 @@ import dao.ImmobileDAO;
 import dao.OffertaInizialeDAO;
 import dao.RispostaOffertaDAO;
 import database.ConnessioneDatabase;
+import model.dto.StoricoClienteDTO;
 import model.entity.OffertaIniziale;
 import model.entity.RispostaOfferta;
 import util.Base64ImageRenderer;
@@ -26,11 +27,11 @@ import util.TextAreaRenderer;
 import util.TextBoldRenderer;
 
 public class OfferteController {
-	
-	 public OfferteController() {
-	    }
 
-	
+	public OfferteController() {
+	}
+
+
 	private void impostaRendererStato(JTable table, int colonnaStatoIndex) {
 		DefaultTableCellRenderer rendererStato = new DefaultTableCellRenderer() {
 			/**
@@ -71,10 +72,10 @@ public class OfferteController {
 					c.setForeground(new Color(0, 0, 0));
 				}
 
-				
+
 				c.setFont(c.getFont().deriveFont(java.awt.Font.BOLD));
 
-				
+
 				if (isSelected) {
 					c.setBackground(table.getSelectionBackground());
 				} else {
@@ -89,7 +90,7 @@ public class OfferteController {
 		table.getColumnModel().getColumn(colonnaStatoIndex).setCellRenderer(rendererStato);
 	}
 
-	
+
 
 	public boolean inserisciOffertaIniziale(double offertaProposta, String idCliente, long idImmobile) {
 		try {
@@ -161,9 +162,7 @@ public class OfferteController {
 		}
 	}
 
-	
-	
-	private void popolaTabellaOfferteProposte(JTable tableOfferteProposte, List<Object[]> datiOfferte) {
+	private void popolaTabellaOfferteProposte(JTable tableOfferteProposte, List<StoricoClienteDTO> offerte) {
 		String[] nomiColonne = { "ID", "Foto", "Categoria", "Descrizione", "Data", "Prezzo proposto", "Stato" };
 
 		@SuppressWarnings("serial")
@@ -171,9 +170,13 @@ public class OfferteController {
 			@Override
 			public Class<?> getColumnClass(int columnIndex) {
 				return switch (columnIndex) {
-				case 0 -> Long.class;
-				case 1 -> String.class;
-				case 2, 3, 4, 5 -> String.class;
+				case 0 -> Long.class;      // ID
+				case 1 -> String.class;    // Foto (Base64)
+				case 2 -> String.class;    // Categoria
+				case 3 -> String.class;    // Descrizione
+				case 4 -> String.class;    // Data (formattata)
+				case 5 -> String.class;    // Prezzo (formattato)
+				case 6 -> String.class;    // Stato
 				default -> Object.class;
 				};
 			}
@@ -184,60 +187,65 @@ public class OfferteController {
 			}
 		};
 
-		for (Object[] riga : datiOfferte) {
-			Object[] rigaFormattata = new Object[7];
+		// ✅ Ora usa i metodi getter del DTO invece di Object[]
+		for (StoricoClienteDTO offerta : offerte) {
+			Object[] riga = new Object[7];
 
-			rigaFormattata[0] = riga[0];
-			rigaFormattata[1] = riga[1];
-			rigaFormattata[2] = riga[2];
-			rigaFormattata[3] = riga[3];
-			rigaFormattata[4] = TableUtils.formattaData((LocalDateTime) riga[4]);
-			rigaFormattata[5] = TableUtils.formattaPrezzo(riga[5]);
-			rigaFormattata[6] = riga[6];
+			riga[0] = offerta.getIdOfferta();                           // getIdOfferta()
+			riga[1] = offerta.getPrimaImmagineBase64();                // getPrimaImmagineBase64()
+			riga[2] = offerta.getCategoria();                          // getCategoria()
+			riga[3] = offerta.getDescrizione();                        // getDescrizione()
+			riga[4] = TableUtils.formattaData(offerta.getDataOfferta()); // getDataOfferta()
+			riga[5] = TableUtils.formattaPrezzo(offerta.getImportoProposto()); // getImportoProposto()
+			riga[6] = offerta.getStato();                              // getStato()
 
-			model.addRow(rigaFormattata);
+			model.addRow(riga);
 		}
 
 		tableOfferteProposte.setModel(model);
 		tableOfferteProposte.getTableHeader().setReorderingAllowed(false);
 		tableOfferteProposte.setRowHeight(160);
 
-		TableUtils.nascondiColonna(tableOfferteProposte, 0);		// idOfferta nascosto
-		TableUtils.fissaColonna(tableOfferteProposte, 1, 200);		// Foto
-		TableUtils.fissaColonna(tableOfferteProposte, 2, 120);		// Categoria
-		TableUtils.larghezzaColonna(tableOfferteProposte, 3, 400);	// Descrizione
-		TableUtils.fissaColonna(tableOfferteProposte, 4, 150);		// Data
-		TableUtils.fissaColonna(tableOfferteProposte, 5, 150);		// Prezzo proposto
-		TableUtils.fissaColonna(tableOfferteProposte, 6, 120);		// Stato
+		// Configurazione dimensioni colonne
+		TableUtils.nascondiColonna(tableOfferteProposte, 0);        // ID nascosto
+		TableUtils.fissaColonna(tableOfferteProposte, 1, 200);      // Foto (larghezza fissa)
+		TableUtils.fissaColonna(tableOfferteProposte, 2, 120);      // Categoria
+		TableUtils.larghezzaColonna(tableOfferteProposte, 3, 400);  // Descrizione (larga)
+		TableUtils.fissaColonna(tableOfferteProposte, 4, 150);      // Data
+		TableUtils.fissaColonna(tableOfferteProposte, 5, 150);      // Prezzo proposto
+		TableUtils.fissaColonna(tableOfferteProposte, 6, 120);      // Stato
 
+		// Applica renderer personalizzati
 		TableColumnModel columnModel = tableOfferteProposte.getColumnModel();
 		columnModel.getColumn(1).setCellRenderer(new Base64ImageRenderer());
 		columnModel.getColumn(2).setCellRenderer(new TextBoldRenderer(true, new Color(50, 133, 177)));
 		columnModel.getColumn(3).setCellRenderer(new TextAreaRenderer());
 		columnModel.getColumn(4).setCellRenderer(new TextBoldRenderer(true, new Color(0, 0, 0)));
 		columnModel.getColumn(5).setCellRenderer(new TextBoldRenderer(true, new Color(0, 0, 0)));
+
+		// ✅ Usa il tuo metodo esistente per il renderer dello stato
 		impostaRendererStato(tableOfferteProposte, 6);
 	}
-	
 
-	
 
-	
 	public void riempiTableOfferteProposte(JTable tableOfferteProposte, String emailUtente) {
 		Connection connAWS;
 		try {
 			connAWS = ConnessioneDatabase.getInstance().getConnection();
 			ImmobileDAO immobileDAO = new ImmobileDAO(connAWS);
 
-			// Il DAO restituisce solo i dati
-			List<Object[]> datiOfferte = immobileDAO.getDatiOfferteProposte(emailUtente);
+			// Il DAO ora restituisce List<StoricoClienteDTO>
+			List<StoricoClienteDTO> offerte = immobileDAO.getDatiOfferteProposte(emailUtente);
 
 			// Sposto qui tutta la logica di presentazione
-			popolaTabellaOfferteProposte(tableOfferteProposte, datiOfferte);
+			popolaTabellaOfferteProposte(tableOfferteProposte, offerte);
 
 		} catch (SQLException e) {
 			e.printStackTrace();
+			JOptionPane.showMessageDialog(null,
+					"Errore nel caricamento dello storico offerte: " + e.getMessage(),
+					"Errore", JOptionPane.ERROR_MESSAGE);
 		}
 	}
-	
+
 }
