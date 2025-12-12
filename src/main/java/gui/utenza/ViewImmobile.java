@@ -98,10 +98,12 @@ public class ViewImmobile extends JFrame {
 		lblMaps.setBounds(854, 482, 277, 132);
 		contentPane.add(lblMaps);
 
+		/*
 		JLabel lblVicinanza = new JLabel("Vicino a:");
 		lblVicinanza.setFont(new Font("Segoe UI", Font.BOLD, 12));
 		lblVicinanza.setBounds(854, 625, 277, 30);
 		contentPane.add(lblVicinanza);
+		 */
 
 		// GOOGLE MAPS
 
@@ -388,8 +390,7 @@ public class ViewImmobile extends JFrame {
 
 		if (immobile != null) {
 			// Popola campi
-			String titoloCompleto = immobile.getTitolo() + ", " + immobile.getIndirizzo() + ", "
-					+ immobile.getLocalita();
+			String titoloCompleto = immobile.getTitolo() + ", " + immobile.getIndirizzo();
 			lblTitolo.setText(titoloCompleto);
 
 			lblNumLocali.setText("n.locali:  " + immobile.getNumeroLocali());

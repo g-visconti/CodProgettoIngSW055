@@ -18,6 +18,7 @@ import dao.ImmobileDAO;
 import dao.OffertaInizialeDAO;
 import dao.RispostaOffertaDAO;
 import database.ConnessioneDatabase;
+import model.dto.StoricoAgenteDTO;
 import model.dto.StoricoClienteDTO;
 import model.entity.OffertaIniziale;
 import model.entity.RispostaOfferta;
@@ -32,11 +33,8 @@ public class OfferteController {
 	}
 
 
-	private void impostaRendererStato(JTable table, int colonnaStatoIndex) {
+	private void impostaRendererStato(JTable table, int colonnaStatoIndex, boolean isAgente) {
 		DefaultTableCellRenderer rendererStato = new DefaultTableCellRenderer() {
-			/**
-			 *
-			 */
 			private static final long serialVersionUID = 8565820085308350483L;
 
 			@Override
@@ -51,30 +49,45 @@ public class OfferteController {
 				// Imposta colore in base al testo
 				if (value != null) {
 					String stato = value.toString();
-					switch (stato) {
-					case "Rifiutata":
-						c.setForeground(new Color(255, 68, 68));
-						break;
-					case "In attesa":
-						c.setForeground(new Color(243, 182, 80));
-						break;
-					case "Accettata":
-						c.setForeground(new Color(103, 235, 88));
-						break;
-					case "Controproposta":
-						c.setForeground(new Color(7, 170, 248));
-						break;
-					default:
-						c.setForeground(new Color(0, 0, 0));
-						break;
+
+					if (isAgente) {
+						// Stati per l'agente
+						switch (stato) {
+						case "In attesa":
+							c.setForeground(new Color(243, 182, 80)); // Arancione
+							break;
+						case "Valutato":
+							c.setForeground(new Color(103, 235, 88)); // Verde
+							break;
+						default:
+							c.setForeground(new Color(0, 0, 0));
+							break;
+						}
+					} else {
+						// Stati per il cliente (esistente)
+						switch (stato) {
+						case "Rifiutata":
+							c.setForeground(new Color(255, 68, 68));
+							break;
+						case "In attesa":
+							c.setForeground(new Color(243, 182, 80));
+							break;
+						case "Accettata":
+							c.setForeground(new Color(103, 235, 88));
+							break;
+						case "Controproposta":
+							c.setForeground(new Color(7, 170, 248));
+							break;
+						default:
+							c.setForeground(new Color(0, 0, 0));
+							break;
+						}
 					}
 				} else {
 					c.setForeground(new Color(0, 0, 0));
 				}
 
-
 				c.setFont(c.getFont().deriveFont(java.awt.Font.BOLD));
-
 
 				if (isSelected) {
 					c.setBackground(table.getSelectionBackground());
@@ -162,7 +175,12 @@ public class OfferteController {
 		}
 	}
 
-	private void popolaTabellaOfferteProposte(JTable tableOfferteProposte, List<StoricoClienteDTO> offerte) {
+
+	/**
+	 * Metodo per popolare la tabella delle offerte PROPOSTE da un CLIENTE
+	 */
+	private void popolaTabellaOfferteProposteCliente(JTable tableOfferteProposte, List<StoricoClienteDTO> offerte) {
+		// La logica rimane identica a quella che hai già
 		String[] nomiColonne = { "ID", "Foto", "Categoria", "Descrizione", "Data", "Prezzo proposto", "Stato" };
 
 		@SuppressWarnings("serial")
@@ -187,7 +205,6 @@ public class OfferteController {
 			}
 		};
 
-		// ✅ Ora usa i metodi getter del DTO invece di Object[]
 		for (StoricoClienteDTO offerta : offerte) {
 			Object[] riga = new Object[7];
 
@@ -223,22 +240,96 @@ public class OfferteController {
 		columnModel.getColumn(4).setCellRenderer(new TextBoldRenderer(true, new Color(0, 0, 0)));
 		columnModel.getColumn(5).setCellRenderer(new TextBoldRenderer(true, new Color(0, 0, 0)));
 
-		// ✅ Usa il tuo metodo esistente per il renderer dello stato
-		impostaRendererStato(tableOfferteProposte, 6);
+		// Applica il renderer dello stato
+		impostaRendererStato(tableOfferteProposte, 6, false);
 	}
 
+	/**
+	 * Metodo per popolare la tabella delle offerte RICEVUTE da un AGENTE
+	 */
+	private void popolaTabellaOfferteRicevuteAgente(JTable tableOfferteRicevute, List<StoricoAgenteDTO> offerte) {
+		// Stesse colonne ma dati da StoricoAgenteDTO
+		String[] nomiColonne = { "ID", "Foto", "Categoria", "Descrizione", "Data", "Prezzo proposto", "Stato" };
 
-	public void riempiTableOfferteProposte(JTable tableOfferteProposte, String emailUtente) {
+		@SuppressWarnings("serial")
+		DefaultTableModel model = new DefaultTableModel(nomiColonne, 0) {
+			@Override
+			public Class<?> getColumnClass(int columnIndex) {
+				return switch (columnIndex) {
+				case 0 -> Long.class;      // ID
+				case 1 -> String.class;    // Foto (Base64)
+				case 2 -> String.class;    // Categoria
+				case 3 -> String.class;    // Descrizione
+				case 4 -> String.class;    // Data (formattata)
+				case 5 -> String.class;    // Prezzo (formattato)
+				case 6 -> String.class;    // Stato
+				default -> Object.class;
+				};
+			}
+
+			@Override
+			public boolean isCellEditable(int row, int column) {
+				return false;
+			}
+		};
+
+		for (StoricoAgenteDTO offerta : offerte) {
+			Object[] riga = new Object[7];
+
+			riga[0] = offerta.getIdOfferta();
+			riga[1] = offerta.getPrimaImmagineBase64();
+			riga[2] = offerta.getCategoria();
+			riga[3] = offerta.getDescrizione();
+			riga[4] = TableUtils.formattaData(offerta.getDataOfferta());
+			riga[5] = TableUtils.formattaPrezzo(offerta.getImportoProposto());
+			riga[6] = offerta.getStato(); // Sarà "In attesa" o "Valutato"
+
+			model.addRow(riga);
+		}
+
+		tableOfferteRicevute.setModel(model);
+		tableOfferteRicevute.getTableHeader().setReorderingAllowed(false);
+		tableOfferteRicevute.setRowHeight(160);
+
+		// Configurazione dimensioni colonne
+		TableUtils.nascondiColonna(tableOfferteRicevute, 0);
+		TableUtils.fissaColonna(tableOfferteRicevute, 1, 200);
+		TableUtils.fissaColonna(tableOfferteRicevute, 2, 120);
+		TableUtils.larghezzaColonna(tableOfferteRicevute, 3, 400);
+		TableUtils.fissaColonna(tableOfferteRicevute, 4, 150);
+		TableUtils.fissaColonna(tableOfferteRicevute, 5, 150);
+		TableUtils.fissaColonna(tableOfferteRicevute, 6, 120);
+
+		// Applica renderer personalizzati
+		TableColumnModel columnModel = tableOfferteRicevute.getColumnModel();
+		columnModel.getColumn(1).setCellRenderer(new Base64ImageRenderer());
+		columnModel.getColumn(2).setCellRenderer(new TextBoldRenderer(true, new Color(50, 133, 177)));
+		columnModel.getColumn(3).setCellRenderer(new TextAreaRenderer());
+		columnModel.getColumn(4).setCellRenderer(new TextBoldRenderer(true, new Color(0, 0, 0)));
+		columnModel.getColumn(5).setCellRenderer(new TextBoldRenderer(true, new Color(0, 0, 0)));
+
+		// Applica il renderer dello stato specifico per agente
+		impostaRendererStato(tableOfferteRicevute, 6, true); // true = per agente
+	}
+
+	/**
+	 * Metodo che discrimina automaticamente tra cliente e agente
+	 */
+	public void riempiTableOfferte(JTable tableOfferte, String emailUtente, boolean isAgente) {
 		Connection connAWS;
 		try {
 			connAWS = ConnessioneDatabase.getInstance().getConnection();
 			ImmobileDAO immobileDAO = new ImmobileDAO(connAWS);
 
-			// Il DAO ora restituisce List<StoricoClienteDTO>
-			List<StoricoClienteDTO> offerte = immobileDAO.getDatiOfferteProposte(emailUtente);
-
-			// Sposto qui tutta la logica di presentazione
-			popolaTabellaOfferteProposte(tableOfferteProposte, offerte);
+			if (isAgente) {
+				// Chiama il metodo DAO per l'agente
+				List<StoricoAgenteDTO> offerte = immobileDAO.getDatiOfferteRicevuteAgente(emailUtente);
+				popolaTabellaOfferteRicevuteAgente(tableOfferte, offerte);
+			} else {
+				// Chiama il metodo DAO per il cliente (esistente)
+				List<StoricoClienteDTO> offerte = immobileDAO.getDatiOfferteProposte(emailUtente);
+				popolaTabellaOfferteProposteCliente(tableOfferte, offerte);
+			}
 
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -246,6 +337,16 @@ public class OfferteController {
 					"Errore nel caricamento dello storico offerte: " + e.getMessage(),
 					"Errore", JOptionPane.ERROR_MESSAGE);
 		}
+	}
+
+	// Mantieni il vecchio metodo per retrocompatibilità
+	public void riempiTableOfferteProposte(JTable tableOfferteProposte, String emailUtente) {
+		riempiTableOfferte(tableOfferteProposte, emailUtente, false);
+	}
+
+	// Nuovo metodo specifico per agente
+	public void riempiTableOfferteRicevuteAgente(JTable tableOfferteRicevute, String emailAgente) {
+		riempiTableOfferte(tableOfferteRicevute, emailAgente, true);
 	}
 
 }

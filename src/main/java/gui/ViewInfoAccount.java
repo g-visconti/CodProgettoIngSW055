@@ -17,7 +17,6 @@ import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 
 import controller.AccountController;
-
 import util.GuiUtils;
 
 public class ViewInfoAccount extends JFrame {
@@ -28,7 +27,7 @@ public class ViewInfoAccount extends JFrame {
 
 	/**
 	 * Create the frame.
-	 * 
+	 *
 	 * @throws SQLException
 	 */
 	public ViewInfoAccount(String emailUtente) {
@@ -130,7 +129,7 @@ public class ViewInfoAccount extends JFrame {
 		}
 		if (infoProfilo != null) {
 			lblNomeUtenteRes.setText(infoProfilo[2]);
-			lblRuoloRes.setText(infoProfilo[8]);
+			lblRuoloRes.setText(infoProfilo[7]);
 			lblTelefonoRes.setText(infoProfilo[4]);
 			lblCittaRes.setText(infoProfilo[5]);
 			lblIndirizzoRes.setText(infoProfilo[6]);

@@ -8,7 +8,6 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -33,7 +32,7 @@ public class ViewStoricoAgente extends JFrame {
 	/**
 	 * Create the frame ViewOfferte.
 	 */
-	public ViewStoricoAgente(String emailUtente) {
+	public ViewStoricoAgente(String emailAgente) {
 		// Imposta l'icona di DietiEstates25 alla finestra in uso
 		GuiUtils.setIconaFinestra(this);
 		setTitle("DietiEstates25 - Storico agente");
@@ -100,7 +99,7 @@ public class ViewStoricoAgente extends JFrame {
 		lblBenvenuto.setHorizontalAlignment(SwingConstants.RIGHT);
 		panelComandi.add(lblBenvenuto);
 
-		JLabel lblEmailAccesso = new JLabel(emailUtente + " ");
+		JLabel lblEmailAccesso = new JLabel(emailAgente + " ");
 		sl_panelComandi.putConstraint(SpringLayout.SOUTH, lblEmailAccesso, -52, SpringLayout.NORTH, lblDescrizione);
 		sl_panelComandi.putConstraint(SpringLayout.NORTH, lblEmailAccesso, 6, SpringLayout.SOUTH, lblBenvenuto);
 		sl_panelComandi.putConstraint(SpringLayout.WEST, lblEmailAccesso, 951, SpringLayout.EAST, btnTornaIndietro);
@@ -170,29 +169,27 @@ public class ViewStoricoAgente extends JFrame {
 
 		// Popola la tabella con i dati tramite il controller
 		OfferteController controller = new OfferteController();
-		controller.riempiTableOfferteProposte(tableStoricoOfferte, emailUtente);
+		controller.riempiTableOfferteRicevuteAgente(tableStoricoOfferte, emailAgente);
 
 		// Azione al clic di uno dei risultati
 		tableStoricoOfferte.getSelectionModel().addListSelectionListener(e -> {
 			if (!e.getValueIsAdjusting()) {
 				int selectedRow = tableStoricoOfferte.getSelectedRow();
 				if (selectedRow != -1) {
-					String stato = (String) tableStoricoOfferte.getValueAt(selectedRow, 4);
+					String stato = (String) tableStoricoOfferte.getValueAt(selectedRow, 5); // Colonna 5 = Stato
 					System.out.println("Stato offerta selezionata: " + stato);
 
-					// Puoi usare lo stato per varie azioni:
+					// Recupera l'ID dell'offerta dalla colonna nascosta
+					//Long idOfferta = (Long) tableStoricoOfferte.getValueAt(selectedRow, 0);
+
 					switch(stato) {
-					case "Valutata":
-						JOptionPane.showMessageDialog(null, "La proposta è stata già valutata", "Messaggio informativo",
-								JOptionPane.INFORMATION_MESSAGE);
+					case "Valutato":
+						// Offerta già valutata - mostra dettagli
+						//mostraDettagliOfferta(idOfferta);
 						break;
 					case "In attesa":
-						// recupera id immobile
-						// mostra l'elenco delle offerte che l'agente ha ricevuto
-						//ViewOffertaProposta offertaProposta = new ViewOffertaProposta(idImmobile, idAgente);
-
-						JOptionPane.showMessageDialog(null, "Controproposta dell'agente", "Messaggio informativo",
-								JOptionPane.INFORMATION_MESSAGE);
+						// Offerta da valutare - mostra vista per rispondere
+						//apriValutazioneOfferta(idOfferta);
 						break;
 					}
 				}

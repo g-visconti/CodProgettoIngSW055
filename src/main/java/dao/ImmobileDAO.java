@@ -19,6 +19,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.postgresql.util.PGobject;
 
+import model.dto.StoricoAgenteDTO;
 import model.dto.StoricoClienteDTO;
 import model.entity.Filtri;
 import model.entity.Immobile;
@@ -156,7 +157,7 @@ public class ImmobileDAO {
 
 	public List<StoricoClienteDTO> getDatiOfferteProposte(String emailUtente) {
 		String query = "SELECT oi.\"idOfferta\" as \"idOfferta\", i.\"immagini\" as \"Foto\", i.\"tipologia\" as \"Categoria\", i.\"descrizione\" as \"Descrizione\", "
-				+ "oi.\"dataOfferta\" as \"Data\", oi.\"importoProposto\" as \"Prezzo proposto\", oi.\"stato\" as \"Stato\" "
+				+ "oi.\"dataOfferta\" as \"Data\", oi.\"importoProposto\" as \"Prezzo proposto\", oi.\"stato\" as \"stato\" "
 				+ "FROM \"Immobile\" i "
 				+ "INNER JOIN \"OffertaIniziale\" oi ON i.\"idImmobile\" = oi.\"immobileAssociato\" "
 				+ "INNER JOIN \"Account\" a ON oi.\"clienteAssociato\" = a.\"idAccount\" "
@@ -217,7 +218,49 @@ public class ImmobileDAO {
 		return risultati;
 	}
 
+	// Aggiungi questo metodo al tuo ImmobileDAO
 
+	public List<StoricoAgenteDTO> getDatiOfferteRicevuteAgente(String emailAgente) throws SQLException {
+		List<StoricoAgenteDTO> offerte = new ArrayList<>();
+
+		String query = "SELECT " +
+				"    oi.\"idOfferta\" as \"idOfferta\", " +
+				"    i.\"immagini\"->>0 as \"primaImmagine\", " +
+				"    i.\"tipologia\" as \"categoria\", " +
+				"    i.\"descrizione\" as \"descrizione\", " +
+				"    oi.\"dataOfferta\" as \"dataOfferta\", " +
+				"    oi.\"importoProposto\" as \"importoProposto\", " +
+				"    CASE " +
+				"        WHEN oi.\"stato\" = 'In attesa' THEN 'In attesa' " +
+				"        ELSE 'Valutato' " +
+				"    END as \"stato\" " +
+				"FROM \"Immobile\" i " +
+				"INNER JOIN \"OffertaIniziale\" oi ON i.\"idImmobile\" = oi.\"immobileAssociato\" " +
+				"INNER JOIN \"Account\" a ON i.\"agenteAssociato\" = a.\"idAccount\" " +
+				"WHERE a.\"email\" = ? " +
+				"ORDER BY oi.\"dataOfferta\" DESC";
+
+		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+			pstmt.setString(1, emailAgente);
+
+			try (ResultSet rs = pstmt.executeQuery()) {
+				while (rs.next()) {
+					StoricoAgenteDTO offerta = new StoricoAgenteDTO(
+							rs.getLong("idOfferta"),
+							rs.getString("primaImmagine"), // Base64 o percorso immagine
+							rs.getString("categoria"),
+							rs.getString("descrizione"),
+							rs.getTimestamp("dataOfferta").toLocalDateTime(),
+							rs.getBigDecimal("importoProposto"),
+							rs.getString("stato")
+							);
+					offerte.add(offerta);
+				}
+			}
+		}
+
+		return offerte;
+	}
 
 	public Immobile getImmobileById(long idimmobile) throws SQLException {
 		String sqlBase = "SELECT * FROM \"Immobile\" WHERE \"idImmobile\" = ?";
