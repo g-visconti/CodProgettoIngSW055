@@ -2,6 +2,7 @@ package auth;
 
 import java.util.concurrent.TimeUnit;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -86,9 +87,11 @@ public class CognitoAuthServiceImpl implements CognitoAuthService {
 		jsonRequest.addProperty("Username", username);
 		jsonRequest.addProperty("Password", password);
 
-		JsonObject userAttributes = new JsonObject();
-		userAttributes.addProperty("Name", "email");
-		userAttributes.addProperty("Value", email);
+		JsonArray userAttributes = new JsonArray();
+		JsonObject emailAttr = new JsonObject();
+		emailAttr.addProperty("Name", "email");
+		emailAttr.addProperty("Value", email);
+		userAttributes.add(emailAttr);
 
 		jsonRequest.add("UserAttributes", userAttributes);
 
@@ -98,7 +101,7 @@ public class CognitoAuthServiceImpl implements CognitoAuthService {
 				);
 
 		Request request = new Request.Builder()
-				.url(config.getSignupUrl())
+				.url("https://cognito-idp." + config.getRegion() + ".amazonaws.com/")
 				.post(body)
 				.header("Content-Type", "application/json")
 				.header("X-Amz-Target", "AWSCognitoIdentityProviderService.SignUp")
