@@ -28,12 +28,13 @@ import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 
 import controller.AccountController;
-
 import controller.ImmobileController;
+import controller.OfferteController;
 import model.entity.Account;
 import model.entity.Immobile;
 import model.entity.ImmobileInAffitto;
 import model.entity.ImmobileInVendita;
+import model.entity.OffertaIniziale;
 import util.GuiUtils;
 
 public class ViewOffertaProposta extends JFrame {
@@ -43,11 +44,28 @@ public class ViewOffertaProposta extends JFrame {
 	private JTextArea descrizioneField;
 	private List<byte[]> immagini; // già esiste nel tuo codice
 	private int indiceFotoCorrente = 0;
+	private OffertaIniziale offertaCorrente; // Aggiungi
+	private boolean isInAttesa; // Aggiungi questa variabile
 
 	/**
 	 * Create the frame.
 	 */
-	public ViewOffertaProposta(long idImmobile, String idAccount) {
+	public ViewOffertaProposta(long idOfferta, String emailAgente) {
+		// Inizializza il controller per recuperare l'offerta
+		OfferteController offerteController = new OfferteController();
+		offertaCorrente = offerteController.getOffertaById(idOfferta);
+
+		if (offertaCorrente == null) {
+			JOptionPane.showMessageDialog(this,
+					"Offerta non trovata!",
+					"Errore",
+					JOptionPane.ERROR_MESSAGE);
+			dispose();
+			return;
+		}
+
+		long idImmobile = offertaCorrente.getImmobileAssociato();
+
 		setTitle("DietiEstates25 - Dettagli dell'immobile selezionato");
 
 		// Imposta l'icona di DietiEstates25 alla finestra in uso
@@ -104,27 +122,27 @@ public class ViewOffertaProposta extends JFrame {
 		contentPane.add(lblVicinanza);
 
 		// GOOGLE MAPS
-		
+
 		lblMaps.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		lblMaps.addMouseListener(new MouseAdapter() {
-		    @Override
-		    public void mouseClicked(MouseEvent e) {
-		        String testoCompleto = lblTitolo.getText();
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				String testoCompleto = lblTitolo.getText();
 
-		        String[] parole = testoCompleto.split(" ", 2);
-		        String indirizzo = parole.length > 1 ? parole[1] : testoCompleto;
+				String[] parole = testoCompleto.split(" ", 2);
+				String indirizzo = parole.length > 1 ? parole[1] : testoCompleto;
 
-		        String url = "https://www.google.com/maps/search/?api=1&query=" + indirizzo.replace(" ", "+");
+				String url = "https://www.google.com/maps/search/?api=1&query=" + indirizzo.replace(" ", "+");
 
-		        try {
-		            Desktop.getDesktop().browse(new URI(url));
-		        } catch (Exception ex) {
-		            ex.printStackTrace();
-		            JOptionPane.showMessageDialog(null, "Errore nell'apertura del browser");
-		        }
+				try {
+					Desktop.getDesktop().browse(new URI(url));
+				} catch (Exception ex) {
+					ex.printStackTrace();
+					JOptionPane.showMessageDialog(null, "Errore nell'apertura del browser");
+				}
 
-		       
-		    }
+
+			}
 		});
 
 
@@ -146,17 +164,21 @@ public class ViewOffertaProposta extends JFrame {
 		JButton btnRispondiCliente = new JButton("Rispondi al cliente");
 		btnRispondiCliente.setFocusable(false);
 		btnRispondiCliente.setForeground(Color.WHITE);
-		btnRispondiCliente.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				ViewRispostaOfferte guiOfferta = new ViewRispostaOfferte(idImmobile, idAccount);
-				guiOfferta.setLocationRelativeTo(null);
-				guiOfferta.setVisible(true);
-			}
-		});
-		btnRispondiCliente.setBackground(new Color(204, 0, 0));
-		btnRispondiCliente.setBounds(36, 131, 204, 37);
-		panelProponiOfferta.add(btnRispondiCliente);
+
+		// Recupera il nome del cliente che ha fatto l'offerta
+		String nomeCliente = offerteController.getClienteByOffertaId(idOfferta);
+
+		JLabel lblDescrizioneValoreProposta = new JLabel("Il cliente propone:");
+		lblDescrizioneValoreProposta.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		lblDescrizioneValoreProposta.setHorizontalAlignment(SwingConstants.CENTER);
+		lblDescrizioneValoreProposta.setBounds(49, 41, 179, 21);
+		panelProponiOfferta.add(lblDescrizioneValoreProposta);
+
+		// Modifica le label per mostrare le informazioni del cliente
+		lblDescrizioneValoreProposta.setText("Proposta del cliente:");
+		if (nomeCliente != null && !nomeCliente.isEmpty()) {
+			lblDescrizioneValoreProposta.setText("Proposta di: " + nomeCliente);
+		}
 
 		JLabel lblValoreProposta = new JLabel("valore proposta");
 		lblValoreProposta.setHorizontalAlignment(SwingConstants.CENTER);
@@ -164,11 +186,67 @@ public class ViewOffertaProposta extends JFrame {
 		lblValoreProposta.setBounds(40, 73, 196, 21);
 		panelProponiOfferta.add(lblValoreProposta);
 
-		JLabel lblDescrizioneValoreProposta = new JLabel("Il cliente propone:");
-		lblDescrizioneValoreProposta.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		lblDescrizioneValoreProposta.setHorizontalAlignment(SwingConstants.CENTER);
-		lblDescrizioneValoreProposta.setBounds(49, 41, 179, 21);
-		panelProponiOfferta.add(lblDescrizioneValoreProposta);
+		// **CORREZIONE: Controllo corretto dello stato**
+		if (offertaCorrente != null) {
+			double importoProposto = offertaCorrente.getImportoProposto();
+			String importoFormattato = String.format("€ %,.2f", importoProposto);
+			lblValoreProposta.setText(importoFormattato);
+
+			// DEBUG più dettagliato
+			System.out.println("DEBUG ViewOffertaProposta - Stato offerta letto: '" + offertaCorrente.getStato() + "'");
+
+			// Controlla se lo stato è "In attesa" (con 'I' maiuscola come nel constraint)
+			String stato = offertaCorrente.getStato();
+			isInAttesa = false;
+
+			if (stato != null) {
+				// Rimuovi spazi extra e controlla in modo flessibile
+				stato = stato.trim();
+				System.out.println("DEBUG - Stato dopo trim: '" + stato + "'");
+
+				// Controlla vari modi in cui potrebbe essere scritto
+				isInAttesa = stato.equalsIgnoreCase("In attesa") ||
+						stato.equalsIgnoreCase("IN_ATTESA") ||
+						stato.equalsIgnoreCase("IN ATTESA");
+
+				System.out.println("DEBUG - isInAttesa risultato: " + isInAttesa);
+			}
+
+			// **CONFIGURA IL BOTTONE IN BASE ALLO STATO**
+			if (isInAttesa) {
+				// OFFERTA IN ATTESA: bottone rosso per rispondere
+				btnRispondiCliente.setText("Rispondi al cliente");
+				btnRispondiCliente.setBackground(new Color(204, 0, 0)); // Rosso
+				btnRispondiCliente.setEnabled(true);
+				System.out.println("DEBUG - Bottone configurato: 'Rispondi al cliente' (abilitato)");
+			} else {
+				// OFFERTA GIÀ VALUTATA: bottone blu per nuova proposta
+				btnRispondiCliente.setText("Proponi nuova offerta");
+				btnRispondiCliente.setBackground(new Color(30, 144, 255)); // Blu
+				btnRispondiCliente.setEnabled(true);
+				System.out.println("DEBUG - Bottone configurato: 'Proponi nuova offerta' (abilitato)");
+			}
+		}
+
+		btnRispondiCliente.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				ViewRispostaOfferte guiOfferta = new ViewRispostaOfferte(idOfferta, emailAgente);
+				guiOfferta.setLocationRelativeTo(null);
+				guiOfferta.setVisible(true);
+			}
+		});
+
+
+
+
+		btnRispondiCliente.setBackground(new Color(204, 0, 0));
+		btnRispondiCliente.setBounds(36, 131, 204, 37);
+		panelProponiOfferta.add(btnRispondiCliente);
+
+
+
+
 
 		JPanel panelDettagliImmobile = new JPanel() {
 
@@ -446,6 +524,42 @@ public class ViewOffertaProposta extends JFrame {
 				}
 			}
 		});
+
+		// DEBUG
+
+		// Nel costruttore di ViewOffertaProposta, aggiungi questi debug:
+		System.out.println("=== DEBUG ViewOffertaProposta ===");
+		System.out.println("idOfferta: " + idOfferta);
+		System.out.println("emailAgente passata: " + emailAgente);
+		System.out.println("offertaCorrente: " + offertaCorrente);
+		System.out.println("Stato offerta: '" + offertaCorrente.getStato() + "'");
+		System.out.println("Cliente associato: " + offertaCorrente.getClienteAssociato());
+		System.out.println("Immobile associato: " + offertaCorrente.getImmobileAssociato());
+		System.out.println("Importo proposto: " + offertaCorrente.getImportoProposto());
+		System.out.println("=== FINE DEBUG ===");
+
+		// Modifica il controllo dello stato con più opzioni:
+		String stato = offertaCorrente.getStato();
+		System.out.println("DEBUG - Stato raw: '" + stato + "'");
+		System.out.println("DEBUG - Stato uppercase: '" + stato.toUpperCase() + "'");
+		System.out.println("DEBUG - Contiene 'ATTESA': " + stato.toUpperCase().contains("ATTESA"));
+
+		boolean isInAttesa = false;
+		if (stato != null) {
+			String statoUpper = stato.trim().toUpperCase();
+			isInAttesa = statoUpper.equals("IN_ATTESA") ||
+					statoUpper.equals("IN ATTESA") ||
+					statoUpper.equals("IN-ATTESA") ||
+					statoUpper.contains("ATTESA");
+		}
+
+		System.out.println("DEBUG - isInAttesa risultato: " + isInAttesa);
+
+
+		// Dopo aver impostato il testo della label
+		System.out.println("DEBUG - Testo label valoreProposta: " + lblValoreProposta.getText());
+		System.out.println("DEBUG - Bottone rispondiCliente enabled: " + btnRispondiCliente.isEnabled());
+		System.out.println("DEBUG - Bottone rispondiCliente text: " + btnRispondiCliente.getText());
 
 	}
 }

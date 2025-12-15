@@ -16,21 +16,26 @@ import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 
-
 import controller.OfferteController;
+import model.entity.OffertaIniziale;
 import util.GuiUtils;
 
 public class ViewRispostaOfferte extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
-	private JTextField lblOfferta;
-
+	private JTextField txtControproposta; // Cambia da lblOfferta
 	/**
 	 * Launch the application.
 	 */
 
-	public ViewRispostaOfferte(long idImmobile, String idAgente) {
+	public ViewRispostaOfferte(long idOfferta, String idAgente) {
+		System.out.println("=== DEBUG ViewRispostaOfferte ===");
+		System.out.println("Costruttore - idOfferta: " + idOfferta);
+		System.out.println("Costruttore - idAgente: " + idAgente);
+		System.out.println("=== FINE DEBUG ViewRispostaOfferte ===");
+
+
 		// Imposta l'icona di DietiEstates25 alla finestra in uso
 		GuiUtils.setIconaFinestra(this);
 		setTitle("DietiEstates25 - Rispondi alla proposta del cliente");
@@ -46,16 +51,18 @@ public class ViewRispostaOfferte extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 
+
+
 		JLabel lblDescrizione = new JLabel("Scegliere un'opzione sull'offerta proposta");
 		lblDescrizione.setHorizontalAlignment(SwingConstants.CENTER);
 		lblDescrizione.setFont(new Font("Tahoma", Font.PLAIN, 18));
 		lblDescrizione.setBounds(47, 21, 483, 24);
 		contentPane.add(lblDescrizione);
 
-		lblOfferta = new JTextField();
-		lblOfferta.setBounds(189, 188, 207, 24);
-		contentPane.add(lblOfferta);
-		lblOfferta.setColumns(10);
+		txtControproposta = new JTextField();
+		txtControproposta.setBounds(189, 188, 207, 24);
+		contentPane.add(txtControproposta);
+		txtControproposta.setColumns(10);
 
 		JLabel lblProposta = new JLabel("Controproposta: €");
 		lblProposta.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -63,18 +70,147 @@ public class ViewRispostaOfferte extends JFrame {
 		lblProposta.setBounds(47, 191, 132, 19);
 		contentPane.add(lblProposta);
 
+		JLabel lblOppureProponiUna = new JLabel("oppure proporre una nuova offerta");
+		lblOppureProponiUna.setHorizontalAlignment(SwingConstants.CENTER);
+		lblOppureProponiUna.setFont(new Font("Tahoma", Font.PLAIN, 18));
+		lblOppureProponiUna.setBounds(51, 146, 483, 24);
+		contentPane.add(lblOppureProponiUna);
+
+		JButton btnAccetta = new JButton("Accetta");
+		btnAccetta.setForeground(Color.WHITE);
+		btnAccetta.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 11));
+		btnAccetta.setBackground(Color.GREEN);
+
+		JButton btnRifiuta = new JButton("Rifiuta");
+		btnRifiuta.setForeground(Color.WHITE);
+		btnRifiuta.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 11));
+		btnRifiuta.setBackground(Color.RED);
+
 		JButton btnControproposta = new JButton("Controproposta");
 		getRootPane().setDefaultButton(btnControproposta);
 		btnControproposta.setForeground(new Color(255, 255, 255));
 		btnControproposta.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 11));
 		btnControproposta.setBackground(SystemColor.textHighlight);
+
+		// **RECUPERA LO STATO DELL'OFFERTA PER SAPIRE SE È GIÀ VALUTATA**
+		OfferteController controller = new OfferteController();
+		OffertaIniziale offerta = controller.getOffertaById(idOfferta);
+
+		boolean isOffertaGiàValutata = false;
+		if (offerta != null) {
+			String stato = offerta.getStato();
+			isOffertaGiàValutata = stato != null &&
+					!stato.trim().equalsIgnoreCase("In attesa");
+			System.out.println("DEBUG - Stato offerta: '" + stato + "'");
+			System.out.println("DEBUG - Offerta già valutata: " + isOffertaGiàValutata);
+		}
+
+		// **MODIFICA LA GUI IN BASE ALLO STATO**
+		if (isOffertaGiàValutata) {
+			// Offerta già valutata: mostra solo la controproposta
+			lblDescrizione.setText("Fai una nuova proposta al cliente");
+			lblOppureProponiUna.setText("Inserisci il nuovo importo proposto");
+
+			// Nascondi i bottoni Accetta e Rifiuta
+			btnAccetta.setVisible(false);
+			btnRifiuta.setVisible(false);
+
+			// Sposta su la sezione della controproposta
+			lblOppureProponiUna.setBounds(51, 72, 483, 24); // Più in alto
+			lblProposta.setBounds(47, 111, 132, 19);
+			txtControproposta.setBounds(189, 108, 207, 24);
+			btnControproposta.setBounds(427, 108, 131, 23);
+
+			// Cambia testo del bottone
+			btnControproposta.setText("Invia proposta");
+		}
+
+		System.out.println("=== FINE DEBUG ViewRispostaOfferte ===");
+
+
+		// L'agente accetta la proposta del cliente
+
+
+
+		btnAccetta.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				int conferma = JOptionPane.showConfirmDialog(
+						null,
+						"Sei sicuro di voler accettare questa offerta?",
+						"Conferma accettazione",
+						JOptionPane.YES_NO_OPTION
+						);
+
+				if (conferma == JOptionPane.YES_OPTION) {
+					OfferteController controller = new OfferteController();
+					boolean successo = controller.inserisciRispostaOfferta(
+							idOfferta,
+							idAgente,
+							"Accettata",
+							null
+							);
+
+					if (successo) {
+						JOptionPane.showMessageDialog(null, "Offerta accettata con successo!");
+						dispose();
+					} else {
+						JOptionPane.showMessageDialog(null, "Errore durante l'accettazione dell'offerta.");
+					}
+				}
+			}
+		});
+
+		btnAccetta.setBounds(147, 72, 131, 23);
+		contentPane.add(btnAccetta);
+
+		// L'agente rifiuta l'offerta proposta dal cliente
+
+
+
+		btnRifiuta.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				int conferma = JOptionPane.showConfirmDialog(
+						null,
+						"Sei sicuro di voler rifiutare questa offerta?",
+						"Conferma rifiuto",
+						JOptionPane.YES_NO_OPTION
+						);
+
+				if (conferma == JOptionPane.YES_OPTION) {
+					OfferteController controller = new OfferteController();
+					boolean successo = controller.inserisciRispostaOfferta(
+							idOfferta,
+							idAgente,
+							"Rifiutata",
+							null
+							);
+
+					if (successo) {
+						JOptionPane.showMessageDialog(null, "Offerta rifiutata con successo!");
+						dispose();
+					} else {
+						JOptionPane.showMessageDialog(null, "Errore durante il rifiuto dell'offerta.");
+					}
+				}
+			}
+		});
+
+		btnRifiuta.setBounds(314, 72, 131, 23);
+		contentPane.add(btnRifiuta);
+
+
+		// Controproposta dell'agente
+
+
+
 		btnControproposta.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-
 				double controproposta;
 				try {
-					String testo = lblOfferta.getText();
+					String testo = txtControproposta.getText();
 					controproposta = Double.parseDouble(testo);
 
 					if (controproposta <= 0) {
@@ -87,38 +223,23 @@ public class ViewRispostaOfferte extends JFrame {
 				}
 
 				OfferteController controller = new OfferteController();
-				boolean offertaInserita = controller.inserisciOffertaIniziale(controproposta, idAgente, idImmobile);
+				boolean successo = controller.inserisciRispostaOfferta(
+						idOfferta,
+						idAgente,
+						"Controproposta",
+						controproposta
+						);
 
-				if (offertaInserita) {
-					JOptionPane.showMessageDialog(null, "Offerta proposta con successo!");
+				if (successo) {
+					JOptionPane.showMessageDialog(null, "Controproposta inviata con successo!");
 					dispose();
 				} else {
-					JOptionPane.showMessageDialog(null, "Errore durante la proposta dell'offerta. Riprova.");
+					JOptionPane.showMessageDialog(null, "Errore durante l'invio della controproposta.");
 				}
 			}
-
 		});
+
 		btnControproposta.setBounds(427, 188, 131, 23);
 		contentPane.add(btnControproposta);
-
-		JButton btnAccetta = new JButton("Accetta");
-		btnAccetta.setForeground(Color.WHITE);
-		btnAccetta.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 11));
-		btnAccetta.setBackground(Color.GREEN);
-		btnAccetta.setBounds(147, 72, 131, 23);
-		contentPane.add(btnAccetta);
-
-		JButton btnRifiuta = new JButton("Rifiuta");
-		btnRifiuta.setForeground(Color.WHITE);
-		btnRifiuta.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 11));
-		btnRifiuta.setBackground(Color.RED);
-		btnRifiuta.setBounds(314, 72, 131, 23);
-		contentPane.add(btnRifiuta);
-
-		JLabel lblOppureProponiUna = new JLabel("oppure proporre una nuova offerta");
-		lblOppureProponiUna.setHorizontalAlignment(SwingConstants.CENTER);
-		lblOppureProponiUna.setFont(new Font("Tahoma", Font.PLAIN, 18));
-		lblOppureProponiUna.setBounds(51, 146, 483, 24);
-		contentPane.add(lblOppureProponiUna);
 	}
 }

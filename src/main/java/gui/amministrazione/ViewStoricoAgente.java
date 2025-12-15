@@ -8,6 +8,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -39,6 +40,9 @@ public class ViewStoricoAgente extends JFrame {
 
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 1248, 946);
+
+		// Imposta la finestra a schermo intero
+		setExtendedState(JFrame.MAXIMIZED_BOTH);
 
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -131,13 +135,14 @@ public class ViewStoricoAgente extends JFrame {
 		// Crea il modello dati della tabella
 		@SuppressWarnings("serial")
 		DefaultTableModel model = new DefaultTableModel(new Object[][] {},
-				new String[] { "Foto", "Categoria", "Descrizione", "Data", "Prezzo proposto", "Stato" }
+				new String[] { "ID", "Foto", "Categoria", "Descrizione", "Data", "Prezzo proposto", "Stato" }
 				) {
 			@Override
 			public Class<?> getColumnClass(int columnIndex) {
 				return switch (columnIndex) {
-				case 0 -> String.class; // Base64 immagini
-				case 1, 2, 3, 4, 5 -> String.class;
+				case 0 -> Long.class;    // ID (nascosto)
+				case 1 -> String.class;  // Base64 immagini
+				case 2, 3, 4, 5, 6 -> String.class;
 				default -> Object.class;
 				};
 			}
@@ -157,12 +162,17 @@ public class ViewStoricoAgente extends JFrame {
 		tableStoricoOfferte.setSelectionBackground(new Color(226, 226, 226));
 
 		// Configura larghezze colonne (aggiornate per 3 colonne)
-		int[] preferredWidths = { 100, 100, 400, 120, 120, 80 };
+		int[] preferredWidths = { 0, 100, 100, 400, 120, 120, 80 }; // Larghezza 0 per ID nascosto
 		for (int i = 0; i < preferredWidths.length; i++) {
 			TableColumn col = tableStoricoOfferte.getColumnModel().getColumn(i);
 			col.setPreferredWidth(preferredWidths[i]);
 			col.setResizable(false);
 		}
+
+		// Nascondi la colonna ID (colonna 0)
+		tableStoricoOfferte.getColumnModel().getColumn(0).setMinWidth(0);
+		tableStoricoOfferte.getColumnModel().getColumn(0).setMaxWidth(0);
+		tableStoricoOfferte.getColumnModel().getColumn(0).setWidth(0);
 
 		// Inserisci la tabella nello scroll pane
 		scrollPane.setViewportView(tableStoricoOfferte);
@@ -176,25 +186,60 @@ public class ViewStoricoAgente extends JFrame {
 			if (!e.getValueIsAdjusting()) {
 				int selectedRow = tableStoricoOfferte.getSelectedRow();
 				if (selectedRow != -1) {
-					String stato = (String) tableStoricoOfferte.getValueAt(selectedRow, 5); // Colonna 5 = Stato
+					String stato = (String) tableStoricoOfferte.getValueAt(selectedRow, 6); // Colonna 6 = Stato (era 5)
 					System.out.println("Stato offerta selezionata: " + stato);
 
-					// Recupera l'ID dell'offerta dalla colonna nascosta
-					//Long idOfferta = (Long) tableStoricoOfferte.getValueAt(selectedRow, 0);
+					// Recupera l'ID dell'offerta dalla colonna 0
+					Long idOfferta = null;
+					try {
+						Object idObj = tableStoricoOfferte.getValueAt(selectedRow, 0);
+						if (idObj != null) {
+							if (idObj instanceof Long) {
+								idOfferta = (Long) idObj;
+							} else {
+								idOfferta = Long.parseLong(idObj.toString());
+							}
+						}
+					} catch (Exception ex) {
+						ex.printStackTrace();
+					}
 
+					if (idOfferta == null || idOfferta == 0) {
+						JOptionPane.showMessageDialog(this,
+								"Errore: Impossibile recuperare l'ID dell'offerta",
+								"Errore",
+								JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+
+					// Recupera l'ID dell'agente dall'email (dovrai aggiungere questa funzionalità)
+					// Per ora passiamo l'email direttamente
 					switch(stato) {
 					case "Valutato":
-						// Offerta già valutata - mostra dettagli
-						//mostraDettagliOfferta(idOfferta);
+						// Apri comunque i dettagli dell'offerta
+						apriDettagliOfferta(idOfferta, emailAgente);
 						break;
 					case "In attesa":
-						// Offerta da valutare - mostra vista per rispondere
-						//apriValutazioneOfferta(idOfferta);
+						// Apri vista per valutare l'offerta
+						apriValutazioneOfferta(idOfferta, emailAgente);
 						break;
 					}
 				}
 			}
 		});
 
+
+	}
+
+	private void apriDettagliOfferta(Long idOfferta, String emailAgente) {
+		ViewOffertaProposta viewOfferta = new ViewOffertaProposta(idOfferta, emailAgente);
+		viewOfferta.setLocationRelativeTo(null);
+		viewOfferta.setVisible(true);
+	}
+
+	private void apriValutazioneOfferta(Long idOfferta, String emailAgente) {
+		ViewOffertaProposta viewOfferta = new ViewOffertaProposta(idOfferta, emailAgente);
+		viewOfferta.setLocationRelativeTo(null);
+		viewOfferta.setVisible(true);
 	}
 }

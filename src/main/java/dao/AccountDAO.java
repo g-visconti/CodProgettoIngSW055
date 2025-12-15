@@ -286,4 +286,57 @@ public class AccountDAO {
 		return agenteAssociato;
 	}
 
+	public Account getAccountByEmail(String email) throws SQLException {
+		String query = "SELECT * FROM \"Account\" WHERE \"email\" = ?";
+
+		try (PreparedStatement stmt = connection.prepareStatement(query)) {
+			stmt.setString(1, email);
+			ResultSet rs = stmt.executeQuery();
+
+			if (rs.next()) {
+				Account account = new Account();
+				account.setIdAccount(rs.getString("idAccount"));
+				account.setEmail(rs.getString("email"));
+				account.setNome(rs.getString("nome"));
+				account.setCognome(rs.getString("cognome"));
+				account.setTelefono(rs.getString("numeroTelefono"));
+				account.setCitta(rs.getString("citta"));
+				account.setCap(rs.getString("cap"));
+				account.setIndirizzo(rs.getString("indirizzo"));
+				account.setRuolo(rs.getString("ruolo"));
+				return account;
+			}
+		}
+		return null;
+	}
+
+	// Se non hai già un AccountDAO con un metodo getAccountById, aggiungilo:
+
+	public Account getAccountById(String idAccount) throws SQLException {
+		String query = "SELECT * FROM \"Account\" WHERE \"idAccount\" = ?";
+
+		try (PreparedStatement stmt = connection.prepareStatement(query)) {
+			stmt.setString(1, idAccount);
+			ResultSet rs = stmt.executeQuery();
+
+			if (rs.next()) {
+				// Usa il costruttore con tutti i parametri o i setter
+				Account account = new Account();
+				account.setIdAccount(rs.getString("idAccount"));
+				account.setEmail(rs.getString("email"));
+				account.setNome(rs.getString("nome"));
+				account.setCognome(rs.getString("cognome"));
+				account.setTelefono(rs.getString("numeroTelefono"));
+				account.setCitta(rs.getString("citta"));
+				account.setCap(rs.getString("cap"));
+				account.setIndirizzo(rs.getString("indirizzo"));
+				account.setRuolo(rs.getString("ruolo"));
+				account.setPassword(rs.getString("password")); // se necessario
+
+				return account;
+			}
+		}
+		return null;
+	}
+
 }

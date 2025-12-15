@@ -12,35 +12,44 @@ public class Account {
 	private String indirizzo;
 	private String ruolo;
 
-	// Costruttore con tutti i parametri
-	public Account(String id, String email, String password, String nome, String cognome, String citta, String telefono,
-			String cap, String indirizzo, String ruolo) {
-		this.idAccount = id;
+	// Costruttore vuoto (per DAO, JPA, serializzazione)
+	public Account() {
+	}
+
+	// Costruttore per login (email, password, ruolo)
+	public Account(String email, String password, String ruolo) {
+		this.email = email;
+		this.password = password;
+		this.ruolo = ruolo;
+	}
+
+	// Costruttore per registrazione/update con tutti i campi
+	public Account(String id, String email, String password, String nome, String cognome,
+			String citta, String telefono, String cap, String indirizzo, String ruolo) {
+		setIdAccount(id);
 		this.email = email;
 		this.password = password;
 		this.nome = nome;
 		this.cognome = cognome;
-		this.setCitta(citta);
-		this.setTelefono(telefono);
-		this.setCap(cap);
-		this.setIndirizzo(indirizzo);
-		this.setRuolo(ruolo);
-
+		this.citta = citta;
+		this.telefono = telefono;
+		this.cap = cap;
+		this.indirizzo = indirizzo;
+		this.ruolo = ruolo;
 	}
 
-	// Costruttore con 2 parametri
-	public Account(String email, String password,String ruolo) {
+	// Costruttore per profilo (senza password)
+	public Account(String id, String email, String nome, String cognome,
+			String citta, String telefono, String cap, String indirizzo, String ruolo) {
+		setIdAccount(id);
 		this.email = email;
-		this.password = password;
-		this.ruolo= ruolo;
-	}
-
-	public String getIdAccount() {
-		return idAccount;
-	}
-
-	public void setIdAccount(String idAccount) {
-		this.idAccount = idAccount;
+		this.nome = nome;
+		this.cognome = cognome;
+		this.citta = citta;
+		this.telefono = telefono;
+		this.cap = cap;
+		this.indirizzo = indirizzo;
+		this.ruolo = ruolo;
 	}
 
 	// Getter e setter
@@ -114,6 +123,14 @@ public class Account {
 
 	public void setRuolo(String ruolo) {
 		this.ruolo = ruolo;
+	}
+
+	public String getIdAccount() {
+		return idAccount;
+	}
+
+	public void setIdAccount(String idAccount) {
+		this.idAccount = idAccount;
 	}
 
 }

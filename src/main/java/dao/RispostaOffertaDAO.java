@@ -127,36 +127,34 @@ public class RispostaOffertaDAO {
 		return null;
 	}
 
-	/*public String[] getContropropostaDAO(Long idOfferta, String idCliente) throws SQLException {
-		String query = 	" select a.nome, a.cognome, r.\"dataRisposta\", r.\"importoControproposta\" " +
-				" from \"OffertaIniziale\" o join \"RispostaOfferta\" r " +
-				" on o.\"idOfferta\" = r.\"offertaInizialeAssociata\" " +
-				" join \"Account\" a " +
-				" on a.\"idAccount\" = r.\"agenteAssociato\" " +
-				" where o.\"clienteAssociato\" = ? and " +
-				" r.attiva is true ";
+	// Sostituisci il metodo commentato con questo (più completo):
+
+	public String[] getContropropostaByOffertaCliente(Long idOfferta, String idCliente) throws SQLException {
+		String query = "SELECT a.nome, a.cognome, r.\"dataRisposta\", r.\"importoControproposta\", r.\"tipoRisposta\" " +
+				"FROM \"OffertaIniziale\" o " +
+				"JOIN \"RispostaOfferta\" r ON o.\"idOfferta\" = r.\"offertaInizialeAssociata\" " +
+				"JOIN \"Account\" a ON a.\"idAccount\" = r.\"agenteAssociato\" " +
+				"WHERE o.\"idOfferta\" = ? AND o.\"clienteAssociato\" = ? AND r.\"attiva\" = true";
 
 		try (PreparedStatement stmt = connection.prepareStatement(query)) {
-			stmt.setString(1, emailUtente);
+			stmt.setLong(1, idOfferta);
+			stmt.setString(2, idCliente);
 			ResultSet rs = stmt.executeQuery();
 
 			if (rs.next()) {
-				ResultSetMetaData metaData = rs.getMetaData();
-				int columnCount = metaData.getColumnCount();
-				String[] result = new String[columnCount];
+				String[] result = new String[5];
+				result[0] = rs.getString("nome");
+				result[1] = rs.getString("cognome");
+				result[2] = rs.getTimestamp("dataRisposta").toString();
 
-				for (int i = 0; i < columnCount; i++) {
-					result[i] = rs.getString(i + 1);
-				}
+				double importo = rs.getDouble("importoControproposta");
+				result[3] = rs.wasNull() ? "N/A" : String.valueOf(importo);
 
+				result[4] = rs.getString("tipoRisposta");
 				return result;
 			} else {
-				return null; // Nessuna riga trovata
+				return null;
 			}
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-			return null;
 		}
-	}*/
+	}
 }

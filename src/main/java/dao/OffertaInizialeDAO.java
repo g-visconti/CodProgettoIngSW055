@@ -89,4 +89,43 @@ public class OffertaInizialeDAO {
 			return rowsUpdated > 0;
 		}
 	}
+
+	// Aggiungi questo metodo alla fine della classe OffertaInizialeDAO, prima della chiusura della classe
+
+	public OffertaIniziale getOffertaById(long idOfferta) throws SQLException {
+		String query = "SELECT * FROM \"OffertaIniziale\" WHERE \"idOfferta\" = ?";
+
+		try (PreparedStatement stmt = connection.prepareStatement(query)) {
+			stmt.setLong(1, idOfferta);
+			ResultSet rs = stmt.executeQuery();
+
+			if (rs.next()) {
+				OffertaIniziale offerta = new OffertaIniziale(
+						rs.getDouble("importoProposto"),
+						rs.getString("clienteAssociato"),
+						rs.getLong("immobileAssociato")
+						);
+				offerta.setIdOfferta(rs.getLong("idOfferta"));
+				offerta.setDataOfferta(rs.getTimestamp("dataOfferta").toLocalDateTime());
+				offerta.setStato(rs.getString("stato"));
+				return offerta;
+			}
+		}
+		return null;
+	}
+
+	public String getClienteByOffertaId(long idOfferta) throws SQLException {
+		String query = "SELECT \"clienteAssociato\" FROM \"OffertaIniziale\" WHERE \"idOfferta\" = ?";
+
+		try (PreparedStatement stmt = connection.prepareStatement(query)) {
+			stmt.setLong(1, idOfferta);
+			ResultSet rs = stmt.executeQuery();
+
+			if (rs.next()) {
+				return rs.getString("clienteAssociato");
+			}
+		}
+		return null;
+	}
+
 }

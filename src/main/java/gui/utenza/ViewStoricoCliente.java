@@ -18,7 +18,6 @@ import javax.swing.SpringLayout;
 import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
-//import javax.swing.table.DefaultTableModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
@@ -71,7 +70,7 @@ public class ViewStoricoCliente extends JFrame {
 		lblTitolo.setFont(new Font("Tahoma", Font.BOLD, 30));
 		panelComandi.add(lblTitolo);
 
-		JLabel lblDescrizione = new JLabel("Di seguito è riportato l'elenco delle tue offerte proposte");
+		JLabel lblDescrizione = new JLabel("Di seguito è riportato l'elenco delle sue offerte proposte");
 		sl_panelComandi.putConstraint(SpringLayout.SOUTH, lblTitolo, -13, SpringLayout.NORTH, lblDescrizione);
 		sl_panelComandi.putConstraint(SpringLayout.NORTH, lblDescrizione, 97, SpringLayout.NORTH, panelComandi);
 		sl_panelComandi.putConstraint(SpringLayout.SOUTH, lblDescrizione, -8, SpringLayout.SOUTH, panelComandi);

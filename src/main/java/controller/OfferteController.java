@@ -14,12 +14,14 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
 
+import dao.AccountDAO;
 import dao.ImmobileDAO;
 import dao.OffertaInizialeDAO;
 import dao.RispostaOffertaDAO;
 import database.ConnessioneDatabase;
 import model.dto.StoricoAgenteDTO;
 import model.dto.StoricoClienteDTO;
+import model.entity.Account;
 import model.entity.OffertaIniziale;
 import model.entity.RispostaOfferta;
 import util.Base64ImageRenderer;
@@ -117,31 +119,133 @@ public class OfferteController {
 		}
 	}
 
-	public boolean inserisciRispostaOfferta(long idOfferta, String idAgente, String nome, String cognome, String tipoRisposta, Double importoControproposta) {
+	public boolean inserisciRispostaOfferta(long idOfferta, String idAgente, String tipoRisposta, Double importoControproposta) {
 		try {
+			System.out.println("=== DEBUG inserisciRispostaOfferta ===");
+			System.out.println("idOfferta: " + idOfferta);
+			System.out.println("idAgente ricevuto: " + idAgente);
+			System.out.println("tipoRisposta: " + tipoRisposta);
+			System.out.println("importoControproposta: " + importoControproposta);
+
 			Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
 			RispostaOffertaDAO rispostaDAO = new RispostaOffertaDAO(connAWS);
+			AccountDAO accountDAO = new AccountDAO(connAWS);
+			OffertaInizialeDAO offertaDAO = new OffertaInizialeDAO(connAWS);
 
-			// Disattiva risposte precedenti
+			// Recupera l'offerta per controllarne lo stato
+			OffertaIniziale offerta = offertaDAO.getOffertaById(idOfferta);
+			if (offerta == null) {
+				JOptionPane.showMessageDialog(null, "Offerta non trovata!", "Errore", JOptionPane.ERROR_MESSAGE);
+				return false;
+			}
+
+			String statoOfferta = offerta.getStato();
+			boolean isOffertaInAttesa = "In attesa".equals(statoOfferta);
+			System.out.println("DEBUG - Stato offerta: '" + statoOfferta + "'");
+			System.out.println("DEBUG - Offerta in attesa: " + isOffertaInAttesa);
+
+			// Normalizza il tipoRisposta in base al database
+			String tipoRispostaNormalizzato = null;
+			if (tipoRisposta != null) {
+				tipoRispostaNormalizzato = tipoRisposta.trim();
+				// Assicurati che corrisponda ai valori del constraint
+				if (tipoRispostaNormalizzato.equalsIgnoreCase("ACCETTATA")) {
+					tipoRispostaNormalizzato = "Accettata";
+				} else if (tipoRispostaNormalizzato.equalsIgnoreCase("RIFIUTATA")) {
+					tipoRispostaNormalizzato = "Rifiutata";
+				} else if (tipoRispostaNormalizzato.equalsIgnoreCase("CONTROPROPOSTA")) {
+					tipoRispostaNormalizzato = "Controproposta";
+				}
+			}
+
+			System.out.println("DEBUG - Tipo risposta normalizzato: " + tipoRispostaNormalizzato);
+
+			// Se l'offerta non è in attesa e non è una controproposta, non permettere
+			if (!isOffertaInAttesa && !"Controproposta".equals(tipoRispostaNormalizzato)) {
+				JOptionPane.showMessageDialog(null,
+						"Questa offerta è già stata valutata.\n" +
+								"Puoi solo fare una nuova controproposta.",
+								"Operazione non permessa",
+								JOptionPane.WARNING_MESSAGE);
+				return false;
+			}
+
+			// Cerca l'agente prima per email (poiché viene passata l'email)
+			System.out.println("DEBUG - Cercando agente con email: " + idAgente);
+			Account agente = accountDAO.getAccountByEmail(idAgente);
+
+			if (agente == null) {
+				// Fallback: cerca per ID
+				System.out.println("DEBUG - Agente non trovato per email, provo con ID...");
+				agente = accountDAO.getAccountById(idAgente);
+			}
+
+			if (agente == null) {
+				System.out.println("DEBUG - Agente non trovato!");
+				JOptionPane.showMessageDialog(null,
+						"Agente non trovato! ID/Email: " + idAgente,
+						"Errore", JOptionPane.ERROR_MESSAGE);
+				return false;
+			}
+
+			System.out.println("DEBUG - Agente trovato:");
+			System.out.println("  ID: " + agente.getIdAccount());
+			System.out.println("  Nome: " + agente.getNome());
+			System.out.println("  Cognome: " + agente.getCognome());
+			System.out.println("  Email: " + agente.getEmail());
+
+			// Disattiva risposte precedenti (sempre, per avere solo una risposta attiva)
+			System.out.println("DEBUG - Disattivo risposte precedenti...");
 			rispostaDAO.disattivaRispostePrecedenti(idOfferta);
 
-			// Crea e inserisci nuova risposta (senza note)
-			RispostaOfferta risposta = new RispostaOfferta(idOfferta, idAgente, nome, cognome, tipoRisposta, importoControproposta);
+			// Crea e inserisci nuova risposta
+			RispostaOfferta risposta = new RispostaOfferta(
+					idOfferta,
+					agente.getIdAccount(),  // Usa l'ID dell'account
+					agente.getNome(),
+					agente.getCognome(),
+					tipoRispostaNormalizzato,  // Usa il tipo normalizzato
+					importoControproposta
+					);
+
 			boolean successo = rispostaDAO.inserisciRispostaOfferta(risposta);
+			System.out.println("DEBUG - Inserimento risposta: " + (successo ? "SUCCESSO" : "FALLITO"));
 
 			// Se l'inserimento è riuscito, aggiorna lo stato dell'offerta
 			if (successo) {
-				OffertaInizialeDAO offertaDAO = new OffertaInizialeDAO(connAWS);
-				offertaDAO.aggiornaStatoOfferta(idOfferta, tipoRisposta);
+				boolean aggiornato = offertaDAO.aggiornaStatoOfferta(idOfferta, tipoRispostaNormalizzato);
+				System.out.println("DEBUG - Aggiornamento stato offerta: " + (aggiornato ? "SUCCESSO" : "FALLITO"));
+
+				// Se l'offerta è stata accettata, potresti voler disabilitare altre azioni
+				if ("Accettata".equals(tipoRispostaNormalizzato)) {
+					System.out.println("DEBUG - Offerta accettata, operazione completata.");
+				}
 			}
 
+			System.out.println("=== FINE DEBUG inserisciRispostaOfferta ===");
 			return successo;
+
 		} catch (SQLException e) {
 			e.printStackTrace();
+			System.out.println("DEBUG - Eccezione SQL: " + e.getMessage());
+
+			// Mostra un messaggio di errore più specifico
+			if (e.getMessage().contains("RispostaOfferta_tipoRisposta_check")) {
+				JOptionPane.showMessageDialog(null,
+						"Errore: Tipo risposta non valido.\n" +
+								"I valori accettati sono: 'Accettata', 'Rifiutata', 'Controproposta'",
+								"Errore di validazione",
+								JOptionPane.ERROR_MESSAGE);
+			} else {
+				JOptionPane.showMessageDialog(null,
+						"Errore durante l'inserimento della risposta: " + e.getMessage(),
+						"Errore database",
+						JOptionPane.ERROR_MESSAGE);
+			}
+
 			return false;
 		}
 	}
-
 	public List<OffertaIniziale> getOfferteByCliente(String idCliente) {
 		try {
 			Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
@@ -347,6 +451,51 @@ public class OfferteController {
 	// Nuovo metodo specifico per agente
 	public void riempiTableOfferteRicevuteAgente(JTable tableOfferteRicevute, String emailAgente) {
 		riempiTableOfferte(tableOfferteRicevute, emailAgente, true);
+	}
+
+	// Aggiungi questi metodi alla classe OfferteController
+
+	public OffertaIniziale getOffertaById(long idOfferta) {
+		try {
+			Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
+			OffertaInizialeDAO offertaDAO = new OffertaInizialeDAO(connAWS);
+			return offertaDAO.getOffertaById(idOfferta);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	public String getClienteByOffertaId(long idOfferta) {
+		try {
+			Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
+			OffertaInizialeDAO offertaDAO = new OffertaInizialeDAO(connAWS);
+			OffertaIniziale offerta = offertaDAO.getOffertaById(idOfferta);
+
+			if (offerta != null) {
+				AccountDAO accountDAO = new AccountDAO(connAWS);
+				Account cliente = accountDAO.getAccountById(offerta.getClienteAssociato());
+
+				if (cliente != null) {
+					return cliente.getNome() + " " + cliente.getCognome();
+				}
+			}
+			return "Cliente";
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return "Cliente";
+		}
+	}
+
+	public String[] getContropropostaByOffertaCliente(Long idOfferta, String idCliente) {
+		try {
+			Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
+			RispostaOffertaDAO rispostaDAO = new RispostaOffertaDAO(connAWS);
+			return rispostaDAO.getContropropostaByOffertaCliente(idOfferta, idCliente);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 }
