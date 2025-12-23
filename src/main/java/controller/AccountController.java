@@ -10,6 +10,7 @@ import dao.AmministratoreDAO;
 import dao.OffertaInizialeDAO;
 import dao.RispostaOffertaDAO;
 import database.ConnessioneDatabase;
+import model.dto.AccountInfoDTO;
 import model.entity.Account;
 import model.entity.RispostaOfferta;
 
@@ -33,8 +34,13 @@ public class AccountController {
 		return accountDAO.getIdAccountByEmail(email);
 	}
 
-	//Recupero info profilo (nome, cognome, ecc.)
-	public String[] getInfoProfilo(String emailUtente) throws SQLException {
+	/**
+	 * Tale metodo serve al recupero delle informazioni del profilo utente attualmente in sessione
+	 * @param emailUtente
+	 * @return
+	 * @throws SQLException
+	 */
+	public AccountInfoDTO getInfoProfilo(String emailUtente) throws SQLException {
 		try (Connection connAWS = ConnessioneDatabase.getInstance().getConnection()) {
 			AccountDAO accountDAO = new AccountDAO(connAWS);
 			return accountDAO.getInfoProfiloDAO(emailUtente);

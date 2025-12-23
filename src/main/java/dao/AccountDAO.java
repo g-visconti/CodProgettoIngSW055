@@ -3,11 +3,11 @@ package dao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
 import org.mindrot.jbcrypt.BCrypt;
 
+import model.dto.AccountInfoDTO;
 import model.entity.Account;
 import model.entity.AgenteImmobiliare;
 import model.entity.AmministratoreDiSupporto;
@@ -219,30 +219,39 @@ public class AccountDAO {
 		return result;
 	}
 
-	public String[] getInfoProfiloDAO(String emailUtente) throws SQLException {
-		String query = "SELECT * FROM \"Account\" WHERE email = ?";
+	/**
+	 * Metodo per il recupero delle info del profilo
+	 * @param emailUtente
+	 * @return
+	 * @throws SQLException
+	 */
+	public AccountInfoDTO getInfoProfiloDAO(String emailUtente) throws SQLException {
+		String query = "SELECT \"idAccount\", email, nome, cognome, \"numeroTelefono\", " +
+				"citta, indirizzo, cap, ruolo " +
+				"FROM \"Account\" WHERE email = ?";
 
 		try (PreparedStatement stmt = connection.prepareStatement(query)) {
 			stmt.setString(1, emailUtente);
 			ResultSet rs = stmt.executeQuery();
 
 			if (rs.next()) {
-				ResultSetMetaData metaData = rs.getMetaData();
-				int columnCount = metaData.getColumnCount();
-				String[] result = new String[columnCount];
-
-				for (int i = 0; i < columnCount; i++) {
-					result[i] = rs.getString(i + 1);
-				}
-
-				return result;
+				return new AccountInfoDTO(
+						rs.getString("idAccount"),
+						rs.getString("email"),
+						rs.getString("nome"),
+						rs.getString("cognome"),
+						rs.getString("numeroTelefono"),
+						rs.getString("citta"),
+						rs.getString("indirizzo"),
+						rs.getString("cap"),
+						rs.getString("ruolo")
+						);
 			} else {
-				return null; // Nessuna riga trovata
+				return null;
 			}
-
 		} catch (SQLException e) {
 			e.printStackTrace();
-			return null;
+			throw e;
 		}
 	}
 

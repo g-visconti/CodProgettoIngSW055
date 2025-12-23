@@ -17,13 +17,13 @@ import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 
 import controller.AccountController;
+import model.dto.AccountInfoDTO;
 import util.GuiUtils;
 
 public class ViewInfoAccount extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
-	private String[] infoProfilo;
 
 	/**
 	 * Create the frame.
@@ -121,6 +121,7 @@ public class ViewInfoAccount extends JFrame {
 
 		// codice per il riempimento dell'interfaccia
 		AccountController controller = new AccountController();
+		AccountInfoDTO infoProfilo = null;
 		try {
 			infoProfilo = controller.getInfoProfilo(emailUtente);
 		} catch (SQLException e) {
@@ -128,11 +129,13 @@ public class ViewInfoAccount extends JFrame {
 			e.printStackTrace();
 		}
 		if (infoProfilo != null) {
-			lblNomeUtenteRes.setText(infoProfilo[2]);
-			lblRuoloRes.setText(infoProfilo[7]);
-			lblTelefonoRes.setText(infoProfilo[4]);
-			lblCittaRes.setText(infoProfilo[5]);
-			lblIndirizzoRes.setText(infoProfilo[6]);
+			// Usa nome completo invece di solo nome
+			lblNomeUtenteRes.setText(infoProfilo.getNomeCompleto());
+			lblRuoloRes.setText(infoProfilo.getRuolo());
+			lblTelefonoRes.setText(infoProfilo.getTelefono());
+			lblCittaRes.setText(infoProfilo.getCitta());
+			lblIndirizzoRes.setText(infoProfilo.getIndirizzo());
+			// Se hai bisogno di altre informazioni puoi aggiungere altre label
 		}
 
 		JLabel lblAltreInfo = new JLabel("Altre informazioni:");
