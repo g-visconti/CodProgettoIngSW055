@@ -9,11 +9,15 @@ import javax.swing.JTable;
 import javax.swing.table.TableColumn;
 
 public class TableUtils {
+	private TableUtils() {
+		throw new IllegalStateException("Utility class");
+	}
+
 	/**
 	 * Nasconde una colonna
 	 */
 	public static void nascondiColonna(JTable tabella, int indice) {
-		TableColumn colonna = tabella.getColumnModel().getColumn(indice);
+		final TableColumn colonna = tabella.getColumnModel().getColumn(indice);
 		colonna.setMinWidth(0);
 		colonna.setMaxWidth(0);
 		colonna.setWidth(0);
@@ -24,7 +28,7 @@ public class TableUtils {
 	 * Fissa una colonna
 	 */
 	public static void fissaColonna(JTable tabella, int indice, int larghezza) {
-		TableColumn colonna = tabella.getColumnModel().getColumn(indice);
+		final TableColumn colonna = tabella.getColumnModel().getColumn(indice);
 		colonna.setPreferredWidth(larghezza);
 		colonna.setMinWidth(larghezza);
 		colonna.setMaxWidth(larghezza);
@@ -35,7 +39,7 @@ public class TableUtils {
 	 * Imposta la larghezza di una colonna
 	 */
 	public static void larghezzaColonna(JTable tabella, int indice, int larghezza) {
-		TableColumn colonna = tabella.getColumnModel().getColumn(indice);
+		final TableColumn colonna = tabella.getColumnModel().getColumn(indice);
 		colonna.setPreferredWidth(larghezza);
 	}
 
@@ -43,7 +47,7 @@ public class TableUtils {
 	 * Imposta il formato italiano al prezzo
 	 */
 	public static String formattaPrezzo(Object importo) {
-		NumberFormat format = NumberFormat.getNumberInstance(Locale.ITALY);
+		final NumberFormat format = NumberFormat.getNumberInstance(Locale.ITALY);
 		format.setGroupingUsed(true);
 		format.setMaximumFractionDigits(0);
 		format.setMinimumFractionDigits(0);
@@ -60,9 +64,8 @@ public class TableUtils {
 	public static String formattaData(LocalDateTime data) {
 		if (data == null) {
 			return "";
-		}
-		else {
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+		} else {
+			final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 			return data.format(formatter);
 		}
 	}

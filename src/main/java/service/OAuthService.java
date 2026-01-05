@@ -33,7 +33,7 @@ public class OAuthService {
 		}
 
 		// 1. Autentica con Cognito
-		boolean cognitoSuccess = authenticateWithCognito(token, provider);
+		final boolean cognitoSuccess = authenticateWithCognito(token, provider);
 		if (!cognitoSuccess) {
 			return null;
 		}
@@ -43,44 +43,39 @@ public class OAuthService {
 	}
 
 	public String extractEmailFromToken(String token, String provider) {
-		Account account = getUserInfoFromProvider(token, provider);
+		final Account account = getUserInfoFromProvider(token, provider);
 		return account != null ? account.getEmail() : null;
 	}
 
 	private boolean authenticateWithCognito(String token, String provider) {
-		switch (provider.toLowerCase()) {
-		case "facebook":
-			return cognitoAuthService.authenticateWithFacebook(token);
-		case "google":
-			return cognitoAuthService.authenticateWithGoogle(token);
-		default:
-			throw new IllegalArgumentException("Provider non supportato: " + provider);
-		}
+		return switch (provider.toLowerCase()) {
+		case "facebook" -> cognitoAuthService.authenticateWithFacebook(token);
+		case "google" -> cognitoAuthService.authenticateWithGoogle(token);
+		default -> throw new IllegalArgumentException("Provider non supportato: " + provider);
+		};
 	}
 
 	private Account getUserInfoFromProvider(String token, String provider) {
-		switch (provider.toLowerCase()) {
-		case "facebook":
-			return getFacebookAccount(token);
-		case "google":
-			return getGoogleAccount(token);
-		default:
-			throw new IllegalArgumentException("Provider non supportato: " + provider);
-		}
+		return switch (provider.toLowerCase()) {
+		case "facebook" -> getFacebookAccount(token);
+		case "google" -> getGoogleAccount(token);
+		default -> throw new IllegalArgumentException("Provider non supportato: " + provider);
+		};
 	}
 
 	private Account getFacebookAccount(String facebookAccessToken) {
-		String url = "https://graph.facebook.com/me?fields=email,first_name,last_name&access_token=" + facebookAccessToken;
-		Request request = new Request.Builder().url(url).get().build();
+		final String url = "https://graph.facebook.com/me?fields=email,first_name,last_name&access_token="
+				+ facebookAccessToken;
+		final Request request = new Request.Builder().url(url).get().build();
 
 		try (Response response = httpClient.newCall(request).execute()) {
 			if (response.isSuccessful() && response.body() != null) {
-				String responseBody = response.body().string();
-				JsonObject jsonObject = JsonParser.parseString(responseBody).getAsJsonObject();
+				final String responseBody = response.body().string();
+				final JsonObject jsonObject = JsonParser.parseString(responseBody).getAsJsonObject();
 
-				String email = jsonObject.has("email") ? jsonObject.get("email").getAsString() : null;
-				String ruolo = "Cliente";
-				Account account = new Account(email, facebookAccessToken, ruolo);
+				final String email = jsonObject.has("email") ? jsonObject.get("email").getAsString() : null;
+				final String ruolo = "Cliente";
+				final Account account = new Account(email, facebookAccessToken, ruolo);
 
 				// Imposta nome e cognome se presenti
 				if (jsonObject.has("first_name")) {
@@ -99,19 +94,17 @@ public class OAuthService {
 	}
 
 	private Account getGoogleAccount(String googleAccessToken) {
-		Request request = new Request.Builder()
-				.url("https://www.googleapis.com/oauth2/v3/userinfo")
-				.addHeader("Authorization", "Bearer " + googleAccessToken)
-				.get().build();
+		final Request request = new Request.Builder().url("https://www.googleapis.com/oauth2/v3/userinfo")
+				.addHeader("Authorization", "Bearer " + googleAccessToken).get().build();
 
 		try (Response response = httpClient.newCall(request).execute()) {
 			if (response.isSuccessful() && response.body() != null) {
-				String responseBody = response.body().string();
-				JsonObject jsonObject = JsonParser.parseString(responseBody).getAsJsonObject();
+				final String responseBody = response.body().string();
+				final JsonObject jsonObject = JsonParser.parseString(responseBody).getAsJsonObject();
 
-				String email = jsonObject.has("email") ? jsonObject.get("email").getAsString() : null;
-				String ruolo = "Cliente";
-				Account account = new Account(email, googleAccessToken, ruolo);
+				final String email = jsonObject.has("email") ? jsonObject.get("email").getAsString() : null;
+				final String ruolo = "Cliente";
+				final Account account = new Account(email, googleAccessToken, ruolo);
 
 				if (jsonObject.has("given_name")) {
 					account.setNome(jsonObject.get("given_name").getAsString());

@@ -23,24 +23,22 @@ public class OAuthController {
 
 		try {
 			// 1. Processa l'autenticazione OAuth
-			Account account = oauthService.processOAuthLogin(token, provider);
+			final Account account = oauthService.processOAuthLogin(token, provider);
 
 			if (account == null) {
-				showMessage("Autenticazione con " + provider + " fallita",
-						"Errore", JOptionPane.ERROR_MESSAGE);
+				showMessage("Autenticazione con " + provider + " fallita", "Errore", JOptionPane.ERROR_MESSAGE);
 				return null;
 			}
 
-			String email = account.getEmail();
+			final String email = account.getEmail();
 			if (email == null || email.isEmpty()) {
-				showMessage("Impossibile ottenere l'email da " + provider,
-						"Errore", JOptionPane.ERROR_MESSAGE);
+				showMessage("Impossibile ottenere l'email da " + provider, "Errore", JOptionPane.ERROR_MESSAGE);
 				return null;
 			}
 
 			// 2. Registra o aggiorna l'utente nel database
 			// Il ruolo è sempre "Cliente" per OAuth
-			String ruolo = "Cliente";
+			final String ruolo = "Cliente";
 
 			try {
 				accessController.registraNuovoUtente(email, token, ruolo);
@@ -57,15 +55,14 @@ public class OAuthController {
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			showMessage("Errore durante l'autenticazione: " + e.getMessage(),
-					"Errore", JOptionPane.ERROR_MESSAGE);
+			showMessage("Errore durante l'autenticazione: " + e.getMessage(), "Errore", JOptionPane.ERROR_MESSAGE);
 			return null;
 		}
 	}
 
 	public boolean validateToken(String token, String provider) {
 		try {
-			String email = oauthService.extractEmailFromToken(token, provider);
+			final String email = oauthService.extractEmailFromToken(token, provider);
 			return email != null && !email.isEmpty();
 		} catch (Exception e) {
 			return false;

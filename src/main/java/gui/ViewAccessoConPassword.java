@@ -33,11 +33,11 @@ import util.GuiUtils;
 public class ViewAccessoConPassword extends JFrame {
 
 	private static final long serialVersionUID = 1L;
-	private JPanel contentPane;
-	private JTextField txtAccediORegistrati;
+	private final JPanel contentPane;
+	private final JTextField txtAccediORegistrati;
 	private String campoPieno = "******";
-	private String campoVuoto = "";
-	private JPasswordField passwordField;
+	private final String campoVuoto = "";
+	private final JPasswordField passwordField;
 
 	/**
 	 * Create the frame.
@@ -56,28 +56,28 @@ public class ViewAccessoConPassword extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 
-		JPanel panelLogo = new JPanel();
+		final JPanel panelLogo = new JPanel();
 		panelLogo.setBackground(new Color(255, 255, 255));
 		panelLogo.setBounds(0, 0, 450, 593);
 		contentPane.add(panelLogo);
 		panelLogo.setLayout(null);
 
-		JLabel testlogo = new JLabel("New label");
+		final JLabel testlogo = new JLabel("New label");
 		testlogo.setBounds(95, 176, 259, 249);
 		panelLogo.add(testlogo);
 		testlogo.setOpaque(true);
 
-		URL pathlogo = getClass().getClassLoader().getResource("images/DietiEstatesLogo.png");
+		final URL pathlogo = getClass().getClassLoader().getResource("images/DietiEstatesLogo.png");
 		testlogo.setIcon(new ImageIcon(pathlogo));
 
-		JLabel lblNewLabel = new JLabel("DietiEstates25");
+		final JLabel lblNewLabel = new JLabel("DietiEstates25");
 		lblNewLabel.setBounds(2, 39, 445, 32);
 		panelLogo.add(lblNewLabel);
 		lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		lblNewLabel.setForeground(new Color(27, 99, 142));
 		lblNewLabel.setFont(new Font("Tahoma", Font.BOLD, 30));
 
-		JPanel panelAccesso = new JPanel();
+		final JPanel panelAccesso = new JPanel();
 
 		panelAccesso.setBackground(new Color(245, 245, 245));
 		panelAccesso.setBounds(449, 0, 367, 593);
@@ -140,19 +140,19 @@ public class ViewAccessoConPassword extends JFrame {
 			}
 		});
 
-		JLabel lblInserireLaPassword = new JLabel("Inserire la password di accesso");
+		final JLabel lblInserireLaPassword = new JLabel("Inserire la password di accesso");
 		lblInserireLaPassword.setHorizontalAlignment(SwingConstants.CENTER);
 		lblInserireLaPassword.setFont(new Font("Tahoma", Font.BOLD, 11));
 		lblInserireLaPassword.setBounds(44, 224, 278, 20);
 		panelAccesso.add(lblInserireLaPassword);
 
-		JLabel lblEmail = new JLabel("Email inserita:");
+		final JLabel lblEmail = new JLabel("Email inserita:");
 		lblEmail.setHorizontalAlignment(SwingConstants.CENTER);
 		lblEmail.setFont(new Font("Tahoma", Font.BOLD, 11));
 		lblEmail.setBounds(44, 88, 99, 20);
 		panelAccesso.add(lblEmail);
 
-		JLabel lblEmailAttuale = new JLabel("<email>");
+		final JLabel lblEmailAttuale = new JLabel("<email>");
 		if (!(emailInserita.equals("Email"))) {
 			lblEmailAttuale.setText(emailInserita);
 		}
@@ -161,18 +161,18 @@ public class ViewAccessoConPassword extends JFrame {
 		lblEmailAttuale.setBounds(144, 88, 178, 20);
 		panelAccesso.add(lblEmailAttuale);
 
-		JButton btnTornaIndietro = new JButton("Torna indietro");
+		final JButton btnTornaIndietro = new JButton("Torna indietro");
 		btnTornaIndietro.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				ViewAccesso frame = new ViewAccesso();
+				final ViewAccesso frame = new ViewAccesso();
 				frame.setLocationRelativeTo(null);
 				frame.setVisible(true);
 				dispose();
 			}
 		});
 
-		JButton btnAccedi = new JButton("Accedi");
+		final JButton btnAccedi = new JButton("Accedi");
 		// Bottone predefinito alla pressione del tasto Enter
 		getRootPane().setDefaultButton(btnAccedi);
 
@@ -180,9 +180,9 @@ public class ViewAccessoConPassword extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// Condizione da inserire
-				AccessController con = new AccessController();
+				final AccessController con = new AccessController();
 				@SuppressWarnings("deprecation")
-				String passwordInserita = passwordField.getText();
+				final String passwordInserita = passwordField.getText();
 				try {
 					if (con.checkCredenziali(emailInserita, passwordInserita)) {
 						/*
@@ -191,25 +191,24 @@ public class ViewAccessoConPassword extends JFrame {
 						 */
 						// Guardo com'è strutturato l'id associato alla email, uso un metodo nel
 						// controller
-						AccountController con1 = new AccountController();
-						String ruolo = con1.getRuoloByEmail(emailInserita);
+						final AccountController con1 = new AccountController();
+						final String ruolo = con1.getRuoloByEmail(emailInserita);
 
 						switch (ruolo) {
-						case "Cliente":
-							ViewDashboard viewDashboard = new ViewDashboard(emailInserita);
+						case "Cliente" -> {
+							final ViewDashboard viewDashboard = new ViewDashboard(emailInserita);
 							viewDashboard.setLocationRelativeTo(null);
 							viewDashboard.setVisible(true);
 							dispose();
-							break;
-						case "Agente":
-						case "Supporto":
-						case "Admin":
-							ViewDashboardDietiEstates viewDashboardDietiEstates = new ViewDashboardDietiEstates(emailInserita);
+						}
+						case "Agente", "Supporto", "Admin" -> {
+							final ViewDashboardDietiEstates viewDashboardDietiEstates = new ViewDashboardDietiEstates(
+									emailInserita);
 							viewDashboardDietiEstates.setLocationRelativeTo(null);
 							viewDashboardDietiEstates.setVisible(true);
 							dispose();
-							break;
-						default: JOptionPane.showMessageDialog(null, "Ruolo non riconosciuto", "Errore",
+						}
+						default -> JOptionPane.showMessageDialog(null, "Ruolo non riconosciuto", "Errore",
 								JOptionPane.INFORMATION_MESSAGE);
 						}
 

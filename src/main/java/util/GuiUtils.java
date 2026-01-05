@@ -11,22 +11,26 @@ import javax.swing.JLabel;
 
 public class GuiUtils {
 
+	private GuiUtils() {
+		throw new IllegalStateException("Utility class");
+	}
+
 	public static void setIconaFinestra(Window finestra) {
 		// Carica l'immagine come icona
-		URL pathIcona = GuiUtils.class.getClassLoader().getResource("images/DietiEstatesIcona.png");
+		final URL pathIcona = GuiUtils.class.getClassLoader().getResource("images/DietiEstatesIcona.png");
 		if (pathIcona != null) {
-			ImageIcon icon = new ImageIcon(pathIcona);
-			Image img = icon.getImage();
+			final ImageIcon icon = new ImageIcon(pathIcona);
+			final Image img = icon.getImage();
 			// Imposta l'icona alla finestra
 			finestra.setIconImage(img);
 		}
 	}
 
 	public static void setIconaLabel(JLabel etichetta, String nomeIcona) {
-		URL pathIcona = GuiUtils.class.getClassLoader().getResource("images/" + nomeIcona + ".png");
+		final URL pathIcona = GuiUtils.class.getClassLoader().getResource("images/" + nomeIcona + ".png");
 
 		if (pathIcona != null) {
-			ImageIcon icon = new ImageIcon(pathIcona);
+			final ImageIcon icon = new ImageIcon(pathIcona);
 
 			// Se la label non ha ancora dimensioni, carico l'icona "così com'è"
 			if (etichetta.getWidth() <= 0 || etichetta.getHeight() <= 0) {
@@ -37,8 +41,8 @@ public class GuiUtils {
 					@Override
 					public void componentResized(java.awt.event.ComponentEvent e) {
 						if (etichetta.getWidth() > 0 && etichetta.getHeight() > 0) {
-							Image img = icon.getImage().getScaledInstance(etichetta.getWidth(), etichetta.getHeight(),
-									Image.SCALE_SMOOTH);
+							final Image img = icon.getImage().getScaledInstance(etichetta.getWidth(),
+									etichetta.getHeight(), Image.SCALE_SMOOTH);
 							etichetta.setIcon(new ImageIcon(img));
 							etichetta.setText("");
 							etichetta.removeComponentListener(this); // lo facciamo una volta sola
@@ -47,7 +51,7 @@ public class GuiUtils {
 				});
 			} else {
 				// La label ha già dimensioni → possiamo scalare subito
-				Image img = icon.getImage().getScaledInstance(etichetta.getWidth(), etichetta.getHeight(),
+				final Image img = icon.getImage().getScaledInstance(etichetta.getWidth(), etichetta.getHeight(),
 						Image.SCALE_SMOOTH);
 				etichetta.setIcon(new ImageIcon(img));
 				etichetta.setText("");
@@ -60,18 +64,17 @@ public class GuiUtils {
 
 	public static void setIconaButton(JButton pulsante, String nomeIcona) {
 		// Carica l'immagine come icona
-		URL pathIcona = GuiUtils.class.getClassLoader().getResource("images/" + nomeIcona + ".png");
+		final URL pathIcona = GuiUtils.class.getClassLoader().getResource("images/" + nomeIcona + ".png");
 
 		if (pathIcona != null) {
-			ImageIcon iconaOriginale = new ImageIcon(pathIcona);
+			final ImageIcon iconaOriginale = new ImageIcon(pathIcona);
 			// Ridimensiona l'icona per adattarla al pulsante
-			Image img = iconaOriginale.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH);
+			final Image img = iconaOriginale.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH);
 			pulsante.setIcon(new ImageIcon(img));
 		} else {
 			System.err.println("Icona non trovata: " + nomeIcona);
 		}
 	}
-
 
 	/**
 	 * Carica un'immagine in un'etichetta
@@ -79,8 +82,8 @@ public class GuiUtils {
 	public static void caricaImmagineInEtichetta(JLabel etichetta, byte[] datiImmagine, int larghezza, int altezza) {
 		if (datiImmagine != null && datiImmagine.length > 0) {
 			try {
-				ImageIcon icona = new ImageIcon(datiImmagine);
-				Image img = icona.getImage().getScaledInstance(larghezza, altezza, Image.SCALE_SMOOTH);
+				final ImageIcon icona = new ImageIcon(datiImmagine);
+				final Image img = icona.getImage().getScaledInstance(larghezza, altezza, Image.SCALE_SMOOTH);
 				etichetta.setIcon(new ImageIcon(img));
 				etichetta.setText("");
 			} catch (Exception ex) {
@@ -101,8 +104,8 @@ public class GuiUtils {
 			List<byte[]> immagini, int indiceCorrente) {
 		if (immagini != null && !immagini.isEmpty() && indiceCorrente >= 0 && indiceCorrente < immagini.size()) {
 			// Usa dimensioni ragionevoli di default se la label non ha dimensioni definite
-			int larghezza = etichettaPrincipale.getWidth() > 0 ? etichettaPrincipale.getWidth() : 300;
-			int altezza = etichettaPrincipale.getHeight() > 0 ? etichettaPrincipale.getHeight() : 200;
+			final int larghezza = etichettaPrincipale.getWidth() > 0 ? etichettaPrincipale.getWidth() : 300;
+			final int altezza = etichettaPrincipale.getHeight() > 0 ? etichettaPrincipale.getHeight() : 200;
 
 			caricaImmagineInEtichetta(etichettaPrincipale, immagini.get(indiceCorrente), larghezza, altezza);
 

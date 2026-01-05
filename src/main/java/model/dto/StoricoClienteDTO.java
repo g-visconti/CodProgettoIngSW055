@@ -11,18 +11,18 @@ public class StoricoClienteDTO {
 
 	private Long idOfferta;
 	private String primaImmagineBase64; // Prima immagine dell'immobile
-	private String categoria;          // Tipologia immobile (APPARTAMENTO, VILLA, ecc.)
-	private String descrizione;        // Descrizione immobile
+	private String categoria; // Tipologia immobile (APPARTAMENTO, VILLA, ecc.)
+	private String descrizione; // Descrizione immobile
 	private LocalDateTime dataOfferta; // Data della proposta
 	private BigDecimal importoProposto; // Importo offerto
-	private String stato;              // Stato offerta (IN_ATTESA, ACCETTATA, RIFIUTATA)
+	private String stato; // Stato offerta (IN_ATTESA, ACCETTATA, RIFIUTATA)
 
 	// Costruttori
-	public StoricoClienteDTO() {}
+	public StoricoClienteDTO() {
+	}
 
-	public StoricoClienteDTO(Long idOfferta, String primaImmagineBase64, String categoria,
-			String descrizione, LocalDateTime dataOfferta,
-			BigDecimal importoProposto, String stato) {
+	public StoricoClienteDTO(Long idOfferta, String primaImmagineBase64, String categoria, String descrizione,
+			LocalDateTime dataOfferta, BigDecimal importoProposto, String stato) {
 		this.idOfferta = idOfferta;
 		this.primaImmagineBase64 = primaImmagineBase64;
 		this.categoria = categoria;

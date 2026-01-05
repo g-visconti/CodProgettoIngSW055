@@ -4,17 +4,33 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
- * DTO per rappresentare lo storico delle offerte ricevute sugli immobili di un agente.
+ * DTO per rappresentare lo storico delle offerte ricevute sugli immobili di un
+ * agente.
  */
 public class StoricoAgenteDTO {
 
 	private Long idOfferta;
 	private String primaImmagineBase64; // Prima immagine dell'immobile
-	private String categoria;           // Tipologia immobile (APPARTAMENTO, VILLA, ecc.)
-	private String descrizione;         // Descrizione immobile (breve)
-	private LocalDateTime dataOfferta;  // Data della proposta ricevuta
+	private String categoria; // Tipologia immobile (APPARTAMENTO, VILLA, ecc.)
+	private String descrizione; // Descrizione immobile (breve)
+	private LocalDateTime dataOfferta; // Data della proposta ricevuta
 	private BigDecimal importoProposto; // Importo offerto dal cliente
-	private String stato;               // Stato offerta (IN_ATTESA, ACCETTATA, RIFIUTATA)
+	private String stato; // Stato offerta (IN_ATTESA, ACCETTATA, RIFIUTATA)
+
+	// Costruttori, Getter e Setter...
+	public StoricoAgenteDTO() {
+	}
+
+	public StoricoAgenteDTO(Long idOfferta, String primaImmagineBase64, String categoria, String descrizione,
+			LocalDateTime dataOfferta, BigDecimal importoProposto, String stato) {
+		this.idOfferta = idOfferta;
+		this.primaImmagineBase64 = primaImmagineBase64;
+		this.categoria = categoria;
+		this.descrizione = descrizione;
+		this.dataOfferta = dataOfferta;
+		this.importoProposto = importoProposto;
+		this.stato = stato;
+	}
 
 	// Metodi utili per estrarre anteprima descrizione
 	public String getDescrizioneBreve() {
@@ -30,21 +46,6 @@ public class StoricoAgenteDTO {
 			return "";
 		}
 		return dataOfferta.toLocalDate().toString(); // Oppure usare DateTimeFormatter
-	}
-
-	// Costruttori, Getter e Setter...
-	public StoricoAgenteDTO() {}
-
-	public StoricoAgenteDTO(Long idOfferta, String primaImmagineBase64, String categoria,
-			String descrizione, LocalDateTime dataOfferta,
-			BigDecimal importoProposto, String stato) {
-		this.idOfferta = idOfferta;
-		this.primaImmagineBase64 = primaImmagineBase64;
-		this.categoria = categoria;
-		this.descrizione = descrizione;
-		this.dataOfferta = dataOfferta;
-		this.importoProposto = importoProposto;
-		this.stato = stato;
 	}
 
 	// Getter e Setter (come nel StoricoClienteDTO)
@@ -123,7 +124,6 @@ public class StoricoAgenteDTO {
 
 	@Override
 	public String toString() {
-		return String.format("Offerta #%d [%s] - %s - %s",
-				idOfferta, stato, categoria, importoProposto);
+		return String.format("Offerta #%d [%s] - %s - %s", idOfferta, stato, categoria, importoProposto);
 	}
 }

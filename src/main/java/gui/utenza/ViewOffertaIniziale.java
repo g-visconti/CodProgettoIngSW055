@@ -16,15 +16,14 @@ import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 
-
 import controller.OfferteController;
 import util.GuiUtils;
 
 public class ViewOffertaIniziale extends JFrame {
 
 	private static final long serialVersionUID = 1L;
-	private JPanel contentPane;
-	private JTextField lblOfferta;
+	private final JPanel contentPane;
+	private final JTextField lblOfferta;
 
 	/**
 	 * Launch the application.
@@ -46,7 +45,7 @@ public class ViewOffertaIniziale extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 
-		JLabel lblDescrizione = new JLabel("Proponi un'offerta per l'immobile selezionato");
+		final JLabel lblDescrizione = new JLabel("Proponi un'offerta per l'immobile selezionato");
 		lblDescrizione.setHorizontalAlignment(SwingConstants.CENTER);
 		lblDescrizione.setFont(new Font("Tahoma", Font.BOLD, 18));
 		lblDescrizione.setBounds(30, 11, 477, 24);
@@ -57,12 +56,12 @@ public class ViewOffertaIniziale extends JFrame {
 		contentPane.add(lblOfferta);
 		lblOfferta.setColumns(10);
 
-		JLabel lblProposta = new JLabel("La tua proposta: €");
+		final JLabel lblProposta = new JLabel("La tua proposta: €");
 		lblProposta.setFont(new Font("Tahoma", Font.BOLD, 11));
 		lblProposta.setBounds(96, 81, 113, 19);
 		contentPane.add(lblProposta);
 
-		JButton btnConferma = new JButton("Conferma");
+		final JButton btnConferma = new JButton("Conferma");
 		getRootPane().setDefaultButton(btnConferma);
 		btnConferma.setForeground(new Color(255, 255, 255));
 		btnConferma.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 11));
@@ -70,10 +69,10 @@ public class ViewOffertaIniziale extends JFrame {
 		btnConferma.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				double offertaProposta;
+				final double offertaProposta;
 
 				try {
-					String testo = lblOfferta.getText();
+					final String testo = lblOfferta.getText();
 					offertaProposta = Double.parseDouble(testo);
 
 					if (offertaProposta <= 0) {
@@ -85,8 +84,9 @@ public class ViewOffertaIniziale extends JFrame {
 					return;
 				}
 
-				OfferteController controller = new OfferteController();
-				boolean offertaInserita = controller.inserisciOffertaIniziale(offertaProposta, idCliente, idImmobile);
+				final OfferteController controller = new OfferteController();
+				final boolean offertaInserita = controller.inserisciOffertaIniziale(offertaProposta, idCliente,
+						idImmobile);
 
 				if (offertaInserita) {
 					JOptionPane.showMessageDialog(null, "Offerta proposta con successo!");

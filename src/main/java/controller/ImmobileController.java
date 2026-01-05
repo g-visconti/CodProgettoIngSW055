@@ -9,7 +9,7 @@ import javax.swing.table.DefaultTableModel;
 
 import dao.ImmobileDAO;
 import database.ConnessioneDatabase;
-import model.entity.Filtri;
+import model.dto.RicercaDTO;
 import model.entity.Immobile;
 import model.entity.ImmobileInAffitto;
 import model.entity.ImmobileInVendita;
@@ -20,60 +20,57 @@ import util.TextBoldRenderer;
 
 public class ImmobileController {
 
-    public ImmobileController() {
-    }
+	public ImmobileController() {
+	}
 
-    // Carica un immobile (Affitto o Vendita)
-    public boolean caricaImmobile(Immobile imm) {
-        try {
-            Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
-            ImmobileDAO immobileDao = new ImmobileDAO(connAWS);
-
-            String tipo = imm.getTipologia().toLowerCase();
-
-            switch (tipo) {
-                case "affitto" -> immobileDao.caricaImmobileInAffitto((ImmobileInAffitto) imm);
-                case "vendita" -> immobileDao.caricaImmobileInVendita((ImmobileInVendita) imm);
-                default -> throw new IllegalArgumentException("Tipologia non valida: " + tipo);
-            }
-
-            return true;
-
-        } catch (SQLException | IllegalArgumentException | ClassCastException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    // Recupera un immobile dal database tramite ID
-    public Immobile recuperaDettagli(long idImmobile) {
-        try {
-            Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
-            ImmobileDAO immobileDAO = new ImmobileDAO(connAWS);
-            return immobileDAO.getImmobileById(idImmobile);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-    
-    
-    public int riempiTableRisultati(JTable tableRisultati, String campoPieno, String tipologia, Filtri filtri) {
+	// Carica un immobile (Affitto o Vendita)
+	public boolean caricaImmobile(Immobile imm) {
 		try {
-			Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
-			ImmobileDAO immobileDAO = new ImmobileDAO(connAWS);
+			final Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
+			final ImmobileDAO immobileDao = new ImmobileDAO(connAWS);
 
-			String[] colonne = { "ID", "Immagini", "Titolo dell'annuncio", "Descrizione",
-					tipologia.equals("Vendita") ? "Prezzo Totale" : "Prezzo Mensile" };
+			final String tipo = imm.getTipologia().toLowerCase();
 
-			// ✅ CAMBIO: Modello con colonna Immagini come String invece di ImageIcon
-			@SuppressWarnings("serial")
-			DefaultTableModel model = new DefaultTableModel(colonne, 0) {
+			switch (tipo) {
+			case "affitto" -> immobileDao.caricaImmobileInAffitto((ImmobileInAffitto) imm);
+			case "vendita" -> immobileDao.caricaImmobileInVendita((ImmobileInVendita) imm);
+			default -> throw new IllegalArgumentException("Tipologia non valida: " + tipo);
+			}
+
+			return true;
+
+		} catch (SQLException | IllegalArgumentException | ClassCastException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	// Recupera un immobile dal database tramite ID
+	public Immobile recuperaDettagli(long idImmobile) {
+		try {
+			final Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
+			final ImmobileDAO immobileDAO = new ImmobileDAO(connAWS);
+			return immobileDAO.getImmobileById(idImmobile);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	public int riempiTableRisultati(JTable tableRisultati, RicercaDTO ricercaDTO) {
+		try {
+			final Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
+			final ImmobileDAO immobileDAO = new ImmobileDAO(connAWS);
+
+			final String[] colonne = { "ID", "Immagini", "Titolo dell'annuncio", "Descrizione",
+					"Vendita".equals(ricercaDTO.getTipologiaImmobile()) ? "Prezzo Totale" : "Prezzo Mensile" };
+
+			final DefaultTableModel model = new DefaultTableModel(colonne, 0) {
 				@Override
 				public Class<?> getColumnClass(int columnIndex) {
 					return switch (columnIndex) {
 					case 0 -> Integer.class;
-					case 1 -> String.class; // ✅ CAMBIATO: da ImageIcon a String
+					case 1 -> String.class;
 					case 2 -> String.class;
 					case 3 -> String.class;
 					case 4 -> String.class;
@@ -87,29 +84,17 @@ public class ImmobileController {
 				}
 			};
 
-			if (tipologia.equals("Affitto")) {
-				immobileDAO.getImmobiliAffitto(campoPieno, filtri).forEach(imm -> {
-					// ✅ CAMBIO: Salva direttamente il Base64 invece di convertire in ImageIcon
-					String base64 = imm.getIcon(); // Presumendo che getIcon() restituisca il Base64
-					model.addRow(new Object[] {
-							imm.getId(),
-							base64, // ✅ Base64 come stringa
-							imm.getTitolo(),
-							imm.getDescrizione(),
-							TableUtils.formattaPrezzo(imm.getPrezzoMensile())
-					});
+			if (ricercaDTO.getTipologiaImmobile().equals("Affitto")) {
+				immobileDAO.getImmobiliAffitto(ricercaDTO).forEach(imm -> {
+					final String base64 = imm.getIcon();
+					model.addRow(new Object[] { imm.getId(), base64, imm.getTitolo(), imm.getDescrizione(),
+							TableUtils.formattaPrezzo(imm.getPrezzoMensile()) });
 				});
-			} else if (tipologia.equals("Vendita")) {
-				immobileDAO.getImmobiliVendita(campoPieno, filtri).forEach(imm -> {
-					// ✅ CAMBIO: Salva direttamente il Base64 invece di convertire in ImageIcon
-					String base64 = imm.getIcon(); // Presumendo che getIcon() restituisca il Base64
-					model.addRow(new Object[] {
-							imm.getId(),
-							base64, // ✅ Base64 come stringa
-							imm.getTitolo(),
-							imm.getDescrizione(),
-							TableUtils.formattaPrezzo(imm.getPrezzoTotale())
-					});
+			} else if (ricercaDTO.getTipologiaImmobile().equals("Vendita")) {
+				immobileDAO.getImmobiliVendita(ricercaDTO).forEach(imm -> {
+					final String base64 = imm.getIcon();
+					model.addRow(new Object[] { imm.getId(), base64, imm.getTitolo(), imm.getDescrizione(),
+							TableUtils.formattaPrezzo(imm.getPrezzoTotale()) });
 				});
 			}
 
@@ -122,17 +107,19 @@ public class ImmobileController {
 			tableRisultati.setRowHeight(160);
 
 			// Larghezza di ogni singola colonna
-			TableUtils.nascondiColonna(tableRisultati, 0);           // Nascondi ID dell'immobile
-			TableUtils.fissaColonna(tableRisultati, 1, 180);         // Immagine
-			TableUtils.larghezzaColonna(tableRisultati, 2, 170);	 // Titolo
-			TableUtils.larghezzaColonna(tableRisultati, 3, 450);	 // Descrizione
-			TableUtils.fissaColonna(tableRisultati, 4, 100);         // Prezzo
+			TableUtils.nascondiColonna(tableRisultati, 0); // Nascondi ID dell'immobile
+			TableUtils.fissaColonna(tableRisultati, 1, 180); // Immagine
+			TableUtils.larghezzaColonna(tableRisultati, 2, 170); // Titolo
+			TableUtils.larghezzaColonna(tableRisultati, 3, 450); // Descrizione
+			TableUtils.fissaColonna(tableRisultati, 4, 100); // Prezzo
 
 			// Renderer
 			tableRisultati.getColumnModel().getColumn(1).setCellRenderer(new Base64ImageRenderer());
-			tableRisultati.getColumnModel().getColumn(2).setCellRenderer(new TextBoldRenderer(false, new Color(50, 133, 177)));
+			tableRisultati.getColumnModel().getColumn(2)
+					.setCellRenderer(new TextBoldRenderer(false, new Color(50, 133, 177)));
 			tableRisultati.getColumnModel().getColumn(3).setCellRenderer(new TextAreaRenderer());
-			tableRisultati.getColumnModel().getColumn(4).setCellRenderer(new TextBoldRenderer(true, new Color(0, 0, 0)));
+			tableRisultati.getColumnModel().getColumn(4)
+					.setCellRenderer(new TextBoldRenderer(true, new Color(0, 0, 0)));
 
 			return model.getRowCount();
 

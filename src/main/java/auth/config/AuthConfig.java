@@ -1,17 +1,17 @@
 package auth.config;
 
 /**
- * Configurazione per l'autenticazione AWS Cognito.
- * Le credenziali vengono caricate da variabili d'ambiente o file di properties.
+ * Configurazione per l'autenticazione AWS Cognito. Le credenziali vengono
+ * caricate da variabili d'ambiente o file di properties.
  */
 public class AuthConfig {
 
 	private String region;
 	private String clientId;
-	private String clientSecret;
-	private String tokenUrl;
-	private String signupUrl;
-	private String scope;
+	private final String clientSecret;
+	private final String tokenUrl;
+	private final String signupUrl;
+	private final String scope;
 	private String identityPoolId;
 
 	public AuthConfig() {
@@ -39,18 +39,37 @@ public class AuthConfig {
 	}
 
 	// Getters
-	public String getRegion() { return region; }
-	public String getClientId() { return clientId; }
-	public String getClientSecret() { return clientSecret; }
-	public String getTokenUrl() { return tokenUrl; }
-	public String getSignupUrl() { return signupUrl; }
-	public String getScope() { return scope; }
-	public String getIdentityPoolId() { return identityPoolId; }
+	public String getRegion() {
+		return region;
+	}
+
+	public String getClientId() {
+		return clientId;
+	}
+
+	public String getClientSecret() {
+		return clientSecret;
+	}
+
+	public String getTokenUrl() {
+		return tokenUrl;
+	}
+
+	public String getSignupUrl() {
+		return signupUrl;
+	}
+
+	public String getScope() {
+		return scope;
+	}
+
+	public String getIdentityPoolId() {
+		return identityPoolId;
+	}
 
 	// Validazione
 	public boolean isValid() {
-		return region != null && !region.isEmpty() &&
-				clientId != null && !clientId.isEmpty() &&
-				tokenUrl != null && !tokenUrl.isEmpty();
+		return region != null && !region.isEmpty() && clientId != null && !clientId.isEmpty() && tokenUrl != null
+				&& !tokenUrl.isEmpty();
 	}
 }

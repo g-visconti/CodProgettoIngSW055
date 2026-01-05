@@ -13,6 +13,10 @@ public class Filtri extends Ricerca {
 	public Boolean portineria;
 	public Boolean climatizzazione;
 
+	// Costruttore vuoto
+	public Filtri() {
+	}
+
 	// Costruttore
 	public Filtri(Integer prezzoMin, Integer prezzoMax, Integer superficieMin, Integer superficieMax, String piano,
 			Integer numLocali, Integer numBagni, Boolean ascensore, Boolean portineria, Boolean climatizzazione) {

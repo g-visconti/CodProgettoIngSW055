@@ -15,9 +15,11 @@ import javax.swing.SwingConstants;
 public class Base64ImageRenderer extends ColorazioneAlternataRenderer {
 
 	@Override
-	public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+	public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
+			int row, int column) {
 
-		JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+		final JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row,
+				column);
 		label.setHorizontalAlignment(SwingConstants.CENTER);
 		label.setVerticalAlignment(SwingConstants.CENTER);
 		label.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -25,23 +27,23 @@ public class Base64ImageRenderer extends ColorazioneAlternataRenderer {
 		try {
 			if (value instanceof String base64 && !base64.trim().isEmpty()) {
 				// Decodifica Base64
-				byte[] imageData = Base64.getDecoder().decode(base64);
-				ImageIcon originalIcon = new ImageIcon(imageData);
+				final byte[] imageData = Base64.getDecoder().decode(base64);
+				final ImageIcon originalIcon = new ImageIcon(imageData);
 
 				// Calcola dimensioni disponibili
-				int availableWidth = table.getColumnModel().getColumn(column).getWidth() - 15;
-				int availableHeight = table.getRowHeight(row) - 15;
+				final int availableWidth = table.getColumnModel().getColumn(column).getWidth() - 15;
+				final int availableHeight = table.getRowHeight(row) - 15;
 
 				// Ridimensiona mantenendo le proporzioni
-				Image originalImage = originalIcon.getImage();
-				double widthRatio = (double) availableWidth / originalIcon.getIconWidth();
-				double heightRatio = (double) availableHeight / originalIcon.getIconHeight();
-				double ratio = Math.min(widthRatio, heightRatio);
+				final Image originalImage = originalIcon.getImage();
+				final double widthRatio = (double) availableWidth / originalIcon.getIconWidth();
+				final double heightRatio = (double) availableHeight / originalIcon.getIconHeight();
+				final double ratio = Math.min(widthRatio, heightRatio);
 
-				int newWidth = (int) (originalIcon.getIconWidth() * ratio);
-				int newHeight = (int) (originalIcon.getIconHeight() * ratio);
+				final int newWidth = (int) (originalIcon.getIconWidth() * ratio);
+				final int newHeight = (int) (originalIcon.getIconHeight() * ratio);
 
-				Image scaledImage = originalImage.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
+				final Image scaledImage = originalImage.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
 				label.setIcon(new ImageIcon(scaledImage));
 				label.setText("");
 			} else {

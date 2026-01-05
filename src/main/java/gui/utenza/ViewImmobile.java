@@ -39,8 +39,8 @@ import util.GuiUtils;
 public class ViewImmobile extends JFrame {
 
 	private static final long serialVersionUID = 1L;
-	private JPanel contentPane;
-	private JTextArea descrizioneField;
+	private final JPanel contentPane;
+	private final JTextArea descrizioneField;
 	private List<byte[]> immagini; // già esiste nel tuo codice
 	private int indiceFotoCorrente = 0;
 
@@ -67,13 +67,13 @@ public class ViewImmobile extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 
-		JLabel lblFoto = new JLabel("New label");
+		final JLabel lblFoto = new JLabel("New label");
 		lblFoto.setOpaque(true);
 		lblFoto.setBackground(Color.GRAY);
 		lblFoto.setBounds(10, 11, 690, 289);
 		contentPane.add(lblFoto);
 
-		JLabel lblFotoPlus = new JLabel("+ x foto");
+		final JLabel lblFotoPlus = new JLabel("+ x foto");
 		lblFotoPlus.setForeground(new Color(255, 255, 255));
 		lblFotoPlus.setHorizontalAlignment(SwingConstants.CENTER);
 		lblFotoPlus.setBackground(new Color(30, 144, 255));
@@ -81,10 +81,10 @@ public class ViewImmobile extends JFrame {
 		lblFotoPlus.setBounds(701, 11, 66, 289);
 		contentPane.add(lblFotoPlus);
 
-		URL pathDEimage = this.getClass().getClassLoader().getResource("images/immobiletest.png");
+		final URL pathDEimage = this.getClass().getClassLoader().getResource("images/immobiletest.png");
 		lblFoto.setIcon(new ImageIcon(pathDEimage));
 
-		JLabel lblTitolo = new JLabel("Tipo, Via XXXX, Quartiere, Città");
+		final JLabel lblTitolo = new JLabel("Tipo, Via XXXX, Quartiere, Città");
 		lblTitolo.setHorizontalAlignment(SwingConstants.CENTER);
 		lblTitolo.setFont(new Font("Segoe UI", Font.BOLD | Font.ITALIC, 17));
 		lblTitolo.setForeground(new Color(45, 45, 45)); // grigio scuro, più soft del nero
@@ -92,17 +92,16 @@ public class ViewImmobile extends JFrame {
 		lblTitolo.setBounds(10, 325, 723, 30);
 		contentPane.add(lblTitolo);
 
-		JLabel lblMaps = new JLabel("");
+		final JLabel lblMaps = new JLabel("");
 		lblMaps.setBackground(SystemColor.text);
 		lblMaps.setOpaque(true);
 		lblMaps.setBounds(854, 482, 277, 132);
 		contentPane.add(lblMaps);
 
 		/*
-		JLabel lblVicinanza = new JLabel("Vicino a:");
-		lblVicinanza.setFont(new Font("Segoe UI", Font.BOLD, 12));
-		lblVicinanza.setBounds(854, 625, 277, 30);
-		contentPane.add(lblVicinanza);
+		 * JLabel lblVicinanza = new JLabel("Vicino a:"); lblVicinanza.setFont(new
+		 * Font("Segoe UI", Font.BOLD, 12)); lblVicinanza.setBounds(854, 625, 277, 30);
+		 * contentPane.add(lblVicinanza);
 		 */
 
 		// GOOGLE MAPS
@@ -111,12 +110,12 @@ public class ViewImmobile extends JFrame {
 		lblMaps.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				String testoCompleto = lblTitolo.getText();
+				final String testoCompleto = lblTitolo.getText();
 
-				String[] parole = testoCompleto.split(" ", 2);
-				String indirizzo = parole.length > 1 ? parole[1] : testoCompleto;
+				final String[] parole = testoCompleto.split(" ", 2);
+				final String indirizzo = parole.length > 1 ? parole[1] : testoCompleto;
 
-				String url = "https://www.google.com/maps/search/?api=1&query=" + indirizzo.replace(" ", "+");
+				final String url = "https://www.google.com/maps/search/?api=1&query=" + indirizzo.replace(" ", "+");
 
 				try {
 					Desktop.getDesktop().browse(new URI(url));
@@ -125,32 +124,31 @@ public class ViewImmobile extends JFrame {
 					JOptionPane.showMessageDialog(null, "Errore nell'apertura del browser");
 				}
 
-
 			}
 		});
 
-		URL pathDEimage1 = this.getClass().getClassLoader().getResource("images/mapslogo.png");
+		final URL pathDEimage1 = this.getClass().getClassLoader().getResource("images/mapslogo.png");
 		lblMaps.setIcon(new ImageIcon(pathDEimage1));
 
-		JLabel lblDescrizionePosizione = new JLabel("Controlla la posizione dell'immobile");
+		final JLabel lblDescrizionePosizione = new JLabel("Controlla la posizione dell'immobile");
 		lblDescrizionePosizione.setHorizontalAlignment(SwingConstants.CENTER);
 		lblDescrizionePosizione.setFont(new Font("Tahoma", Font.BOLD, 13));
 		lblDescrizionePosizione.setBounds(854, 453, 277, 23);
 		contentPane.add(lblDescrizionePosizione);
 
-		JPanel panelProponiOfferta = new JPanel();
+		final JPanel panelProponiOfferta = new JPanel();
 		panelProponiOfferta.setBackground(new Color(240, 248, 255));
 		panelProponiOfferta.setBounds(854, 11, 277, 422);
 		contentPane.add(panelProponiOfferta);
 		panelProponiOfferta.setLayout(null);
 
-		JButton btnProponiOfferta = new JButton("Proponi un'offerta");
+		final JButton btnProponiOfferta = new JButton("Proponi un'offerta");
 		btnProponiOfferta.setFocusable(false);
 		btnProponiOfferta.setForeground(Color.WHITE);
 		btnProponiOfferta.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				ViewOffertaIniziale guiOfferta = new ViewOffertaIniziale(idImmobile, idCliente);
+				final ViewOffertaIniziale guiOfferta = new ViewOffertaIniziale(idImmobile, idCliente);
 				guiOfferta.setLocationRelativeTo(null);
 				guiOfferta.setVisible(true);
 			}
@@ -159,51 +157,51 @@ public class ViewImmobile extends JFrame {
 		btnProponiOfferta.setBounds(36, 99, 204, 37);
 		panelProponiOfferta.add(btnProponiOfferta);
 
-		JLabel lblAltreInfo = new JLabel("Oppure contatta l'agente:");
+		final JLabel lblAltreInfo = new JLabel("Oppure contatta l'agente:");
 		lblAltreInfo.setHorizontalAlignment(SwingConstants.CENTER);
 		lblAltreInfo.setFont(new Font("Tahoma", Font.BOLD, 12));
 		lblAltreInfo.setBounds(40, 194, 196, 21);
 		panelProponiOfferta.add(lblAltreInfo);
 
-		JLabel lblNomeAgente = new JLabel("Nome");
+		final JLabel lblNomeAgente = new JLabel("Nome");
 		lblNomeAgente.setBounds(14, 258, 124, 21);
 		panelProponiOfferta.add(lblNomeAgente);
 
-		JLabel lblEmailAgente = new JLabel("email");
+		final JLabel lblEmailAgente = new JLabel("email");
 		lblEmailAgente.setBounds(14, 319, 253, 21);
 		panelProponiOfferta.add(lblEmailAgente);
 
-		JLabel lblTelefonoAgente = new JLabel("Telefono");
+		final JLabel lblTelefonoAgente = new JLabel("Telefono");
 		lblTelefonoAgente.setBounds(153, 381, 121, 21);
 		panelProponiOfferta.add(lblTelefonoAgente);
 
-		JLabel lblAgenziaAgente = new JLabel("Agenzia");
+		final JLabel lblAgenziaAgente = new JLabel("Agenzia");
 		lblAgenziaAgente.setBounds(14, 381, 253, 21);
 		panelProponiOfferta.add(lblAgenziaAgente);
 
-		JLabel lblDescrizioneProponiOfferta = new JLabel("Ti interessa questo immobile?");
+		final JLabel lblDescrizioneProponiOfferta = new JLabel("Ti interessa questo immobile?");
 		lblDescrizioneProponiOfferta.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		lblDescrizioneProponiOfferta.setHorizontalAlignment(SwingConstants.CENTER);
 		lblDescrizioneProponiOfferta.setBounds(49, 41, 179, 21);
 		panelProponiOfferta.add(lblDescrizioneProponiOfferta);
 
-		JLabel lblCognomeAgente = new JLabel("Cognome");
+		final JLabel lblCognomeAgente = new JLabel("Cognome");
 		lblCognomeAgente.setBounds(153, 258, 124, 21);
 		panelProponiOfferta.add(lblCognomeAgente);
 
-		JLabel lblEmail = new JLabel("Email:");
+		final JLabel lblEmail = new JLabel("Email:");
 		lblEmail.setBounds(14, 297, 253, 21);
 		panelProponiOfferta.add(lblEmail);
 
-		JLabel lblTelefono = new JLabel("Telefono:");
+		final JLabel lblTelefono = new JLabel("Telefono:");
 		lblTelefono.setBounds(153, 359, 94, 21);
 		panelProponiOfferta.add(lblTelefono);
 
-		JLabel lblAgenzia = new JLabel("Agenzia:");
+		final JLabel lblAgenzia = new JLabel("Agenzia:");
 		lblAgenzia.setBounds(14, 359, 253, 21);
 		panelProponiOfferta.add(lblAgenzia);
 
-		JPanel panelDettagliImmobile = new JPanel() {
+		final JPanel panelDettagliImmobile = new JPanel() {
 
 			/**
 			 *
@@ -213,14 +211,14 @@ public class ViewImmobile extends JFrame {
 			@Override
 			protected void paintComponent(Graphics g) {
 				super.paintComponent(g);
-				int arc = 20; // raggio per gli angoli arrotondati
-				Graphics2D g2 = (Graphics2D) g;
+				final int arc = 20; // raggio per gli angoli arrotondati
+				final Graphics2D g2 = (Graphics2D) g;
 				g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
 				// Colore azzurro tenue (sfondo)
-				Color bgColor = new Color(220, 240, 255);
+				final Color bgColor = new Color(220, 240, 255);
 				// Colore blu bordo
-				Color borderColor = new Color(30, 144, 255);
+				final Color borderColor = new Color(30, 144, 255);
 
 				// Disegna lo sfondo arrotondato
 				g2.setColor(bgColor);
@@ -237,7 +235,7 @@ public class ViewImmobile extends JFrame {
 		contentPane.add(panelDettagliImmobile);
 		panelDettagliImmobile.setLayout(null);
 
-		JLabel lblNumLocali = new JLabel("n. locali:");
+		final JLabel lblNumLocali = new JLabel("n. locali:");
 		lblNumLocali.setHorizontalAlignment(SwingConstants.LEFT);
 		lblNumLocali.setBounds(156, 11, 126, 30);
 		panelDettagliImmobile.add(lblNumLocali);
@@ -245,7 +243,7 @@ public class ViewImmobile extends JFrame {
 		lblNumLocali.setForeground(new Color(45, 45, 45)); // grigio scuro, più soft del nero
 		lblNumLocali.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
 
-		JLabel lblDimensione = new JLabel("dimensione:");
+		final JLabel lblDimensione = new JLabel("dimensione:");
 		lblDimensione.setHorizontalTextPosition(SwingConstants.LEFT);
 		lblDimensione.setHorizontalAlignment(SwingConstants.LEFT);
 		lblDimensione.setBounds(0, 11, 168, 30);
@@ -254,61 +252,61 @@ public class ViewImmobile extends JFrame {
 		lblDimensione.setForeground(new Color(45, 45, 45)); // grigio scuro, più soft del nero
 		lblDimensione.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
 
-		JLabel lblNumPiano = new JLabel("piano:");
+		final JLabel lblNumPiano = new JLabel("piano:");
 		lblNumPiano.setBounds(310, 11, 150, 30);
 		panelDettagliImmobile.add(lblNumPiano);
 		lblNumPiano.setFont(new Font("Segoe UI", Font.BOLD, 14));
 		lblNumPiano.setForeground(new Color(45, 45, 45)); // grigio scuro, più soft del nero
 		lblNumPiano.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
 
-		JLabel lblNumBagni = new JLabel("n. bagni:");
+		final JLabel lblNumBagni = new JLabel("n. bagni:");
 		lblNumBagni.setBounds(455, 11, 123, 30);
 		panelDettagliImmobile.add(lblNumBagni);
 		lblNumBagni.setFont(new Font("Segoe UI", Font.BOLD, 14));
 		lblNumBagni.setForeground(SystemColor.inactiveCaptionText); // grigio scuro, più soft del nero
 		lblNumBagni.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
 
-		JLabel lblAscensore = new JLabel("ascensore:");
+		final JLabel lblAscensore = new JLabel("ascensore:");
 		lblAscensore.setBounds(53, 65, 150, 30);
 		panelDettagliImmobile.add(lblAscensore);
 		lblAscensore.setFont(new Font("Segoe UI", Font.BOLD, 14));
 		lblAscensore.setForeground(new Color(45, 45, 45)); // grigio scuro, più soft del nero
 		lblAscensore.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
 
-		JLabel lblPortineria = new JLabel("portineria:");
+		final JLabel lblPortineria = new JLabel("portineria:");
 		lblPortineria.setBounds(229, 65, 144, 30);
 		panelDettagliImmobile.add(lblPortineria);
 		lblPortineria.setFont(new Font("Segoe UI", Font.BOLD, 14));
 		lblPortineria.setForeground(new Color(45, 45, 45)); // grigio scuro, più soft del nero
 		lblPortineria.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
 
-		JLabel lblRiscaldamento = new JLabel("riscaldamento:");
+		final JLabel lblRiscaldamento = new JLabel("riscaldamento:");
 		lblRiscaldamento.setBounds(384, 65, 189, 30);
 		panelDettagliImmobile.add(lblRiscaldamento);
 		lblRiscaldamento.setFont(new Font("Segoe UI", Font.BOLD, 14));
 		lblRiscaldamento.setForeground(new Color(45, 45, 45)); // grigio scuro, più soft del nero
 		lblRiscaldamento.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
 
-		JLabel lblDescrizioneImmobile = new JLabel("Descrizione");
+		final JLabel lblDescrizioneImmobile = new JLabel("Descrizione");
 		lblDescrizioneImmobile.setFont(new Font("Segoe UI", Font.BOLD, 14));
 		lblDescrizioneImmobile.setBounds(10, 482, 101, 23);
 		contentPane.add(lblDescrizioneImmobile);
 
 		// CREA IL PANNELLO PER LO SFONDO DELLA DESCRIZIONE
-		JPanel panelDescrizione = new JPanel() {
+		final JPanel panelDescrizione = new JPanel() {
 			private static final long serialVersionUID = 1L;
 
 			@Override
 			protected void paintComponent(Graphics g) {
 				super.paintComponent(g);
-				int arc = 20; // raggio per gli angoli arrotondati
-				Graphics2D g2 = (Graphics2D) g;
+				final int arc = 20; // raggio per gli angoli arrotondati
+				final Graphics2D g2 = (Graphics2D) g;
 				g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
 				// Colore azzurro tenue (sfondo) - STESSO COLORE DI panelDettagliImmobile
-				Color bgColor = new Color(220, 240, 255);
+				final Color bgColor = new Color(220, 240, 255);
 				// Colore blu bordo - STESSO COLORE DI panelDettagliImmobile
-				Color borderColor = new Color(30, 144, 255);
+				final Color borderColor = new Color(30, 144, 255);
 
 				// Disegna lo sfondo arrotondato
 				g2.setColor(bgColor);
@@ -342,9 +340,9 @@ public class ViewImmobile extends JFrame {
 		descrizioneField.setBorder(BorderFactory.createEmptyBorder());
 
 		// IMPORTANTE: Porta la text area in primo piano rispetto al pannello
-		//descrizioneField.setComponentZOrder(descrizioneField, 0);
+		// descrizioneField.setComponentZOrder(descrizioneField, 0);
 
-		JPanel panelPrezzoImmobile = new JPanel() {
+		final JPanel panelPrezzoImmobile = new JPanel() {
 			/**
 			 *
 			 */
@@ -353,15 +351,15 @@ public class ViewImmobile extends JFrame {
 			@Override
 			protected void paintComponent(Graphics g) {
 				super.paintComponent(g);
-				int arc = 20; // raggio angoli arrotondati
-				Graphics2D g2 = (Graphics2D) g;
+				final int arc = 20; // raggio angoli arrotondati
+				final Graphics2D g2 = (Graphics2D) g;
 				g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
 				// Colore interno (rosso scuro ma più chiaro)
-				Color bgColor = new Color(200, 60, 60);
+				final Color bgColor = new Color(200, 60, 60);
 
 				// Colore bordo (rosso più vivo, ma non troppo acceso)
-				Color borderColor = new Color(180, 0, 0);
+				final Color borderColor = new Color(180, 0, 0);
 
 				// Disegna sfondo arrotondato
 				g2.setColor(bgColor);
@@ -378,19 +376,19 @@ public class ViewImmobile extends JFrame {
 		contentPane.add(panelPrezzoImmobile);
 		panelPrezzoImmobile.setLayout(null);
 
-		JLabel lblPrezzo = new JLabel("Prezzo");
+		final JLabel lblPrezzo = new JLabel("Prezzo");
 		lblPrezzo.setHorizontalAlignment(SwingConstants.CENTER);
 		lblPrezzo.setForeground(Color.WHITE);
 		lblPrezzo.setBounds(10, 11, 149, 70);
 		panelPrezzoImmobile.add(lblPrezzo);
 		lblPrezzo.setFont(new Font("Segoe UI", Font.BOLD, 16));
 
-		ImmobileController controllerImmobile = new ImmobileController();
-		Immobile immobile = controllerImmobile.recuperaDettagli(idImmobile);
+		final ImmobileController controllerImmobile = new ImmobileController();
+		final Immobile immobile = controllerImmobile.recuperaDettagli(idImmobile);
 
 		if (immobile != null) {
 			// Popola campi
-			String titoloCompleto = immobile.getTitolo() + ", " + immobile.getIndirizzo();
+			final String titoloCompleto = immobile.getTitolo() + ", " + immobile.getIndirizzo();
 			lblTitolo.setText(titoloCompleto);
 
 			lblNumLocali.setText("n.locali:  " + immobile.getNumeroLocali());
@@ -403,22 +401,24 @@ public class ViewImmobile extends JFrame {
 			descrizioneField.setText(immobile.getDescrizione());
 
 			if (immobile instanceof ImmobileInAffitto) {
-				double prezzoMensile = ((ImmobileInAffitto) immobile).getPrezzoMensile();
-				String prezzoFormattato = String.format("%,.0f", prezzoMensile).replace(",", ".");
-				lblPrezzo.setText("<html><div style='text-align: center;'>Prezzo Mensile: <br><span style='font-size:16px; font-weight:bold;'>€ " +
-						prezzoFormattato + "</span></div></html>");
+				final double prezzoMensile = ((ImmobileInAffitto) immobile).getPrezzoMensile();
+				final String prezzoFormattato = String.format("%,.0f", prezzoMensile).replace(",", ".");
+				lblPrezzo.setText(
+						"<html><div style='text-align: center;'>Prezzo Mensile: <br><span style='font-size:16px; font-weight:bold;'>€ "
+								+ prezzoFormattato + "</span></div></html>");
 			} else if (immobile instanceof ImmobileInVendita) {
-				double prezzoTotale = ((ImmobileInVendita) immobile).getPrezzoTotale();
-				String prezzoFormattato = String.format("%,.0f", prezzoTotale).replace(",", ".");
-				lblPrezzo.setText("<html><div style='text-align: center;'>Prezzo Totale: <br><span style='font-size:16px; font-weight:bold;'>€ " +
-						prezzoFormattato + "</span></div></html>");
+				final double prezzoTotale = ((ImmobileInVendita) immobile).getPrezzoTotale();
+				final String prezzoFormattato = String.format("%,.0f", prezzoTotale).replace(",", ".");
+				lblPrezzo.setText(
+						"<html><div style='text-align: center;'>Prezzo Totale: <br><span style='font-size:16px; font-weight:bold;'>€ "
+								+ prezzoFormattato + "</span></div></html>");
 			} else {
 				lblPrezzo.setText("<html><div style='text-align: center;'>Prezzo: Non disponibile</div></html>");
 			}
 			System.out.println("DEBUG: immobile.getAgenteAssociato() = " + immobile.getAgenteAssociato());
 
-			AccountController controllerAccount = new AccountController();
-			Account account = controllerAccount.recuperaDettagliAgente(immobile.getAgenteAssociato());
+			final AccountController controllerAccount = new AccountController();
+			final Account account = controllerAccount.recuperaDettagliAgente(immobile.getAgenteAssociato());
 			System.out.println("DEBUG: account = " + account);
 
 			if ((account != null) && (account != null)) {
@@ -441,10 +441,8 @@ public class ViewImmobile extends JFrame {
 
 			// Usa il metodo di GuiUtils per caricare la prima immagine
 			GuiUtils.caricaImmagineInEtichetta(lblFoto,
-					(immagini != null && !immagini.isEmpty()) ? immagini.get(0) : null,
-							lblFoto.getWidth(),
-							lblFoto.getHeight()
-					);
+					(immagini != null && !immagini.isEmpty()) ? immagini.get(0) : null, lblFoto.getWidth(),
+					lblFoto.getHeight());
 
 			// Configura il contatore immagini
 			if (immagini != null && immagini.size() > 1) {
@@ -466,11 +464,8 @@ public class ViewImmobile extends JFrame {
 					indiceFotoCorrente = (indiceFotoCorrente + 1) % immagini.size();
 
 					// Usa GuiUtils per caricare la nuova immagine
-					GuiUtils.caricaImmagineInEtichetta(lblFoto,
-							immagini.get(indiceFotoCorrente),
-							lblFoto.getWidth(),
-							lblFoto.getHeight()
-							);
+					GuiUtils.caricaImmagineInEtichetta(lblFoto, immagini.get(indiceFotoCorrente), lblFoto.getWidth(),
+							lblFoto.getHeight());
 
 					// Aggiorna il contatore
 					if (immagini.size() > 1) {

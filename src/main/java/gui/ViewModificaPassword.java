@@ -21,17 +21,16 @@ import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 
 import controller.AccountController;
-
 import util.GuiUtils;
 
 public class ViewModificaPassword extends JFrame {
 
 	private static final long serialVersionUID = 1L;
-	private JPanel contentPane;
-	private JPasswordField passwordField;
-	private JPasswordField confermaPasswordField;
+	private final JPanel contentPane;
+	private final JPasswordField passwordField;
+	private final JPasswordField confermaPasswordField;
 	private String campoPieno = "******";
-	private String campoVuoto = "";
+	private final String campoVuoto = "";
 
 	/**
 	 * Create the frame.
@@ -50,13 +49,13 @@ public class ViewModificaPassword extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 
-		JPanel panel = new JPanel();
+		final JPanel panel = new JPanel();
 		panel.setBackground(new Color(255, 255, 255));
 		panel.setBounds(0, 0, 546, 299);
 		contentPane.add(panel);
 		panel.setLayout(null);
 
-		JLabel lblModificaPassword = new JLabel("Digitare la nuova password");
+		final JLabel lblModificaPassword = new JLabel("Digitare la nuova password");
 		lblModificaPassword.setFont(new Font("Tahoma", Font.BOLD, 18));
 		lblModificaPassword.setBounds(145, 24, 253, 22);
 		panel.add(lblModificaPassword);
@@ -87,8 +86,9 @@ public class ViewModificaPassword extends JFrame {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				campoPieno = passwordField.getText();
-				if (campoPieno.equals("******"))
+				if (campoPieno.equals("******")) {
 					passwordField.setText(campoVuoto);
+				}
 			}
 		});
 
@@ -98,8 +98,9 @@ public class ViewModificaPassword extends JFrame {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				campoPieno = passwordField.getText();
-				if (campoPieno.equals(campoVuoto))
+				if (campoPieno.equals(campoVuoto)) {
 					passwordField.setText("******");
+				}
 			}
 		});
 
@@ -136,8 +137,9 @@ public class ViewModificaPassword extends JFrame {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				campoPieno = confermaPasswordField.getText();
-				if (campoPieno.equals("******"))
+				if (campoPieno.equals("******")) {
 					confermaPasswordField.setText(campoVuoto);
+				}
 			}
 		});
 
@@ -147,8 +149,9 @@ public class ViewModificaPassword extends JFrame {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				campoPieno = confermaPasswordField.getText();
-				if (campoPieno.equals(campoVuoto))
+				if (campoPieno.equals(campoVuoto)) {
 					confermaPasswordField.setText("******");
+				}
 			}
 		});
 
@@ -159,19 +162,19 @@ public class ViewModificaPassword extends JFrame {
 		confermaPasswordField.setBounds(279, 147, 133, 25);
 		panel.add(confermaPasswordField);
 
-		JLabel lblPass = new JLabel("Nuova password:");
+		final JLabel lblPass = new JLabel("Nuova password:");
 		lblPass.setFont(new Font("Tahoma", Font.BOLD, 11));
 		lblPass.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblPass.setBounds(80, 105, 177, 14);
 		panel.add(lblPass);
 
-		JLabel lblConfermaPass = new JLabel("Conferma nuova password:");
+		final JLabel lblConfermaPass = new JLabel("Conferma nuova password:");
 		lblConfermaPass.setFont(new Font("Tahoma", Font.BOLD, 11));
 		lblConfermaPass.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblConfermaPass.setBounds(80, 152, 177, 14);
 		panel.add(lblConfermaPass);
 
-		JButton btnAnnulla = new JButton("Annulla");
+		final JButton btnAnnulla = new JButton("Annulla");
 		btnAnnulla.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -185,16 +188,16 @@ public class ViewModificaPassword extends JFrame {
 		btnAnnulla.setBounds(102, 237, 133, 23);
 		panel.add(btnAnnulla);
 
-		JButton btnConferma = new JButton("Conferma");
+		final JButton btnConferma = new JButton("Conferma");
 		getRootPane().setDefaultButton(btnConferma);
 		btnConferma.addMouseListener(new MouseAdapter() {
 			@SuppressWarnings("deprecation")
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				String pass = passwordField.getText();
-				String confermaPass = confermaPasswordField.getText();
+				final String pass = passwordField.getText();
+				final String confermaPass = confermaPasswordField.getText();
 				// passo al controller
-				AccountController con = new AccountController();
+				final AccountController con = new AccountController();
 				try {
 					if (con.updatePassword(emailAssociata, pass, confermaPass)) {
 						// accesso con password
@@ -216,7 +219,7 @@ public class ViewModificaPassword extends JFrame {
 		btnConferma.setBounds(294, 237, 133, 23);
 		panel.add(btnConferma);
 
-		JLabel lblSpecifiche = new JLabel(
+		final JLabel lblSpecifiche = new JLabel(
 				"(La nuova password deve contenere lettere e numeri, lunghezza minima 6 caratteri)");
 		lblSpecifiche.setHorizontalAlignment(SwingConstants.CENTER);
 		lblSpecifiche.setFont(new Font("Tahoma", Font.PLAIN, 11));

@@ -34,55 +34,39 @@ public class OfferteController {
 	public OfferteController() {
 	}
 
-
 	private void impostaRendererStato(JTable table, int colonnaStatoIndex, boolean isAgente) {
-		DefaultTableCellRenderer rendererStato = new DefaultTableCellRenderer() {
+		final DefaultTableCellRenderer rendererStato = new DefaultTableCellRenderer() {
 			private static final long serialVersionUID = 8565820085308350483L;
 
 			@Override
 			public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
 					boolean hasFocus, int row, int column) {
 
-				Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+				final Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row,
+						column);
 
 				// Allinea al centro
 				setHorizontalAlignment(SwingConstants.CENTER);
 
 				// Imposta colore in base al testo
 				if (value != null) {
-					String stato = value.toString();
+					final String stato = value.toString();
 
 					if (isAgente) {
 						// Stati per l'agente
 						switch (stato) {
-						case "In attesa":
-							c.setForeground(new Color(243, 182, 80)); // Arancione
-							break;
-						case "Valutato":
-							c.setForeground(new Color(103, 235, 88)); // Verde
-							break;
-						default:
-							c.setForeground(new Color(0, 0, 0));
-							break;
+						case "In attesa" -> c.setForeground(new Color(243, 182, 80)); // Arancione
+						case "Valutato" -> c.setForeground(new Color(103, 235, 88)); // Verde
+						default -> c.setForeground(new Color(0, 0, 0));
 						}
 					} else {
 						// Stati per il cliente (esistente)
 						switch (stato) {
-						case "Rifiutata":
-							c.setForeground(new Color(255, 68, 68));
-							break;
-						case "In attesa":
-							c.setForeground(new Color(243, 182, 80));
-							break;
-						case "Accettata":
-							c.setForeground(new Color(103, 235, 88));
-							break;
-						case "Controproposta":
-							c.setForeground(new Color(7, 170, 248));
-							break;
-						default:
-							c.setForeground(new Color(0, 0, 0));
-							break;
+						case "Rifiutata" -> c.setForeground(new Color(255, 68, 68));
+						case "In attesa" -> c.setForeground(new Color(243, 182, 80));
+						case "Accettata" -> c.setForeground(new Color(103, 235, 88));
+						case "Controproposta" -> c.setForeground(new Color(7, 170, 248));
+						default -> c.setForeground(new Color(0, 0, 0));
 						}
 					}
 				} else {
@@ -105,13 +89,11 @@ public class OfferteController {
 		table.getColumnModel().getColumn(colonnaStatoIndex).setCellRenderer(rendererStato);
 	}
 
-
-
 	public boolean inserisciOffertaIniziale(double offertaProposta, String idCliente, long idImmobile) {
 		try {
-			Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
-			OffertaInizialeDAO offertaInizialeDAO = new OffertaInizialeDAO(connAWS);
-			OffertaIniziale offerta = new OffertaIniziale(offertaProposta, idCliente, idImmobile);
+			final Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
+			final OffertaInizialeDAO offertaInizialeDAO = new OffertaInizialeDAO(connAWS);
+			final OffertaIniziale offerta = new OffertaIniziale(offertaProposta, idCliente, idImmobile);
 			return offertaInizialeDAO.inserisciOffertaIniziale(offerta);
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -119,7 +101,8 @@ public class OfferteController {
 		}
 	}
 
-	public boolean inserisciRispostaOfferta(long idOfferta, String idAgente, String tipoRisposta, Double importoControproposta) {
+	public boolean inserisciRispostaOfferta(long idOfferta, String idAgente, String tipoRisposta,
+			Double importoControproposta) {
 		try {
 			System.out.println("=== DEBUG inserisciRispostaOfferta ===");
 			System.out.println("idOfferta: " + idOfferta);
@@ -127,20 +110,20 @@ public class OfferteController {
 			System.out.println("tipoRisposta: " + tipoRisposta);
 			System.out.println("importoControproposta: " + importoControproposta);
 
-			Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
-			RispostaOffertaDAO rispostaDAO = new RispostaOffertaDAO(connAWS);
-			AccountDAO accountDAO = new AccountDAO(connAWS);
-			OffertaInizialeDAO offertaDAO = new OffertaInizialeDAO(connAWS);
+			final Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
+			final RispostaOffertaDAO rispostaDAO = new RispostaOffertaDAO(connAWS);
+			final AccountDAO accountDAO = new AccountDAO(connAWS);
+			final OffertaInizialeDAO offertaDAO = new OffertaInizialeDAO(connAWS);
 
 			// Recupera l'offerta per controllarne lo stato
-			OffertaIniziale offerta = offertaDAO.getOffertaById(idOfferta);
+			final OffertaIniziale offerta = offertaDAO.getOffertaById(idOfferta);
 			if (offerta == null) {
 				JOptionPane.showMessageDialog(null, "Offerta non trovata!", "Errore", JOptionPane.ERROR_MESSAGE);
 				return false;
 			}
 
-			String statoOfferta = offerta.getStato();
-			boolean isOffertaInAttesa = "In attesa".equals(statoOfferta);
+			final String statoOfferta = offerta.getStato();
+			final boolean isOffertaInAttesa = "In attesa".equals(statoOfferta);
 			System.out.println("DEBUG - Stato offerta: '" + statoOfferta + "'");
 			System.out.println("DEBUG - Offerta in attesa: " + isOffertaInAttesa);
 
@@ -163,10 +146,8 @@ public class OfferteController {
 			// Se l'offerta non è in attesa e non è una controproposta, non permettere
 			if (!isOffertaInAttesa && !"Controproposta".equals(tipoRispostaNormalizzato)) {
 				JOptionPane.showMessageDialog(null,
-						"Questa offerta è già stata valutata.\n" +
-								"Puoi solo fare una nuova controproposta.",
-								"Operazione non permessa",
-								JOptionPane.WARNING_MESSAGE);
+						"Questa offerta è già stata valutata.\n" + "Puoi solo fare una nuova controproposta.",
+						"Operazione non permessa", JOptionPane.WARNING_MESSAGE);
 				return false;
 			}
 
@@ -182,9 +163,8 @@ public class OfferteController {
 
 			if (agente == null) {
 				System.out.println("DEBUG - Agente non trovato!");
-				JOptionPane.showMessageDialog(null,
-						"Agente non trovato! ID/Email: " + idAgente,
-						"Errore", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(null, "Agente non trovato! ID/Email: " + idAgente, "Errore",
+						JOptionPane.ERROR_MESSAGE);
 				return false;
 			}
 
@@ -199,21 +179,17 @@ public class OfferteController {
 			rispostaDAO.disattivaRispostePrecedenti(idOfferta);
 
 			// Crea e inserisci nuova risposta
-			RispostaOfferta risposta = new RispostaOfferta(
-					idOfferta,
-					agente.getIdAccount(),  // Usa l'ID dell'account
-					agente.getNome(),
-					agente.getCognome(),
-					tipoRispostaNormalizzato,  // Usa il tipo normalizzato
-					importoControproposta
-					);
+			final RispostaOfferta risposta = new RispostaOfferta(idOfferta, agente.getIdAccount(), // Usa l'ID
+																									// dell'account
+					agente.getNome(), agente.getCognome(), tipoRispostaNormalizzato, // Usa il tipo normalizzato
+					importoControproposta);
 
-			boolean successo = rispostaDAO.inserisciRispostaOfferta(risposta);
+			final boolean successo = rispostaDAO.inserisciRispostaOfferta(risposta);
 			System.out.println("DEBUG - Inserimento risposta: " + (successo ? "SUCCESSO" : "FALLITO"));
 
 			// Se l'inserimento è riuscito, aggiorna lo stato dell'offerta
 			if (successo) {
-				boolean aggiornato = offertaDAO.aggiornaStatoOfferta(idOfferta, tipoRispostaNormalizzato);
+				final boolean aggiornato = offertaDAO.aggiornaStatoOfferta(idOfferta, tipoRispostaNormalizzato);
 				System.out.println("DEBUG - Aggiornamento stato offerta: " + (aggiornato ? "SUCCESSO" : "FALLITO"));
 
 				// Se l'offerta è stata accettata, potresti voler disabilitare altre azioni
@@ -232,24 +208,22 @@ public class OfferteController {
 			// Mostra un messaggio di errore più specifico
 			if (e.getMessage().contains("RispostaOfferta_tipoRisposta_check")) {
 				JOptionPane.showMessageDialog(null,
-						"Errore: Tipo risposta non valido.\n" +
-								"I valori accettati sono: 'Accettata', 'Rifiutata', 'Controproposta'",
-								"Errore di validazione",
-								JOptionPane.ERROR_MESSAGE);
+						"Errore: Tipo risposta non valido.\n"
+								+ "I valori accettati sono: 'Accettata', 'Rifiutata', 'Controproposta'",
+						"Errore di validazione", JOptionPane.ERROR_MESSAGE);
 			} else {
-				JOptionPane.showMessageDialog(null,
-						"Errore durante l'inserimento della risposta: " + e.getMessage(),
-						"Errore database",
-						JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(null, "Errore durante l'inserimento della risposta: " + e.getMessage(),
+						"Errore database", JOptionPane.ERROR_MESSAGE);
 			}
 
 			return false;
 		}
 	}
+
 	public List<OffertaIniziale> getOfferteByCliente(String idCliente) {
 		try {
-			Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
-			OffertaInizialeDAO offertaDAO = new OffertaInizialeDAO(connAWS);
+			final Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
+			final OffertaInizialeDAO offertaDAO = new OffertaInizialeDAO(connAWS);
 			return offertaDAO.getOfferteByCliente(idCliente);
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -259,8 +233,8 @@ public class OfferteController {
 
 	public List<RispostaOfferta> getRisposteByOfferta(long idOfferta) {
 		try {
-			Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
-			RispostaOffertaDAO rispostaDAO = new RispostaOffertaDAO(connAWS);
+			final Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
+			final RispostaOffertaDAO rispostaDAO = new RispostaOffertaDAO(connAWS);
 			return rispostaDAO.getRisposteByOfferta(idOfferta);
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -270,8 +244,8 @@ public class OfferteController {
 
 	public RispostaOfferta getDettagliRispostaAttiva(Long idOfferta) {
 		try {
-			Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
-			RispostaOffertaDAO rispostaDAO = new RispostaOffertaDAO(connAWS);
+			final Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
+			final RispostaOffertaDAO rispostaDAO = new RispostaOffertaDAO(connAWS);
 			return rispostaDAO.getDettagliRispostaAttiva(idOfferta);
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -279,26 +253,25 @@ public class OfferteController {
 		}
 	}
 
-
 	/**
 	 * Metodo per popolare la tabella delle offerte PROPOSTE da un CLIENTE
 	 */
 	private void popolaTabellaOfferteProposteCliente(JTable tableOfferteProposte, List<StoricoClienteDTO> offerte) {
 		// La logica rimane identica a quella che hai già
-		String[] nomiColonne = { "ID", "Foto", "Categoria", "Descrizione", "Data", "Prezzo proposto", "Stato" };
+		final String[] nomiColonne = { "ID", "Foto", "Categoria", "Descrizione", "Data", "Prezzo proposto", "Stato" };
 
 		@SuppressWarnings("serial")
-		DefaultTableModel model = new DefaultTableModel(nomiColonne, 0) {
+		final DefaultTableModel model = new DefaultTableModel(nomiColonne, 0) {
 			@Override
 			public Class<?> getColumnClass(int columnIndex) {
 				return switch (columnIndex) {
-				case 0 -> Long.class;      // ID
-				case 1 -> String.class;    // Foto (Base64)
-				case 2 -> String.class;    // Categoria
-				case 3 -> String.class;    // Descrizione
-				case 4 -> String.class;    // Data (formattata)
-				case 5 -> String.class;    // Prezzo (formattato)
-				case 6 -> String.class;    // Stato
+				case 0 -> Long.class; // ID
+				case 1 -> String.class; // Foto (Base64)
+				case 2 -> String.class; // Categoria
+				case 3 -> String.class; // Descrizione
+				case 4 -> String.class; // Data (formattata)
+				case 5 -> String.class; // Prezzo (formattato)
+				case 6 -> String.class; // Stato
 				default -> Object.class;
 				};
 			}
@@ -309,35 +282,35 @@ public class OfferteController {
 			}
 		};
 
-		for (StoricoClienteDTO offerta : offerte) {
-			Object[] riga = new Object[7];
+		offerte.forEach(offerta -> {
+			final Object[] riga = new Object[7];
 
-			riga[0] = offerta.getIdOfferta();                           // getIdOfferta()
-			riga[1] = offerta.getPrimaImmagineBase64();                // getPrimaImmagineBase64()
-			riga[2] = offerta.getCategoria();                          // getCategoria()
-			riga[3] = offerta.getDescrizione();                        // getDescrizione()
+			riga[0] = offerta.getIdOfferta(); // getIdOfferta()
+			riga[1] = offerta.getPrimaImmagineBase64(); // getPrimaImmagineBase64()
+			riga[2] = offerta.getCategoria(); // getCategoria()
+			riga[3] = offerta.getDescrizione(); // getDescrizione()
 			riga[4] = TableUtils.formattaData(offerta.getDataOfferta()); // getDataOfferta()
 			riga[5] = TableUtils.formattaPrezzo(offerta.getImportoProposto()); // getImportoProposto()
-			riga[6] = offerta.getStato();                              // getStato()
+			riga[6] = offerta.getStato(); // getStato()
 
 			model.addRow(riga);
-		}
+		});
 
 		tableOfferteProposte.setModel(model);
 		tableOfferteProposte.getTableHeader().setReorderingAllowed(false);
 		tableOfferteProposte.setRowHeight(160);
 
 		// Configurazione dimensioni colonne
-		TableUtils.nascondiColonna(tableOfferteProposte, 0);        // ID nascosto
-		TableUtils.fissaColonna(tableOfferteProposte, 1, 200);      // Foto (larghezza fissa)
-		TableUtils.fissaColonna(tableOfferteProposte, 2, 120);      // Categoria
-		TableUtils.larghezzaColonna(tableOfferteProposte, 3, 400);  // Descrizione (larga)
-		TableUtils.fissaColonna(tableOfferteProposte, 4, 150);      // Data
-		TableUtils.fissaColonna(tableOfferteProposte, 5, 150);      // Prezzo proposto
-		TableUtils.fissaColonna(tableOfferteProposte, 6, 120);      // Stato
+		TableUtils.nascondiColonna(tableOfferteProposte, 0); // ID nascosto
+		TableUtils.fissaColonna(tableOfferteProposte, 1, 200); // Foto (larghezza fissa)
+		TableUtils.fissaColonna(tableOfferteProposte, 2, 120); // Categoria
+		TableUtils.larghezzaColonna(tableOfferteProposte, 3, 400); // Descrizione (larga)
+		TableUtils.fissaColonna(tableOfferteProposte, 4, 150); // Data
+		TableUtils.fissaColonna(tableOfferteProposte, 5, 150); // Prezzo proposto
+		TableUtils.fissaColonna(tableOfferteProposte, 6, 120); // Stato
 
 		// Applica renderer personalizzati
-		TableColumnModel columnModel = tableOfferteProposte.getColumnModel();
+		final TableColumnModel columnModel = tableOfferteProposte.getColumnModel();
 		columnModel.getColumn(1).setCellRenderer(new Base64ImageRenderer());
 		columnModel.getColumn(2).setCellRenderer(new TextBoldRenderer(true, new Color(50, 133, 177)));
 		columnModel.getColumn(3).setCellRenderer(new TextAreaRenderer());
@@ -353,20 +326,20 @@ public class OfferteController {
 	 */
 	private void popolaTabellaOfferteRicevuteAgente(JTable tableOfferteRicevute, List<StoricoAgenteDTO> offerte) {
 		// Stesse colonne ma dati da StoricoAgenteDTO
-		String[] nomiColonne = { "ID", "Foto", "Categoria", "Descrizione", "Data", "Prezzo proposto", "Stato" };
+		final String[] nomiColonne = { "ID", "Foto", "Categoria", "Descrizione", "Data", "Prezzo proposto", "Stato" };
 
 		@SuppressWarnings("serial")
-		DefaultTableModel model = new DefaultTableModel(nomiColonne, 0) {
+		final DefaultTableModel model = new DefaultTableModel(nomiColonne, 0) {
 			@Override
 			public Class<?> getColumnClass(int columnIndex) {
 				return switch (columnIndex) {
-				case 0 -> Long.class;      // ID
-				case 1 -> String.class;    // Foto (Base64)
-				case 2 -> String.class;    // Categoria
-				case 3 -> String.class;    // Descrizione
-				case 4 -> String.class;    // Data (formattata)
-				case 5 -> String.class;    // Prezzo (formattato)
-				case 6 -> String.class;    // Stato
+				case 0 -> Long.class; // ID
+				case 1 -> String.class; // Foto (Base64)
+				case 2 -> String.class; // Categoria
+				case 3 -> String.class; // Descrizione
+				case 4 -> String.class; // Data (formattata)
+				case 5 -> String.class; // Prezzo (formattato)
+				case 6 -> String.class; // Stato
 				default -> Object.class;
 				};
 			}
@@ -377,8 +350,8 @@ public class OfferteController {
 			}
 		};
 
-		for (StoricoAgenteDTO offerta : offerte) {
-			Object[] riga = new Object[7];
+		offerte.forEach(offerta -> {
+			final Object[] riga = new Object[7];
 
 			riga[0] = offerta.getIdOfferta();
 			riga[1] = offerta.getPrimaImmagineBase64();
@@ -389,7 +362,7 @@ public class OfferteController {
 			riga[6] = offerta.getStato(); // Sarà "In attesa" o "Valutato"
 
 			model.addRow(riga);
-		}
+		});
 
 		tableOfferteRicevute.setModel(model);
 		tableOfferteRicevute.getTableHeader().setReorderingAllowed(false);
@@ -405,7 +378,7 @@ public class OfferteController {
 		TableUtils.fissaColonna(tableOfferteRicevute, 6, 120);
 
 		// Applica renderer personalizzati
-		TableColumnModel columnModel = tableOfferteRicevute.getColumnModel();
+		final TableColumnModel columnModel = tableOfferteRicevute.getColumnModel();
 		columnModel.getColumn(1).setCellRenderer(new Base64ImageRenderer());
 		columnModel.getColumn(2).setCellRenderer(new TextBoldRenderer(true, new Color(50, 133, 177)));
 		columnModel.getColumn(3).setCellRenderer(new TextAreaRenderer());
@@ -420,25 +393,24 @@ public class OfferteController {
 	 * Metodo che discrimina automaticamente tra cliente e agente
 	 */
 	public void riempiTableOfferte(JTable tableOfferte, String emailUtente, boolean isAgente) {
-		Connection connAWS;
+		final Connection connAWS;
 		try {
 			connAWS = ConnessioneDatabase.getInstance().getConnection();
-			ImmobileDAO immobileDAO = new ImmobileDAO(connAWS);
+			final ImmobileDAO immobileDAO = new ImmobileDAO(connAWS);
 
 			if (isAgente) {
 				// Chiama il metodo DAO per l'agente
-				List<StoricoAgenteDTO> offerte = immobileDAO.getDatiOfferteRicevuteAgente(emailUtente);
+				final List<StoricoAgenteDTO> offerte = immobileDAO.getDatiOfferteRicevuteAgente(emailUtente);
 				popolaTabellaOfferteRicevuteAgente(tableOfferte, offerte);
 			} else {
 				// Chiama il metodo DAO per il cliente (esistente)
-				List<StoricoClienteDTO> offerte = immobileDAO.getDatiOfferteProposte(emailUtente);
+				final List<StoricoClienteDTO> offerte = immobileDAO.getDatiOfferteProposte(emailUtente);
 				popolaTabellaOfferteProposteCliente(tableOfferte, offerte);
 			}
 
 		} catch (SQLException e) {
 			e.printStackTrace();
-			JOptionPane.showMessageDialog(null,
-					"Errore nel caricamento dello storico offerte: " + e.getMessage(),
+			JOptionPane.showMessageDialog(null, "Errore nel caricamento dello storico offerte: " + e.getMessage(),
 					"Errore", JOptionPane.ERROR_MESSAGE);
 		}
 	}
@@ -457,8 +429,8 @@ public class OfferteController {
 
 	public OffertaIniziale getOffertaById(long idOfferta) {
 		try {
-			Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
-			OffertaInizialeDAO offertaDAO = new OffertaInizialeDAO(connAWS);
+			final Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
+			final OffertaInizialeDAO offertaDAO = new OffertaInizialeDAO(connAWS);
 			return offertaDAO.getOffertaById(idOfferta);
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -468,13 +440,13 @@ public class OfferteController {
 
 	public String getClienteByOffertaId(long idOfferta) {
 		try {
-			Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
-			OffertaInizialeDAO offertaDAO = new OffertaInizialeDAO(connAWS);
-			OffertaIniziale offerta = offertaDAO.getOffertaById(idOfferta);
+			final Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
+			final OffertaInizialeDAO offertaDAO = new OffertaInizialeDAO(connAWS);
+			final OffertaIniziale offerta = offertaDAO.getOffertaById(idOfferta);
 
 			if (offerta != null) {
-				AccountDAO accountDAO = new AccountDAO(connAWS);
-				Account cliente = accountDAO.getAccountById(offerta.getClienteAssociato());
+				final AccountDAO accountDAO = new AccountDAO(connAWS);
+				final Account cliente = accountDAO.getAccountById(offerta.getClienteAssociato());
 
 				if (cliente != null) {
 					return cliente.getNome() + " " + cliente.getCognome();
@@ -489,8 +461,8 @@ public class OfferteController {
 
 	public String[] getContropropostaByOffertaCliente(Long idOfferta, String idCliente) {
 		try {
-			Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
-			RispostaOffertaDAO rispostaDAO = new RispostaOffertaDAO(connAWS);
+			final Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
+			final RispostaOffertaDAO rispostaDAO = new RispostaOffertaDAO(connAWS);
 			return rispostaDAO.getContropropostaByOffertaCliente(idOfferta, idCliente);
 		} catch (SQLException e) {
 			e.printStackTrace();

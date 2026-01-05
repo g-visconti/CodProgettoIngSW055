@@ -43,10 +43,10 @@ import util.GuiUtils;
 public class ViewAccesso extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private final OAuthController oauthController;
-	private JPanel contentPane;
-	private JTextField txtEmail;
-	private JTextField txtAccediORegistrati;
-	private JTextField txtOppure;
+	private final JPanel contentPane;
+	private final JTextField txtEmail;
+	private final JTextField txtAccediORegistrati;
+	private final JTextField txtOppure;
 	String ruoloDefault = "Cliente";
 	String campoPieno;
 	String tokentest = "";
@@ -71,28 +71,28 @@ public class ViewAccesso extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 
-		JPanel panelLogo = new JPanel();
+		final JPanel panelLogo = new JPanel();
 		panelLogo.setBackground(new Color(255, 255, 255));
 		panelLogo.setBounds(0, 0, 446, 593);
 		contentPane.add(panelLogo);
 		panelLogo.setLayout(null);
 
-		JLabel DietiEstatesimage = new JLabel("");
+		final JLabel DietiEstatesimage = new JLabel("");
 		DietiEstatesimage.setBounds(93, 169, 259, 249);
 		panelLogo.add(DietiEstatesimage);
 		DietiEstatesimage.setOpaque(true);
 
-		URL pathDEimage = getClass().getClassLoader().getResource("images/DietiEstatesLogo.png");
+		final URL pathDEimage = getClass().getClassLoader().getResource("images/DietiEstatesLogo.png");
 		DietiEstatesimage.setIcon(new ImageIcon(pathDEimage));
 
-		JLabel lblDieti = new JLabel("DietiEstates25");
+		final JLabel lblDieti = new JLabel("DietiEstates25");
 		lblDieti.setBounds(0, 39, 446, 32);
 		panelLogo.add(lblDieti);
 		lblDieti.setHorizontalAlignment(SwingConstants.CENTER);
 		lblDieti.setForeground(new Color(27, 99, 142));
 		lblDieti.setFont(new Font("Tahoma", Font.BOLD, 30));
 
-		JPanel panelAccessoRegistrazione = new JPanel();
+		final JPanel panelAccessoRegistrazione = new JPanel();
 		panelAccessoRegistrazione.setBackground(new Color(245, 245, 245));
 		panelAccessoRegistrazione.setBounds(446, 0, 370, 593);
 		contentPane.add(panelAccessoRegistrazione);
@@ -150,34 +150,31 @@ public class ViewAccesso extends JFrame {
 		txtOppure.setBounds(13, 240, 344, 20);
 		panelAccessoRegistrazione.add(txtOppure);
 
-		/*JLabel lblGitHub = new JLabel("Github");
-		lblGitHub.setToolTipText("Non disponibile attualmente");
-		lblGitHub.addMouseListener(new MouseAdapter() {
+		/*
+		 * JLabel lblGitHub = new JLabel("Github");
+		 * lblGitHub.setToolTipText("Non disponibile attualmente");
+		 * lblGitHub.addMouseListener(new MouseAdapter() {
+		 * 
+		 * 
+		 * 
+		 * @Override public void mouseEntered(MouseEvent e) {
+		 * lblGitHub.setForeground(Color.BLACK);
+		 * 
+		 * }
+		 * 
+		 * @Override public void mouseExited(MouseEvent e) {
+		 * lblGitHub.setForeground(Color.WHITE); // Torna normale quando il mouse esce
+		 * 
+		 * } }); lblGitHub.setBorder(new LineBorder(new Color(255, 140, 0), 1, true));
+		 * lblGitHub.setFont(new Font("Yu Gothic UI Semibold", Font.BOLD, 11));
+		 * lblGitHub.setForeground(Color.WHITE); lblGitHub.setOpaque(true);
+		 * lblGitHub.setBackground(new Color(255, 140, 0));
+		 * lblGitHub.setHorizontalAlignment(SwingConstants.CENTER);
+		 * lblGitHub.setBounds(105, 341, 146, 23);
+		 * panelAccessoRegistrazione.add(lblGitHub);
+		 */
 
-
-
-			@Override
-			public void mouseEntered(MouseEvent e) {
-				lblGitHub.setForeground(Color.BLACK);
-
-			}
-
-			@Override
-			public void mouseExited(MouseEvent e) {
-				lblGitHub.setForeground(Color.WHITE); // Torna normale quando il mouse esce
-
-			}
-		});
-		lblGitHub.setBorder(new LineBorder(new Color(255, 140, 0), 1, true));
-		lblGitHub.setFont(new Font("Yu Gothic UI Semibold", Font.BOLD, 11));
-		lblGitHub.setForeground(Color.WHITE);
-		lblGitHub.setOpaque(true);
-		lblGitHub.setBackground(new Color(255, 140, 0));
-		lblGitHub.setHorizontalAlignment(SwingConstants.CENTER);
-		lblGitHub.setBounds(105, 341, 146, 23);
-		panelAccessoRegistrazione.add(lblGitHub);*/
-
-		JLabel lblGoogle = new JLabel("Google");
+		final JLabel lblGoogle = new JLabel("Google");
 		lblGoogle.addMouseListener(new MouseAdapter() {
 
 			@Override
@@ -208,7 +205,7 @@ public class ViewAccesso extends JFrame {
 		lblGoogle.setBounds(109, 374, 146, 23);
 		panelAccessoRegistrazione.add(lblGoogle);
 
-		JLabel lblFacebook = new JLabel("Facebook");
+		final JLabel lblFacebook = new JLabel("Facebook");
 		lblFacebook.addMouseListener(new MouseAdapter() {
 
 			@Override
@@ -240,46 +237,49 @@ public class ViewAccesso extends JFrame {
 		lblFacebook.setBounds(109, 328, 146, 23);
 		panelAccessoRegistrazione.add(lblFacebook);
 
-		/* JLabel lblGitHublogo = new JLabel("");
-		lblGitHublogo.setBounds(70, 342, 27, 22);
-		panelAccessoRegistrazione.add(lblGitHublogo);
+		/*
+		 * JLabel lblGitHublogo = new JLabel(""); lblGitHublogo.setBounds(70, 342, 27,
+		 * 22); panelAccessoRegistrazione.add(lblGitHublogo);
+		 * 
+		 * URL GitHublogo =
+		 * getClass().getClassLoader().getResource("images/GitHublogo.png");
+		 * lblGitHublogo.setIcon(new ImageIcon(GitHublogo));
+		 */
 
-		URL GitHublogo = getClass().getClassLoader().getResource("images/GitHublogo.png");
-		lblGitHublogo.setIcon(new ImageIcon(GitHublogo));*/
-
-		JLabel lblGooglelogo = new JLabel("");
+		final JLabel lblGooglelogo = new JLabel("");
 		lblGooglelogo.setBounds(74, 374, 27, 23);
 		panelAccessoRegistrazione.add(lblGooglelogo);
 
-		URL Googlelogo = getClass().getClassLoader().getResource("images/Googlelogo.png");
+		final URL Googlelogo = getClass().getClassLoader().getResource("images/Googlelogo.png");
 		lblGooglelogo.setIcon(new ImageIcon(Googlelogo));
 
-		JLabel lblFacebooklogo = new JLabel("");
+		final JLabel lblFacebooklogo = new JLabel("");
 		lblFacebooklogo.setBounds(74, 328, 27, 23);
 		panelAccessoRegistrazione.add(lblFacebooklogo);
 
-		URL Facebooklogo = getClass().getClassLoader().getResource("images/Facebooklogo.png");
+		final URL Facebooklogo = getClass().getClassLoader().getResource("images/Facebooklogo.png");
 		lblFacebooklogo.setIcon(new ImageIcon(Facebooklogo));
 
-		JButton btnAccedi = new JButton("Accedi");
+		final JButton btnAccedi = new JButton("Accedi");
 		getRootPane().setDefaultButton(btnAccedi);
 
 		btnAccedi.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				String emailDaTastiera = txtEmail.getText();
+				final String emailDaTastiera = txtEmail.getText();
 
-				AccessController con = new AccessController();
+				final AccessController con = new AccessController();
 				// discrimino esistenza
 				try {
 					if (con.checkUtente(emailDaTastiera)) {
 						// accesso con password
-						ViewAccessoConPassword viewAccessoConPassword = new ViewAccessoConPassword(emailDaTastiera);
+						final ViewAccessoConPassword viewAccessoConPassword = new ViewAccessoConPassword(
+								emailDaTastiera);
 						viewAccessoConPassword.setLocationRelativeTo(null);
 						viewAccessoConPassword.setVisible(true);
 					} else {
 						// registrazione
-						ViewRegistrazione viewRegistrazione = new ViewRegistrazione(emailDaTastiera);
+						final ViewRegistrazione viewRegistrazione = new ViewRegistrazione(emailDaTastiera);
 						viewRegistrazione.setLocationRelativeTo(null);
 						viewRegistrazione.setVisible(true);
 					}
@@ -291,14 +291,14 @@ public class ViewAccesso extends JFrame {
 			}
 		});
 
-		JButton btnProsegui = new JButton("Prosegui");
+		final JButton btnProsegui = new JButton("Prosegui");
 		// Bottone predefinito alla pressione del tasto Enter
 		getRootPane().setDefaultButton(btnProsegui);
 
 		btnProsegui.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				String emailDaTastiera = txtEmail.getText().trim();
+				final String emailDaTastiera = txtEmail.getText().trim();
 
 				// Validazione preliminare
 				if (emailDaTastiera.isEmpty()) {
@@ -308,16 +308,17 @@ public class ViewAccesso extends JFrame {
 					return;
 				}
 
-				AccessController con = new AccessController();
+				final AccessController con = new AccessController();
 				try {
 					if (con.checkUtente(emailDaTastiera)) {
 						// accesso con password
-						ViewAccessoConPassword viewAccessoConPassword = new ViewAccessoConPassword(emailDaTastiera);
+						final ViewAccessoConPassword viewAccessoConPassword = new ViewAccessoConPassword(
+								emailDaTastiera);
 						viewAccessoConPassword.setLocationRelativeTo(null);
 						viewAccessoConPassword.setVisible(true);
 					} else {
 						// registrazione
-						ViewRegistrazione viewRegistrazione = new ViewRegistrazione(emailDaTastiera);
+						final ViewRegistrazione viewRegistrazione = new ViewRegistrazione(emailDaTastiera);
 						viewRegistrazione.setLocationRelativeTo(null);
 						viewRegistrazione.setVisible(true);
 					}
@@ -338,17 +339,16 @@ public class ViewAccesso extends JFrame {
 
 	private void handleProviderToken(String token, String provider) {
 		if (token == null || token.isEmpty()) {
-			JOptionPane.showMessageDialog(null, "Nessun token rilevato",
-					"Attenzione", JOptionPane.WARNING_MESSAGE);
+			JOptionPane.showMessageDialog(null, "Nessun token rilevato", "Attenzione", JOptionPane.WARNING_MESSAGE);
 			return;
 		}
 
 		// Usa il controller per gestire l'intero processo
-		String email = oauthController.handleOAuthLogin(token, provider);
+		final String email = oauthController.handleOAuthLogin(token, provider);
 
 		if (email != null && !email.isEmpty()) {
 			// Login riuscito, apri la dashboard
-			ViewDashboard viewDashboard = new ViewDashboard(email);
+			final ViewDashboard viewDashboard = new ViewDashboard(email);
 			viewDashboard.setVisible(true);
 			viewDashboard.setLocationRelativeTo(null);
 			viewDashboard.setMaximumSize(getMaximumSize());
@@ -359,7 +359,8 @@ public class ViewAccesso extends JFrame {
 	private void loginWithFacebook() {
 		try {
 
-			String facebookLoginUrl = "https://www.facebook.com/v11.0/dialog/oauth?" + "client_id=1445081039790531"
+			final String facebookLoginUrl = "https://www.facebook.com/v11.0/dialog/oauth?"
+					+ "client_id=1445081039790531"
 					+ "&redirect_uri=https://manubxx.github.io/fb-callback-redirect/callbackfb"
 					+ "&scope=email,public_profile" + "&response_type=token";
 
@@ -374,7 +375,7 @@ public class ViewAccesso extends JFrame {
 
 	private void loginWithGoogle() {
 		try {
-			String googleLoginUrl = "https://accounts.google.com/o/oauth2/v2/auth?"
+			final String googleLoginUrl = "https://accounts.google.com/o/oauth2/v2/auth?"
 					+ "client_id=1099039266131-kt4al5u1r4ldd4q64h9euh3a9pjpeu98.apps.googleusercontent.com"
 					+ "&redirect_uri=https://manubxx.github.io/google-callback-redirect/callbackgoogle"
 					+ "&response_type=token" + "&scope=openid%20profile%20email";
@@ -394,37 +395,33 @@ public class ViewAccesso extends JFrame {
 	 * Mostra una finestra di dialogo per confermare l'accesso
 	 */
 	private void showTokenConfirmationDialog(String provider) {
-		JFrame confirmFrame = new JFrame("Conferma Accesso " + provider);
+		final JFrame confirmFrame = new JFrame("Conferma Accesso " + provider);
 		GuiUtils.setIconaFinestra(confirmFrame);
 
 		confirmFrame.setSize(350, 150);
 		confirmFrame.setLocationRelativeTo(this);
 		confirmFrame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
-		JPanel panel = new JPanel();
+		final JPanel panel = new JPanel();
 		panel.setLayout(new GridBagLayout());
 		panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-		GridBagConstraints gbc = new GridBagConstraints();
+		final GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridwidth = GridBagConstraints.REMAINDER;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.insets = new Insets(5, 5, 5, 5);
 
-		JLabel label = new JLabel("Incolla il token dalla clipboard e clicca Conferma");
+		final JLabel label = new JLabel("Incolla il token dalla clipboard e clicca Conferma");
 		label.setHorizontalAlignment(SwingConstants.CENTER);
 		panel.add(label, gbc);
 
-		JButton btnConferma = new JButton("Conferma Accesso");
+		final JButton btnConferma = new JButton("Conferma Accesso");
 		btnConferma.setFocusPainted(false);
 
 		// Colore in base al provider - CORREGGI:
 		switch (provider.toLowerCase()) {
-		case "facebook":
-		case "google":
-			btnConferma.setBackground(new Color(66, 133, 244)); // Blu
-			break;
-		default:
-			btnConferma.setBackground(SystemColor.textHighlight);
+		case "facebook", "google" -> btnConferma.setBackground(new Color(66, 133, 244)); // Blu
+		default -> btnConferma.setBackground(SystemColor.textHighlight);
 		}
 
 		btnConferma.setForeground(Color.WHITE);
@@ -439,20 +436,18 @@ public class ViewAccesso extends JFrame {
 		// Azione del pulsante
 		btnConferma.addActionListener(_ -> {
 			try {
-				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-				String token = (String) clipboard.getData(DataFlavor.stringFlavor);
+				final Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+				final String token = (String) clipboard.getData(DataFlavor.stringFlavor);
 
 				if (token != null && !token.isEmpty()) {
 					handleProviderToken(token, provider);
 				} else {
-					JOptionPane.showMessageDialog(confirmFrame,
-							"Nessun token rilevato nella clipboard",
-							"Attenzione", JOptionPane.INFORMATION_MESSAGE);
+					JOptionPane.showMessageDialog(confirmFrame, "Nessun token rilevato nella clipboard", "Attenzione",
+							JOptionPane.INFORMATION_MESSAGE);
 				}
 			} catch (Exception ex) {
 				ex.printStackTrace();
-				JOptionPane.showMessageDialog(confirmFrame,
-						"Errore nella lettura del token: " + ex.getMessage(),
+				JOptionPane.showMessageDialog(confirmFrame, "Errore nella lettura del token: " + ex.getMessage(),
 						"Errore", JOptionPane.ERROR_MESSAGE);
 			}
 			confirmFrame.dispose();

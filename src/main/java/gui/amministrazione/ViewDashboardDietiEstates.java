@@ -29,7 +29,6 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
-import javax.swing.table.DefaultTableModel;
 
 import controller.AccountController;
 import controller.ImmobileController;
@@ -39,6 +38,7 @@ import gui.ViewFiltri;
 import gui.ViewInfoAccount;
 import gui.ViewModificaPassword;
 import gui.utenza.ViewImmobile;
+import model.dto.RicercaDTO;
 import model.entity.Filtri;
 import util.GuiUtils;
 import util.InputUtils;
@@ -47,16 +47,19 @@ public class ViewDashboardDietiEstates extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	private String idAgente = null;
+	private final String emailAgente;
 	private String ruoloDietiEstates = "non definito";
 	private JTextField campoRicerca;
 	private String campoPieno;
-	private String campoVuoto = "";
+	private final String campoVuoto = "";
 	private JTable tableRisultati;
 	private JLabel lblLogout;
 	private JLabel lblRisultati;
 	private ViewFiltri viewFiltri;
 	private JComboBox<String> comboBoxAppartamento;
+	private JComboBox<String> comboBoxFiltraImmobili;
 	private int numeroRisultatiTrovati;
+	private JLabel lblEmailAccesso; // Variabile di istanza per memorizzare il riferimento
 
 	/**
 	 * Create the frame ViewDashboardAdmin.
@@ -68,8 +71,11 @@ public class ViewDashboardDietiEstates extends JFrame {
 		setResizable(true);
 		Preferences.userNodeForPackage(ViewFiltri.class);
 
+		this.emailAgente = emailAgente;
+
 		// Opzioni per le comboBox
-		String[] opAppartamento = { "Vendita", "Affitto" };
+		final String[] opAppartamento = { "Vendita", "Affitto" };
+		final String[] opFiltraImmobili = { "Tutti i risultati", "I miei immobili" };
 
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		this.setBounds(100, 100, 1382, 794);
@@ -77,50 +83,44 @@ public class ViewDashboardDietiEstates extends JFrame {
 		// Imposta la finestra a schermo intero
 		setExtendedState(JFrame.MAXIMIZED_BOTH);
 
-		JPanel dashboard = new JPanel();
+		final JPanel dashboard = new JPanel();
 		dashboard.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 11));
 		dashboard.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(dashboard);
 		dashboard.setLayout(null);
-		SpringLayout sl_dashboard = new SpringLayout();
+		final SpringLayout sl_dashboard = new SpringLayout();
 		dashboard.setLayout(sl_dashboard);
 
 		// Definisco la dashborad da visualizzare in base al ruolo di amministrazione
-		AccountController controller = new AccountController();
+		final AccountController controller = new AccountController();
 		try {
 			ruoloDietiEstates = controller.getRuoloByEmail(emailAgente);
 		} catch (SQLException e) {
-			JOptionPane.showMessageDialog(null, "Non è stato possibile recuperare il ruolo", "Errore", JOptionPane.INFORMATION_MESSAGE);
+			JOptionPane.showMessageDialog(null, "Non è stato possibile recuperare il ruolo", "Errore",
+					JOptionPane.INFORMATION_MESSAGE);
 			e.printStackTrace();
 		}
 
 		// Crea il pannello di ricerca comune a tutti i ruoli
-		JPanel ricerca = createRicercaPanel(emailAgente, opAppartamento, sl_dashboard, dashboard);
+		final JPanel ricerca = createRicercaPanel(emailAgente, opAppartamento, opFiltraImmobili, sl_dashboard,
+				dashboard);
 
 		// Configurazioni specifiche per ruolo
-		switch(ruoloDietiEstates) {
-		case "Admin":
-		case "Supporto":
-			// Per Admin e Supporto aggiungiamo il menu per aggiungere utenti
-			setupAdminSupportoUI(ricerca, emailAgente, ruoloDietiEstates);
-			break;
-		case "Agente":
-			// Per Agente configuramo l'action listener specifico
-			setupAgenteUI(ricerca, emailAgente);
-			break;
-		default:
-			dispose();
+		switch (ruoloDietiEstates) {
+		case "Admin", "Supporto" -> // Per Admin e Supporto aggiungiamo il menu per aggiungere utenti
+		setupAdminSupportoUI(ricerca, emailAgente, ruoloDietiEstates);
+		case "Agente" -> // Per Agente configuramo l'action listener specifico
+		setupAgenteUI(ricerca, emailAgente);
+		default -> dispose();
 		}
 
 		// Pannello per i risultati della ricerca (COMUNE A TUTTI)
 		setupRisultatiPanel(emailAgente, sl_dashboard, dashboard);
 	}
 
-	// METODI PRIVATI
-
-	private JPanel createRicercaPanel(String emailAgente, String[] opAppartamento,
+	private JPanel createRicercaPanel(String emailAgente, String[] opAppartamento, String[] opFiltraImmobili,
 			SpringLayout sl_dashboard, JPanel dashboard) {
-		JPanel ricerca = new JPanel();
+		final JPanel ricerca = new JPanel();
 		sl_dashboard.putConstraint(SpringLayout.NORTH, ricerca, 0, SpringLayout.NORTH, dashboard);
 		sl_dashboard.putConstraint(SpringLayout.WEST, ricerca, 0, SpringLayout.WEST, dashboard);
 		sl_dashboard.putConstraint(SpringLayout.SOUTH, ricerca, 189, SpringLayout.NORTH, dashboard);
@@ -140,9 +140,10 @@ public class ViewDashboardDietiEstates extends JFrame {
 		// Listeners per il campo di ricerca
 		setupCampoRicercaListeners(ricerca);
 
-		SpringLayout sl_ricerca = new SpringLayout();
+		final SpringLayout sl_ricerca = new SpringLayout();
 		sl_ricerca.putConstraint(SpringLayout.EAST, campoRicerca, -355, SpringLayout.EAST, ricerca);
-		sl_ricerca.putConstraint(SpringLayout.HORIZONTAL_CENTER, campoRicerca, 0, SpringLayout.HORIZONTAL_CENTER, ricerca);
+		sl_ricerca.putConstraint(SpringLayout.HORIZONTAL_CENTER, campoRicerca, 0, SpringLayout.HORIZONTAL_CENTER,
+				ricerca);
 		sl_ricerca.putConstraint(SpringLayout.VERTICAL_CENTER, campoRicerca, 0, SpringLayout.VERTICAL_CENTER, ricerca);
 		ricerca.setLayout(sl_ricerca);
 
@@ -169,7 +170,7 @@ public class ViewDashboardDietiEstates extends JFrame {
 		GuiUtils.setIconaLabel(lblLogout, "Logout");
 
 		// Bottone ricerca
-		JButton btnEseguiRicerca = new JButton();
+		final JButton btnEseguiRicerca = new JButton();
 		GuiUtils.setIconaButton(btnEseguiRicerca, "Search");
 		btnEseguiRicerca.setBorderPainted(false);
 		btnEseguiRicerca.setFocusPainted(false);
@@ -185,7 +186,7 @@ public class ViewDashboardDietiEstates extends JFrame {
 		ricerca.add(btnEseguiRicerca);
 
 		// Label utente
-		JLabel lblUser = new JLabel("");
+		final JLabel lblUser = new JLabel("");
 		sl_ricerca.putConstraint(SpringLayout.SOUTH, lblLogout, 0, SpringLayout.SOUTH, lblUser);
 		sl_ricerca.putConstraint(SpringLayout.NORTH, lblUser, 8, SpringLayout.NORTH, ricerca);
 		sl_ricerca.putConstraint(SpringLayout.NORTH, lblLogout, 0, SpringLayout.NORTH, lblUser);
@@ -198,7 +199,7 @@ public class ViewDashboardDietiEstates extends JFrame {
 		GuiUtils.setIconaLabel(lblUser, "User");
 
 		// Titolo
-		JLabel lblTitolo = new JLabel("DietiEstates25");
+		final JLabel lblTitolo = new JLabel("DietiEstates25");
 		sl_ricerca.putConstraint(SpringLayout.NORTH, lblTitolo, 0, SpringLayout.NORTH, ricerca);
 		sl_ricerca.putConstraint(SpringLayout.WEST, lblTitolo, 10, SpringLayout.WEST, ricerca);
 		sl_ricerca.putConstraint(SpringLayout.SOUTH, lblTitolo, -145, SpringLayout.SOUTH, ricerca);
@@ -212,7 +213,7 @@ public class ViewDashboardDietiEstates extends JFrame {
 		setupBenvenutoLabels(ricerca, sl_ricerca, lblTitolo, emailAgente, btnEseguiRicerca);
 
 		// Filtri
-		JLabel lblFiltri = new JLabel();
+		final JLabel lblFiltri = new JLabel();
 		sl_ricerca.putConstraint(SpringLayout.WEST, lblFiltri, 23, SpringLayout.EAST, campoRicerca);
 		sl_ricerca.putConstraint(SpringLayout.EAST, lblFiltri, -302, SpringLayout.EAST, ricerca);
 		sl_ricerca.putConstraint(SpringLayout.WEST, btnEseguiRicerca, 17, SpringLayout.EAST, lblFiltri);
@@ -223,7 +224,7 @@ public class ViewDashboardDietiEstates extends JFrame {
 		lblFiltri.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				String tipologiaAppartamento = (String) comboBoxAppartamento.getSelectedItem();
+				final String tipologiaAppartamento = (String) comboBoxAppartamento.getSelectedItem();
 				viewFiltri = new ViewFiltri(tipologiaAppartamento);
 				viewFiltri.setLocationRelativeTo(null);
 				viewFiltri.setVisible(true);
@@ -232,20 +233,36 @@ public class ViewDashboardDietiEstates extends JFrame {
 		ricerca.add(lblFiltri);
 		GuiUtils.setIconaLabel(lblFiltri, "Tune");
 
+		// Combobox per il filtraggio degli immobili
+		comboBoxFiltraImmobili = new JComboBox<>(opFiltraImmobili);
+		sl_ricerca.putConstraint(SpringLayout.NORTH, comboBoxFiltraImmobili, 0, SpringLayout.NORTH,
+				comboBoxAppartamento);
+		sl_ricerca.putConstraint(SpringLayout.WEST, comboBoxFiltraImmobili, 84, SpringLayout.WEST, ricerca);
+		sl_ricerca.putConstraint(SpringLayout.SOUTH, comboBoxFiltraImmobili, 0, SpringLayout.SOUTH,
+				comboBoxAppartamento);
+		sl_ricerca.putConstraint(SpringLayout.EAST, comboBoxFiltraImmobili, -40, SpringLayout.WEST,
+				comboBoxAppartamento);
+		comboBoxFiltraImmobili.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 11));
+		comboBoxFiltraImmobili.setFocusable(false);
+		comboBoxFiltraImmobili.setForeground(new Color(0, 0, 51));
+		comboBoxFiltraImmobili.setBackground(new Color(255, 255, 255));
+		comboBoxFiltraImmobili.setToolTipText("Filtra o ricerca tutti gli immobili");
+		ricerca.add(comboBoxFiltraImmobili);
+
 		return ricerca;
 	}
 
 	private void setupAdminSupportoUI(JPanel ricerca, String emailAgente, String ruolo) {
-		SpringLayout sl_ricerca = (SpringLayout) ricerca.getLayout();
+		final SpringLayout sl_ricerca = (SpringLayout) ricerca.getLayout();
 
 		// Menu per aggiungere utenti (solo per Admin e Supporto)
-		JPopupMenu menuAggiungiUtente = new JPopupMenu();
+		final JPopupMenu menuAggiungiUtente = new JPopupMenu();
 
 		// Solo gli Admin possono aggiungere altri admin di supporto
 		if ("Admin".equals(ruolo)) {
 			setTitle("DietiEstates25 - Dashboard per l'Admin");
 
-			JMenuItem amministratoreDiSupporto = new JMenuItem("Aggiungi un nuovo amministratore di supporto");
+			final JMenuItem amministratoreDiSupporto = new JMenuItem("Aggiungi un nuovo amministratore di supporto");
 			menuAggiungiUtente.add(amministratoreDiSupporto);
 
 			amministratoreDiSupporto.addActionListener(new ActionListener() {
@@ -254,10 +271,10 @@ public class ViewDashboardDietiEstates extends JFrame {
 					SwingUtilities.invokeLater(new Runnable() {
 						@Override
 						public void run() {
-							AccountController con2 = new AccountController();
-							String agenzia = con2.getAgenzia(emailAgente);
+							final AccountController con2 = new AccountController();
+							final String agenzia = con2.getAgenzia(emailAgente);
 
-							ViewInserimentoEmail view = new ViewInserimentoEmail(agenzia,
+							final ViewInserimentoEmail view = new ViewInserimentoEmail(agenzia,
 									ViewInserimentoEmail.TipoInserimento.SUPPORTO);
 							view.setLocationRelativeTo(null);
 							view.setVisible(true);
@@ -265,13 +282,12 @@ public class ViewDashboardDietiEstates extends JFrame {
 					});
 				}
 			});
-		}else {
+		} else {
 			setTitle("DietiEstates25 - Dashboard per l'agente di supporto");
 		}
 
-
 		// Sia Admin che Supporto possono aggiungere agenti immobiliari
-		JMenuItem agente = new JMenuItem("Aggiungi un nuovo agente immobiliare");
+		final JMenuItem agente = new JMenuItem("Aggiungi un nuovo agente immobiliare");
 		menuAggiungiUtente.add(agente);
 
 		agente.addActionListener(new ActionListener() {
@@ -280,10 +296,10 @@ public class ViewDashboardDietiEstates extends JFrame {
 				SwingUtilities.invokeLater(new Runnable() {
 					@Override
 					public void run() {
-						AccountController con1 = new AccountController();
-						String agenzia = con1.getAgenzia(emailAgente);
+						final AccountController con1 = new AccountController();
+						final String agenzia = con1.getAgenzia(emailAgente);
 
-						ViewInserimentoEmail view = new ViewInserimentoEmail(agenzia,
+						final ViewInserimentoEmail view = new ViewInserimentoEmail(agenzia,
 								ViewInserimentoEmail.TipoInserimento.AGENTE);
 						view.setLocationRelativeTo(null);
 						view.setVisible(true);
@@ -292,17 +308,17 @@ public class ViewDashboardDietiEstates extends JFrame {
 			}
 		});
 
-		JLabel lblAggiungiUtente = new JLabel();
+		final JLabel lblAggiungiUtente = new JLabel();
 		sl_ricerca.putConstraint(SpringLayout.EAST, lblAggiungiUtente, -95, SpringLayout.EAST, ricerca);
 		// Trova lblUser per impostare i constraint relativi
-		JLabel lblUser = findLabelByTooltip(ricerca, "Clicca per vedere altre ozioni sul profilo");
+		final JLabel lblUser = findLabelByTooltip(ricerca, "Clicca per vedere altre ozioni sul profilo");
 		if (lblUser != null) {
 			sl_ricerca.putConstraint(SpringLayout.WEST, lblUser, 6, SpringLayout.EAST, lblAggiungiUtente);
 		}
 		sl_ricerca.putConstraint(SpringLayout.NORTH, lblAggiungiUtente, 11, SpringLayout.NORTH, ricerca);
 
 		// Trova lblBenvenuto per impostare i constraint relativi
-		JLabel lblBenvenuto = findLabelByText(ricerca, "Accesso effettuato con:");
+		final JLabel lblBenvenuto = findLabelByText(ricerca, "Accesso effettuato con:");
 		if (lblBenvenuto != null) {
 			sl_ricerca.putConstraint(SpringLayout.EAST, lblBenvenuto, -49, SpringLayout.WEST, lblAggiungiUtente);
 		}
@@ -317,7 +333,7 @@ public class ViewDashboardDietiEstates extends JFrame {
 		});
 
 		// Aggiorna il tooltip in base al ruolo
-		String tooltip;
+		final String tooltip;
 		if ("Admin".equals(ruolo)) {
 			tooltip = "Clicca per aggiungere un nuovo agente o amministratore di supporto";
 		} else {
@@ -329,7 +345,7 @@ public class ViewDashboardDietiEstates extends JFrame {
 		GuiUtils.setIconaLabel(lblAggiungiUtente, "AddUser");
 
 		// Configura il listener del bottone ricerca per Admin/Supporto
-		JButton btnEseguiRicerca = findButtonByTooltip(ricerca, "Clicca per iniziare una ricerca");
+		final JButton btnEseguiRicerca = findButtonByTooltip(ricerca, "Clicca per iniziare una ricerca");
 		if (btnEseguiRicerca != null) {
 			btnEseguiRicerca.addActionListener(new ActionListener() {
 				@Override
@@ -343,21 +359,21 @@ public class ViewDashboardDietiEstates extends JFrame {
 	private void setupAgenteUI(JPanel ricerca, String emailAgente) {
 		setTitle("DietiEstates25 - Dashboard per l'Agente immobiliare");
 
-		SpringLayout sl_ricerca = (SpringLayout) ricerca.getLayout();
+		final SpringLayout sl_ricerca = (SpringLayout) ricerca.getLayout();
 
 		// Configurazioni specifiche per Agente
-		JLabel lblUser = findLabelByTooltip(ricerca, "Clicca per vedere altre ozioni sul profilo");
+		final JLabel lblUser = findLabelByTooltip(ricerca, "Clicca per vedere altre ozioni sul profilo");
 		if (lblUser != null) {
 			sl_ricerca.putConstraint(SpringLayout.EAST, lblUser, -89, SpringLayout.EAST, ricerca);
 		}
 
-		JLabel lblBenvenuto = findLabelByText(ricerca, "Accesso effettuato con:");
+		final JLabel lblBenvenuto = findLabelByText(ricerca, "Accesso effettuato con:");
 		if (lblBenvenuto != null) {
 			sl_ricerca.putConstraint(SpringLayout.EAST, lblBenvenuto, -144, SpringLayout.EAST, ricerca);
 		}
 
 		// Configura il listener del bottone ricerca per Agente
-		JButton btnEseguiRicerca = findButtonByTooltip(ricerca, "Clicca per iniziare una ricerca");
+		final JButton btnEseguiRicerca = findButtonByTooltip(ricerca, "Clicca per iniziare una ricerca");
 		if (btnEseguiRicerca != null) {
 			btnEseguiRicerca.addActionListener(new ActionListener() {
 				@Override
@@ -371,20 +387,21 @@ public class ViewDashboardDietiEstates extends JFrame {
 
 	private void setupRisultatiPanel(String emailAgente, SpringLayout sl_dashboard, JPanel dashboard) {
 		// Pannello per i risultati della ricerca
-		JPanel risultatiDaRicerca = new JPanel();
+		final JPanel risultatiDaRicerca = new JPanel();
 		sl_dashboard.putConstraint(SpringLayout.NORTH, risultatiDaRicerca, 190, SpringLayout.NORTH, dashboard);
 		sl_dashboard.putConstraint(SpringLayout.WEST, risultatiDaRicerca, 0, SpringLayout.WEST, dashboard);
 		sl_dashboard.putConstraint(SpringLayout.SOUTH, risultatiDaRicerca, 0, SpringLayout.SOUTH, dashboard);
 		sl_dashboard.putConstraint(SpringLayout.EAST, risultatiDaRicerca, 0, SpringLayout.EAST, dashboard);
 		risultatiDaRicerca.setBackground(new Color(50, 133, 177));
 		dashboard.add(risultatiDaRicerca);
-		SpringLayout sl_risultatiDaRicerca = new SpringLayout();
+		final SpringLayout sl_risultatiDaRicerca = new SpringLayout();
 		risultatiDaRicerca.setLayout(sl_risultatiDaRicerca);
 
-		JScrollPane scrollPane = new JScrollPane();
+		final JScrollPane scrollPane = new JScrollPane();
 		sl_risultatiDaRicerca.putConstraint(SpringLayout.NORTH, scrollPane, 47, SpringLayout.NORTH, risultatiDaRicerca);
 		sl_risultatiDaRicerca.putConstraint(SpringLayout.WEST, scrollPane, 10, SpringLayout.WEST, risultatiDaRicerca);
-		sl_risultatiDaRicerca.putConstraint(SpringLayout.SOUTH, scrollPane, -10, SpringLayout.SOUTH,risultatiDaRicerca);
+		sl_risultatiDaRicerca.putConstraint(SpringLayout.SOUTH, scrollPane, -10, SpringLayout.SOUTH,
+				risultatiDaRicerca);
 		sl_risultatiDaRicerca.putConstraint(SpringLayout.EAST, scrollPane, -10, SpringLayout.EAST, risultatiDaRicerca);
 		scrollPane.getViewport().setBackground(new Color(255, 255, 255));
 		scrollPane.setBorder(null);
@@ -405,10 +422,10 @@ public class ViewDashboardDietiEstates extends JFrame {
 				if (e.getClickCount() == 1) {
 					ottieniIdAccount(emailAgente);
 
-					int row = tableRisultati.rowAtPoint(e.getPoint());
+					final int row = tableRisultati.rowAtPoint(e.getPoint());
 					if (row >= 0) {
-						long idImmobile = (Long) tableRisultati.getValueAt(row, 0);
-						ViewImmobile finestra = new ViewImmobile(idImmobile, idAgente);
+						final long idImmobile = (Long) tableRisultati.getValueAt(row, 0);
+						final ViewImmobile finestra = new ViewImmobile(idImmobile, idAgente);
 						finestra.setLocationRelativeTo(null);
 						finestra.setVisible(true);
 					}
@@ -418,8 +435,9 @@ public class ViewDashboardDietiEstates extends JFrame {
 
 		scrollPane.setViewportView(tableRisultati);
 
-		lblRisultati = new JLabel("Avvia una ricerca per vedere i tuoi immobili");
-		sl_risultatiDaRicerca.putConstraint(SpringLayout.NORTH, lblRisultati, 5, SpringLayout.NORTH, risultatiDaRicerca);
+		lblRisultati = new JLabel("Avvia una ricerca per vedere i risultati");
+		sl_risultatiDaRicerca.putConstraint(SpringLayout.NORTH, lblRisultati, 5, SpringLayout.NORTH,
+				risultatiDaRicerca);
 		sl_risultatiDaRicerca.putConstraint(SpringLayout.WEST, lblRisultati, 20, SpringLayout.WEST, risultatiDaRicerca);
 		sl_risultatiDaRicerca.putConstraint(SpringLayout.SOUTH, lblRisultati, -10, SpringLayout.NORTH, scrollPane);
 		lblRisultati.setHorizontalAlignment(SwingConstants.LEFT);
@@ -428,14 +446,16 @@ public class ViewDashboardDietiEstates extends JFrame {
 		risultatiDaRicerca.add(lblRisultati);
 
 		// Vedi Offerte Proposte
-		JButton btnVediOfferteProposte = new JButton("Vedi offerte proposte");
+		final JButton btnVediOfferteProposte = new JButton("Vedi offerte proposte");
 		btnVediOfferteProposte.setFocusable(false);
-		sl_risultatiDaRicerca.putConstraint(SpringLayout.NORTH, btnVediOfferteProposte, 8, SpringLayout.NORTH, lblRisultati);
-		sl_risultatiDaRicerca.putConstraint(SpringLayout.EAST, btnVediOfferteProposte, -42, SpringLayout.EAST, risultatiDaRicerca);
+		sl_risultatiDaRicerca.putConstraint(SpringLayout.NORTH, btnVediOfferteProposte, 8, SpringLayout.NORTH,
+				lblRisultati);
+		sl_risultatiDaRicerca.putConstraint(SpringLayout.EAST, btnVediOfferteProposte, -42, SpringLayout.EAST,
+				risultatiDaRicerca);
 		btnVediOfferteProposte.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				ViewStoricoAgente viewOfferte = new ViewStoricoAgente(emailAgente);
+				final ViewStoricoAgente viewOfferte = new ViewStoricoAgente(emailAgente);
 				viewOfferte.setLocationRelativeTo(null);
 				viewOfferte.setVisible(true);
 			}
@@ -447,13 +467,14 @@ public class ViewDashboardDietiEstates extends JFrame {
 		risultatiDaRicerca.add(btnVediOfferteProposte);
 
 		// Carica un immobile
-		JButton btnCaricaImmobile = new JButton("Carica immobile");
+		final JButton btnCaricaImmobile = new JButton("Carica immobile");
 		sl_risultatiDaRicerca.putConstraint(SpringLayout.NORTH, btnCaricaImmobile, 8, SpringLayout.NORTH, lblRisultati);
-		sl_risultatiDaRicerca.putConstraint(SpringLayout.EAST, btnCaricaImmobile, -18, SpringLayout.WEST, btnVediOfferteProposte);
+		sl_risultatiDaRicerca.putConstraint(SpringLayout.EAST, btnCaricaImmobile, -18, SpringLayout.WEST,
+				btnVediOfferteProposte);
 		btnCaricaImmobile.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				ViewCaricaImmobile viewCaricaImmobile = new ViewCaricaImmobile(emailAgente);
+				final ViewCaricaImmobile viewCaricaImmobile = new ViewCaricaImmobile(emailAgente);
 				viewCaricaImmobile.setLocationRelativeTo(null);
 				viewCaricaImmobile.setVisible(true);
 			}
@@ -464,8 +485,6 @@ public class ViewDashboardDietiEstates extends JFrame {
 		btnCaricaImmobile.setBackground(Color.WHITE);
 		risultatiDaRicerca.add(btnCaricaImmobile);
 	}
-
-	// METODI DI SUPPORTO
 
 	private void setupCampoRicercaListeners(JPanel ricerca) {
 		campoRicerca.addKeyListener(new KeyAdapter() {
@@ -494,8 +513,8 @@ public class ViewDashboardDietiEstates extends JFrame {
 		logoutLabel.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				int scelta = JOptionPane.showConfirmDialog(null, "Sei sicuro di voler fare logout?", "Conferma logout",
-						JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+				final int scelta = JOptionPane.showConfirmDialog(null, "Sei sicuro di voler fare logout?",
+						"Conferma logout", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 
 				if (scelta == JOptionPane.YES_OPTION) {
 					try {
@@ -509,7 +528,7 @@ public class ViewDashboardDietiEstates extends JFrame {
 						return;
 					}
 
-					ViewAccesso viewAccesso = new ViewAccesso();
+					final ViewAccesso viewAccesso = new ViewAccesso();
 					viewAccesso.setLocationRelativeTo(null);
 					viewAccesso.setVisible(true);
 					dispose();
@@ -519,9 +538,9 @@ public class ViewDashboardDietiEstates extends JFrame {
 	}
 
 	private void setupUserMenu(JLabel userLabel, String emailAgente) {
-		JPopupMenu menuUtente = new JPopupMenu();
-		JMenuItem visualizzaInfoAccount = new JMenuItem("Visualizza informazioni sull'account");
-		JMenuItem modificaPassword = new JMenuItem("Modifica password");
+		final JPopupMenu menuUtente = new JPopupMenu();
+		final JMenuItem visualizzaInfoAccount = new JMenuItem("Visualizza informazioni sull'account");
+		final JMenuItem modificaPassword = new JMenuItem("Modifica password");
 
 		menuUtente.add(visualizzaInfoAccount);
 		menuUtente.add(modificaPassword);
@@ -529,7 +548,7 @@ public class ViewDashboardDietiEstates extends JFrame {
 		visualizzaInfoAccount.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				ViewInfoAccount viewAccount = new ViewInfoAccount(emailAgente);
+				final ViewInfoAccount viewAccount = new ViewInfoAccount(emailAgente);
 				viewAccount.setLocationRelativeTo(null);
 				viewAccount.setVisible(true);
 			}
@@ -538,7 +557,7 @@ public class ViewDashboardDietiEstates extends JFrame {
 		modificaPassword.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				ViewModificaPassword viewModificaPassword = new ViewModificaPassword(emailAgente);
+				final ViewModificaPassword viewModificaPassword = new ViewModificaPassword(emailAgente);
 				viewModificaPassword.setLocationRelativeTo(null);
 				viewModificaPassword.setVisible(true);
 			}
@@ -554,11 +573,9 @@ public class ViewDashboardDietiEstates extends JFrame {
 		});
 	}
 
-	private JLabel lblEmailAccesso; // Variabile di istanza per memorizzare il riferimento
-
-	private void setupBenvenutoLabels(JPanel ricerca, SpringLayout sl_ricerca, JLabel lblTitolo,
-			String emailAgente, JButton btnEseguiRicerca) {
-		JLabel lblBenvenuto = new JLabel("Accesso effettuato con:");
+	private void setupBenvenutoLabels(JPanel ricerca, SpringLayout sl_ricerca, JLabel lblTitolo, String emailAgente,
+			JButton btnEseguiRicerca) {
+		final JLabel lblBenvenuto = new JLabel("Accesso effettuato con:");
 		sl_ricerca.putConstraint(SpringLayout.NORTH, lblBenvenuto, 11, SpringLayout.NORTH, ricerca);
 		sl_ricerca.putConstraint(SpringLayout.WEST, lblBenvenuto, 601, SpringLayout.EAST, lblTitolo);
 		lblBenvenuto.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -573,7 +590,7 @@ public class ViewDashboardDietiEstates extends JFrame {
 		sl_ricerca.putConstraint(SpringLayout.WEST, lblEmailAccesso, 532, SpringLayout.EAST, lblTitolo);
 
 		// Trova lblUser per impostare il constraint SOUTH
-		JLabel lblUser = findLabelByTooltip(ricerca, "Clicca per vedere altre ozioni sul profilo");
+		final JLabel lblUser = findLabelByTooltip(ricerca, "Clicca per vedere altre ozioni sul profilo");
 		if (lblUser != null) {
 			sl_ricerca.putConstraint(SpringLayout.SOUTH, lblEmailAccesso, 0, SpringLayout.SOUTH, lblUser);
 		}
@@ -592,8 +609,7 @@ public class ViewDashboardDietiEstates extends JFrame {
 	// Metodi helper per trovare componenti
 	private JLabel findLabelByTooltip(JPanel panel, String tooltip) {
 		for (Component comp : panel.getComponents()) {
-			if (comp instanceof JLabel) {
-				JLabel label = (JLabel) comp;
+			if (comp instanceof JLabel label) {
 				if (tooltip.equals(label.getToolTipText())) {
 					return label;
 				}
@@ -604,8 +620,7 @@ public class ViewDashboardDietiEstates extends JFrame {
 
 	private JLabel findLabelByText(JPanel panel, String text) {
 		for (Component comp : panel.getComponents()) {
-			if (comp instanceof JLabel) {
-				JLabel label = (JLabel) comp;
+			if (comp instanceof JLabel label) {
 				if (text.equals(label.getText())) {
 					return label;
 				}
@@ -616,8 +631,7 @@ public class ViewDashboardDietiEstates extends JFrame {
 
 	private JButton findButtonByTooltip(JPanel panel, String tooltip) {
 		for (Component comp : panel.getComponents()) {
-			if (comp instanceof JButton) {
-				JButton button = (JButton) comp;
+			if (comp instanceof JButton button) {
 				if (tooltip.equals(button.getToolTipText())) {
 					return button;
 				}
@@ -626,68 +640,55 @@ public class ViewDashboardDietiEstates extends JFrame {
 		return null;
 	}
 
-	// METODI ESISTENTI (rimangono invariati)
-
 	private void ottieniIdAccount(String emailAgente) {
-		if(idAgente == null) {
-			AccountController controller = new AccountController();
+		if (idAgente == null) {
+			final AccountController controller = new AccountController();
 			try {
 				idAgente = controller.getIdAccountByEmail(emailAgente);
 			} catch (SQLException ex) {
 				ex.printStackTrace();
-				JOptionPane.showMessageDialog(this,
-						"Errore nel recupero dell'ID account: " + ex.getMessage(),
-						"Errore", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(this, "Errore nel recupero dell'ID account: " + ex.getMessage(), "Errore",
+						JOptionPane.ERROR_MESSAGE);
 			}
 		}
 	}
 
 	private void ricercaImmobili() {
-		ImmobileController controller = new ImmobileController();
-		String tipologiaAppartamento = (String) comboBoxAppartamento.getSelectedItem();
+		final ImmobileController controller = new ImmobileController();
+
+		final String tipologiaAppartamento = (String) comboBoxAppartamento.getSelectedItem();
 		campoPieno = campoRicerca.getText();
-		if (campoPieno.equals("Cerca scrivendo una via, una zona o una parola chiave") || campoPieno.equals(campoVuoto)) {
+
+		if (campoPieno.equals("Cerca scrivendo una via, una zona o una parola chiave")
+				|| campoPieno.equals(campoVuoto)) {
 			JOptionPane.showMessageDialog(null, "Scrivere qualcosa prima di iniziare la ricerca!", "Attenzione",
 					JOptionPane.INFORMATION_MESSAGE);
-		} else {
-			campoPieno = InputUtils.capitalizzaParole(campoPieno);
-
-			ViewFiltri viewFiltri = new ViewFiltri(tipologiaAppartamento);
-			Filtri filtri = viewFiltri.getFiltriSelezionati();
-
-			DefaultTableModel model = new DefaultTableModel(
-					new String[] { "", "Titolo dell'annuncio", "Descrizione", "Prezzo (€)" }, 0) {
-				private static final long serialVersionUID = 1L;
-
-				@SuppressWarnings("rawtypes")
-				Class[] columnTypes = new Class[] { Object.class, String.class, String.class, String.class };
-
-				@Override
-				public Class<?> getColumnClass(int columnIndex) {
-					return columnTypes[columnIndex];
-				}
-
-				@Override
-				public boolean isCellEditable(int row, int column) {
-					return false;
-				}
-			};
-
-			tableRisultati.setModel(model);
-
-			tableRisultati.getColumnModel().getColumn(0).setResizable(false);
-			tableRisultati.getColumnModel().getColumn(1).setResizable(false);
-			tableRisultati.getColumnModel().getColumn(1).setPreferredWidth(170);
-			tableRisultati.getColumnModel().getColumn(2).setResizable(false);
-			tableRisultati.getColumnModel().getColumn(2).setPreferredWidth(450);
-			tableRisultati.getColumnModel().getColumn(3).setResizable(false);
-
-			tableRisultati.getTableHeader().setReorderingAllowed(false);
-			tableRisultati.getTableHeader().setResizingAllowed(false);
-
-			numeroRisultatiTrovati = controller.riempiTableRisultati(tableRisultati, campoPieno, tipologiaAppartamento, filtri);
-			lblRisultati.setText("Immobili trovati: " + numeroRisultatiTrovati);
+			return;
 		}
+
+		campoPieno = InputUtils.capitalizzaParole(campoPieno);
+		final ViewFiltri viewFiltri = new ViewFiltri(tipologiaAppartamento);
+		final Filtri filtri = viewFiltri.getFiltriSelezionati();
+
+		// Creazione del RicercaDTO
+		final RicercaDTO ricercaDTO = new RicercaDTO();
+		ricercaDTO.setQueryRicerca(campoPieno);
+		ricercaDTO.setEmailUtente(emailAgente);
+		ricercaDTO.setTipologiaImmobile(tipologiaAppartamento);
+		ricercaDTO.setFiltri(filtri);
+		ricercaDTO.setEmailUtente(emailAgente); // Email dell'agente corrente
+
+		// Determina il tipo di ricerca in base alla combobox
+		final String selezioneFiltro = (String) comboBoxFiltraImmobili.getSelectedItem();
+		if ("I miei immobili".equals(selezioneFiltro)) {
+			ricercaDTO.setTipoRicerca(RicercaDTO.TipoRicerca.I_MIEI_IMMOBILI);
+		} else {
+			ricercaDTO.setTipoRicerca(RicercaDTO.TipoRicerca.TUTTI_I_RISULTATI);
+		}
+
+		// Chiamata al controller con il DTO
+		numeroRisultatiTrovati = controller.riempiTableRisultati(tableRisultati, ricercaDTO);
+		lblRisultati.setText("Immobili trovati: " + numeroRisultatiTrovati);
 	}
 
 	private void setCampoDiTestoIn() {
@@ -705,4 +706,11 @@ public class ViewDashboardDietiEstates extends JFrame {
 			campoRicerca.setFont(new Font("Yu Gothic UI Semibold", Font.ITALIC, 11));
 		}
 	}
+
+	// METODI PRIVATI
+
+	// METODI DI SUPPORTO
+
+	// METODI ESISTENTI (rimangono invariati)
+
 }

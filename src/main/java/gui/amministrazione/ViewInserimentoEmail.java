@@ -26,21 +26,14 @@ import util.GuiUtils;
 
 public class ViewInserimentoEmail extends JFrame {
 
-	public enum TipoInserimento {
-		SUPPORTO, AGENTE
-	}
-
 	/**
 	 *
 	 */
 	private static final long serialVersionUID = 1L;
-	private JPanel contentPane;
-
-	private JPanel panel;
-
-	private TipoInserimento tipoInserimento;
-
-	private JTextField txtEmail;
+	private final JPanel contentPane;
+	private final JPanel panel;
+	private final TipoInserimento tipoInserimento;
+	private final JTextField txtEmail;
 	private String campoPieno = "E-mail";
 
 	/**
@@ -89,8 +82,9 @@ public class ViewInserimentoEmail extends JFrame {
 		panel.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				if (txtEmail.getText().trim().isEmpty())
+				if (txtEmail.getText().trim().isEmpty()) {
 					txtEmail.setText("E-mail");
+				}
 			}
 		});
 
@@ -99,38 +93,39 @@ public class ViewInserimentoEmail extends JFrame {
 			@Override
 			public void keyTyped(KeyEvent e) {
 				campoPieno = txtEmail.getText();
-				if (campoPieno.equals("E-mail"))
+				if (campoPieno.equals("E-mail")) {
 					txtEmail.setText("");
+				}
 			}
 		});
 
-		JLabel lblErroreEmail = new JLabel("");
+		final JLabel lblErroreEmail = new JLabel("");
 		lblErroreEmail.setForeground(Color.RED);
 		lblErroreEmail.setBounds(165, 125, 300, 22); // subito sotto l'emailArea
 		panel.add(lblErroreEmail);
 
 		// Bottone Procedi
-		JButton btnNewButton = new JButton("Procedi");
+		final JButton btnNewButton = new JButton("Procedi");
 		btnNewButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				String email = txtEmail.getText().trim();
+				final String email = txtEmail.getText().trim();
 
 				// Controllo chiocciola: deve esserci una e una sola
-				int countAt = email.length() - email.replace("@", "").length();
+				final int countAt = email.length() - email.replace("@", "").length();
 
-				if (countAt != 1)
+				if (countAt != 1) {
 					lblErroreEmail.setText("L'email deve contenere una sola chiocciola (@).");
-				else {
+				} else {
 					lblErroreEmail.setText(""); // pulisco eventuale messaggio di errore
 
 					SwingUtilities.invokeLater(() -> {
 						if (tipoInserimento == TipoInserimento.SUPPORTO) {
-							ViewRegistraSupporto view = new ViewRegistraSupporto(email, agenzia);
+							final ViewRegistraSupporto view = new ViewRegistraSupporto(email, agenzia);
 							view.setLocationRelativeTo(null);
 							view.setVisible(true);
 						} else if (tipoInserimento == TipoInserimento.AGENTE) {
-							ViewRegistraAgente view = new ViewRegistraAgente(email, agenzia);
+							final ViewRegistraAgente view = new ViewRegistraAgente(email, agenzia);
 							view.setLocationRelativeTo(null);
 							view.setVisible(true);
 						}
@@ -145,7 +140,7 @@ public class ViewInserimentoEmail extends JFrame {
 		btnNewButton.setBounds(220, 237, 200, 25);
 		panel.add(btnNewButton);
 
-		JLabel lblDescrizione = new JLabel("Inserisci l'e-mail di lavoro dell'utente");
+		final JLabel lblDescrizione = new JLabel("Inserisci l'e-mail di lavoro dell'utente");
 		lblDescrizione.setHorizontalAlignment(SwingConstants.CENTER);
 		lblDescrizione.setFont(new Font("Segoe UI", Font.BOLD, 18));
 		lblDescrizione.setBounds(5, 36, 631, 33);
@@ -159,15 +154,21 @@ public class ViewInserimentoEmail extends JFrame {
 		field.addFocusListener(new FocusAdapter() {
 			@Override
 			public void focusGained(FocusEvent e) {
-				if (field.getText().equals(text))
+				if (field.getText().equals(text)) {
 					field.setText("");
+				}
 			}
 
 			@Override
 			public void focusLost(FocusEvent e) {
-				if (field.getText().trim().isEmpty())
+				if (field.getText().trim().isEmpty()) {
 					field.setText(text);
+				}
 			}
 		});
+	}
+
+	public enum TipoInserimento {
+		SUPPORTO, AGENTE
 	}
 }

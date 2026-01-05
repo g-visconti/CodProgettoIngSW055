@@ -56,7 +56,7 @@ public class Immobile {
 	// l'icona è la prima immagine della lista, codificata in base64
 	public String getIcon() {
 		if (foto != null && !foto.isEmpty()) {
-			byte[] img = foto.get(0);
+			final byte[] img = foto.get(0);
 			System.out.println("Lunghezza immagine: " + img.length);
 			if (img.length < 100) {
 				System.out.println("⚠️ Attenzione: immagine troppo piccola, probabilmente non valida.");
@@ -70,7 +70,7 @@ public class Immobile {
 	// sovrascrivendo la lista con una sola immagine decodificata da base64
 	public void setIcon(String base64) {
 		if (base64 != null && !base64.isEmpty()) {
-			byte[] imageBytes = Base64.getDecoder().decode(base64);
+			final byte[] imageBytes = Base64.getDecoder().decode(base64);
 			foto = new ArrayList<>();
 			foto.add(imageBytes);
 		}
@@ -189,7 +189,7 @@ public class Immobile {
 	}
 
 	public JSONObject getFiltriAsJson() {
-		JSONObject filtriJson = new JSONObject();
+		final JSONObject filtriJson = new JSONObject();
 		filtriJson.put("numeroLocali", this.numeroLocali);
 		filtriJson.put("numeroBagni", this.numeroBagni);
 		filtriJson.put("piano", this.piano);

@@ -6,10 +6,10 @@ public class OffertaIniziale {
 	// Attributi
 	private long idOfferta;
 	private long immobileAssociato;
-	private String clienteAssociato;  // Rinominato da accountAssociato
+	private String clienteAssociato; // Rinominato da accountAssociato
 	private LocalDateTime dataOfferta; // Rinominato da data
 	private String stato;
-	private double importoProposto;   // Rinominato da importo
+	private double importoProposto; // Rinominato da importo
 
 	// Costruttore
 	public OffertaIniziale(double importoProposto, String clienteAssociato, long immobileAssociato) {
@@ -19,7 +19,7 @@ public class OffertaIniziale {
 		dataOfferta = LocalDateTime.now().withNano(0);
 		System.out.println("dataOfferta: " + dataOfferta);
 		System.out.println("clienteAssociato: " + clienteAssociato);
-		stato = "In attesa";  // Cambiato da "Attesa" a "In attesa"
+		stato = "In attesa"; // Cambiato da "Attesa" a "In attesa"
 	}
 
 	// Getter
@@ -75,13 +75,8 @@ public class OffertaIniziale {
 	// Metodo toString per debugging
 	@Override
 	public String toString() {
-		return "OffertaIniziale{" +
-				"idOfferta=" + idOfferta +
-				", immobileAssociato=" + immobileAssociato +
-				", clienteAssociato='" + clienteAssociato + '\'' +
-				", dataOfferta=" + dataOfferta +
-				", stato='" + stato + '\'' +
-				", importoProposto=" + importoProposto +
-				'}';
+		return "OffertaIniziale{" + "idOfferta=" + idOfferta + ", immobileAssociato=" + immobileAssociato
+				+ ", clienteAssociato='" + clienteAssociato + '\'' + ", dataOfferta=" + dataOfferta + ", stato='"
+				+ stato + '\'' + ", importoProposto=" + importoProposto + '}';
 	}
 }

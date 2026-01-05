@@ -15,7 +15,7 @@ import model.entity.Cliente;
 
 public class AccountDAO {
 
-	private Connection connection;
+	private final Connection connection;
 
 	// costruttore per AccountDAO
 	public AccountDAO(Connection connection) {
@@ -25,16 +25,15 @@ public class AccountDAO {
 	// controllo se l'email è presente nel database
 	public boolean emailEsiste(String email) throws SQLException {
 		boolean result = false;
-		String sql = "SELECT 1 FROM \"Account\" WHERE email = ?";
+		final String sql = "SELECT 1 FROM \"Account\" WHERE email = ?";
 		try (PreparedStatement stmt = connection.prepareStatement(sql)) {
 			stmt.setString(1, email);
-			ResultSet rs = stmt.executeQuery();
+			final ResultSet rs = stmt.executeQuery();
 			if (rs.next()) { // true se ottengo una tupla con le credenziali passate per parametri
 				result = true;
 			}
 
 			rs.close();
-			stmt.close();
 
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -45,12 +44,12 @@ public class AccountDAO {
 	// controllo l'esistenza di una tupla con email e password passate come
 	// parametri
 	public boolean checkCredenziali(String email, String passwordInserita) throws SQLException {
-		String query = "SELECT password FROM \"Account\" WHERE email = ?";
+		final String query = "SELECT password FROM \"Account\" WHERE email = ?";
 		try (PreparedStatement stmt = connection.prepareStatement(query)) {
 			stmt.setString(1, email);
 			try (ResultSet rs = stmt.executeQuery()) {
 				if (rs.next()) {
-					String hashedPassword = rs.getString("password");
+					final String hashedPassword = rs.getString("password");
 					return BCrypt.checkpw(passwordInserita, hashedPassword);
 				} else {
 					return false; // nessun account con questa email
@@ -63,7 +62,7 @@ public class AccountDAO {
 	public String insertAccount(Account account) throws SQLException {
 		System.out.println("DEBUG DAO insertAccount - cognome: '" + account.getCognome() + "'");
 
-		String query = "INSERT INTO \"Account\" (\"email\", \"password\", \"nome\", \"cognome\", \"citta\", \"numeroTelefono\",\"cap\", \"indirizzo\", ruolo ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+		final String query = "INSERT INTO \"Account\" (\"email\", \"password\", \"nome\", \"cognome\", \"citta\", \"numeroTelefono\",\"cap\", \"indirizzo\", ruolo ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 		try (PreparedStatement stmt = connection.prepareStatement(query, new String[] { "idAccount" })) {
 			stmt.setString(1, account.getEmail());
@@ -76,7 +75,7 @@ public class AccountDAO {
 			stmt.setString(8, account.getIndirizzo());
 			stmt.setString(9, account.getRuolo());
 
-			int affectedRows = stmt.executeUpdate();
+			final int affectedRows = stmt.executeUpdate();
 			if (affectedRows == 0) {
 				throw new SQLException("Creazione account fallita, nessuna riga inserita.");
 			}
@@ -93,7 +92,7 @@ public class AccountDAO {
 
 	public String insertAccount(Cliente cliente) throws SQLException {
 		// Lasciamo il DB generare idAccount, quindi non lo inseriamo
-		String query = "INSERT INTO \"Account\" (\"email\", \"password\", \"nome\", \"cognome\", \"citta\", \"numeroTelefono\", \"cap\", \"indirizzo\", ruolo) "
+		final String query = "INSERT INTO \"Account\" (\"email\", \"password\", \"nome\", \"cognome\", \"citta\", \"numeroTelefono\", \"cap\", \"indirizzo\", ruolo) "
 				+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING \"idAccount\"";
 
 		try (PreparedStatement stmt = connection.prepareStatement(query)) {
@@ -107,7 +106,7 @@ public class AccountDAO {
 			stmt.setString(8, cliente.getIndirizzo());
 			stmt.setString(9, cliente.getRuolo());
 
-			ResultSet rs = stmt.executeQuery();
+			final ResultSet rs = stmt.executeQuery();
 			if (rs.next()) {
 				// restituiamo la string generata dal DB
 				return rs.getString("idAccount");
@@ -118,23 +117,23 @@ public class AccountDAO {
 	}
 
 	public Account getAccountDettagli(String idAccount) throws SQLException {
-		String sql = "SELECT a.\"idAccount\", a.nome, a.cognome, a.email, a.\"numeroTelefono\", "
+		final String sql = "SELECT a.\"idAccount\", a.nome, a.cognome, a.email, a.\"numeroTelefono\", "
 				+ "       ag.agenzia, s.\"id\" AS supporto_id " + "FROM \"Account\" a "
 				+ "LEFT JOIN \"AgenteImmobiliare\" ag ON a.\"idAccount\" = ag.id "
 				+ "LEFT JOIN \"AmministratoreDiSupporto\" s ON a.\"idAccount\" = s.id " + "WHERE a.\"idAccount\" = ?";
 
 		try (PreparedStatement ps = connection.prepareStatement(sql)) {
 			ps.setString(1, idAccount);
-			ResultSet rs = ps.executeQuery();
+			final ResultSet rs = ps.executeQuery();
 
 			if (rs.next()) {
-				String id = rs.getString("idAccount");
-				String nome = rs.getString("nome");
-				String cognome = rs.getString("cognome");
-				String email = rs.getString("email");
-				String numeroTelefono = rs.getString("numeroTelefono"); // <-- nuovo campo
-				String agenzia = rs.getString("agenzia");
-				String supportoId = rs.getString("supporto_id");
+				final String id = rs.getString("idAccount");
+				final String nome = rs.getString("nome");
+				final String cognome = rs.getString("cognome");
+				final String email = rs.getString("email");
+				final String numeroTelefono = rs.getString("numeroTelefono"); // <-- nuovo campo
+				final String agenzia = rs.getString("agenzia");
+				final String supportoId = rs.getString("supporto_id");
 
 				System.out.println("DEBUG: id=" + id + ", nome=" + nome + ", cognome=" + cognome + ", email=" + email
 						+ ", numeroTelefono=" + numeroTelefono + ", agenzia=" + agenzia + ", supporto_id="
@@ -152,7 +151,7 @@ public class AccountDAO {
 							null, // indirizzo
 							"Supporto", // ruolo
 							agenzia // agenzia
-							);
+					);
 				} else if (agenzia != null) {
 					return new AgenteImmobiliare(id, email, null, nome, cognome, null, numeroTelefono, null, null,
 							"Agente", agenzia);
@@ -167,7 +166,7 @@ public class AccountDAO {
 	}
 
 	public String getRuoloByEmail(String email) throws SQLException {
-		String sql = "SELECT ruolo FROM \"Account\" WHERE email = ?";
+		final String sql = "SELECT ruolo FROM \"Account\" WHERE email = ?";
 		try (PreparedStatement ps = connection.prepareStatement(sql)) {
 			ps.setString(1, email);
 			try (ResultSet rs = ps.executeQuery()) {
@@ -182,11 +181,11 @@ public class AccountDAO {
 
 	public String getId(String email) throws SQLException {
 		String result = "undef";
-		String query = "SELECT SUBSTRING(\"idAccount\", 1, 3) AS \"idAccount\" FROM \"Account\" WHERE email = ?";
+		final String query = "SELECT SUBSTRING(\"idAccount\", 1, 3) AS \"idAccount\" FROM \"Account\" WHERE email = ?";
 
 		try (PreparedStatement stmt = connection.prepareStatement(query)) {
 			stmt.setString(1, email);
-			ResultSet rs = stmt.executeQuery();
+			final ResultSet rs = stmt.executeQuery();
 
 			if (rs.next()) {
 				result = rs.getString("idAccount");
@@ -202,12 +201,12 @@ public class AccountDAO {
 
 	public boolean cambiaPassword(String emailAssociata, String pass, String confermaPass) {
 		boolean result = false;
-		String query = "UPDATE \"Account\" SET \"password\" = ? WHERE email = ?";
+		final String query = "UPDATE \"Account\" SET \"password\" = ? WHERE email = ?";
 		try (PreparedStatement stmt = connection.prepareStatement(query)) {
 			stmt.setString(1, pass);
 			stmt.setString(2, emailAssociata);
 
-			int rowsUpdated = stmt.executeUpdate(); // <-- usa executeUpdate
+			final int rowsUpdated = stmt.executeUpdate(); // <-- usa executeUpdate
 
 			if (rowsUpdated > 0) {
 				result = true; // almeno una riga è stata aggiornata
@@ -221,31 +220,23 @@ public class AccountDAO {
 
 	/**
 	 * Metodo per il recupero delle info del profilo
+	 * 
 	 * @param emailUtente
 	 * @return
 	 * @throws SQLException
 	 */
 	public AccountInfoDTO getInfoProfiloDAO(String emailUtente) throws SQLException {
-		String query = "SELECT \"idAccount\", email, nome, cognome, \"numeroTelefono\", " +
-				"citta, indirizzo, cap, ruolo " +
-				"FROM \"Account\" WHERE email = ?";
+		final String query = "SELECT \"idAccount\", email, nome, cognome, \"numeroTelefono\", "
+				+ "citta, indirizzo, cap, ruolo " + "FROM \"Account\" WHERE email = ?";
 
 		try (PreparedStatement stmt = connection.prepareStatement(query)) {
 			stmt.setString(1, emailUtente);
-			ResultSet rs = stmt.executeQuery();
+			final ResultSet rs = stmt.executeQuery();
 
 			if (rs.next()) {
-				return new AccountInfoDTO(
-						rs.getString("idAccount"),
-						rs.getString("email"),
-						rs.getString("nome"),
-						rs.getString("cognome"),
-						rs.getString("numeroTelefono"),
-						rs.getString("citta"),
-						rs.getString("indirizzo"),
-						rs.getString("cap"),
-						rs.getString("ruolo")
-						);
+				return new AccountInfoDTO(rs.getString("idAccount"), rs.getString("email"), rs.getString("nome"),
+						rs.getString("cognome"), rs.getString("numeroTelefono"), rs.getString("citta"),
+						rs.getString("indirizzo"), rs.getString("cap"), rs.getString("ruolo"));
 			} else {
 				return null;
 			}
@@ -257,11 +248,11 @@ public class AccountDAO {
 
 	public String getIdAccountByEmail(String email) throws SQLException {
 		String idAccount = "undef";
-		String query = "SELECT \"idAccount\" FROM \"Account\" WHERE email = ?";
+		final String query = "SELECT \"idAccount\" FROM \"Account\" WHERE email = ?";
 
 		try (PreparedStatement stmt = connection.prepareStatement(query)) {
 			stmt.setString(1, email);
-			ResultSet rs = stmt.executeQuery();
+			final ResultSet rs = stmt.executeQuery();
 
 			if (rs.next()) {
 				idAccount = rs.getString("idAccount");
@@ -277,11 +268,11 @@ public class AccountDAO {
 
 	public String getAgenteAssociato(long idImmobile) {
 		String agenteAssociato = "inesistente";
-		String query = "SELECT \"agenteAssociato\" FROM \"Immobile\" WHERE \"idImmobile\" = ?";
+		final String query = "SELECT \"agenteAssociato\" FROM \"Immobile\" WHERE \"idImmobile\" = ?";
 
 		try (PreparedStatement stmt = connection.prepareStatement(query)) {
 			stmt.setLong(1, idImmobile);
-			ResultSet rs = stmt.executeQuery();
+			final ResultSet rs = stmt.executeQuery();
 
 			if (rs.next()) {
 				agenteAssociato = rs.getString("agenteAssociato");
@@ -296,14 +287,14 @@ public class AccountDAO {
 	}
 
 	public Account getAccountByEmail(String email) throws SQLException {
-		String query = "SELECT * FROM \"Account\" WHERE \"email\" = ?";
+		final String query = "SELECT * FROM \"Account\" WHERE \"email\" = ?";
 
 		try (PreparedStatement stmt = connection.prepareStatement(query)) {
 			stmt.setString(1, email);
-			ResultSet rs = stmt.executeQuery();
+			final ResultSet rs = stmt.executeQuery();
 
 			if (rs.next()) {
-				Account account = new Account();
+				final Account account = new Account();
 				account.setIdAccount(rs.getString("idAccount"));
 				account.setEmail(rs.getString("email"));
 				account.setNome(rs.getString("nome"));
@@ -322,15 +313,15 @@ public class AccountDAO {
 	// Se non hai già un AccountDAO con un metodo getAccountById, aggiungilo:
 
 	public Account getAccountById(String idAccount) throws SQLException {
-		String query = "SELECT * FROM \"Account\" WHERE \"idAccount\" = ?";
+		final String query = "SELECT * FROM \"Account\" WHERE \"idAccount\" = ?";
 
 		try (PreparedStatement stmt = connection.prepareStatement(query)) {
 			stmt.setString(1, idAccount);
-			ResultSet rs = stmt.executeQuery();
+			final ResultSet rs = stmt.executeQuery();
 
 			if (rs.next()) {
 				// Usa il costruttore con tutti i parametri o i setter
-				Account account = new Account();
+				final Account account = new Account();
 				account.setIdAccount(rs.getString("idAccount"));
 				account.setEmail(rs.getString("email"));
 				account.setNome(rs.getString("nome"));

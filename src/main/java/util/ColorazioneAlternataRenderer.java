@@ -25,10 +25,11 @@ public class ColorazioneAlternataRenderer extends DefaultTableCellRenderer {
 	}
 
 	@Override
-	public Component getTableCellRendererComponent(JTable table, Object value,
-			boolean isSelected, boolean hasFocus, int row, int column) {
+	public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
+			int row, int column) {
 
-		Component componente = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+		final Component componente = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row,
+				column);
 
 		// Applica colorazione alternata solo se la riga non è selezionata
 		if (!isSelected) {

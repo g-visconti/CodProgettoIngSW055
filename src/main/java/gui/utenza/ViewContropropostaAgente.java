@@ -21,10 +21,12 @@ import util.TableUtils;
 public class ViewContropropostaAgente extends JFrame {
 
 	private static final long serialVersionUID = 1L;
-	private JPanel contentPane;
+	private final JPanel contentPane;
+
 	/**
-	 * Realizzo la View relativa alla visualizzazione di
-	 * una controproposta che un agente propone in merito all'offerta fatta da un cliente, per un certo immobile
+	 * Realizzo la View relativa alla visualizzazione di una controproposta che un
+	 * agente propone in merito all'offerta fatta da un cliente, per un certo
+	 * immobile
 	 */
 	public ViewContropropostaAgente(Long idOfferta, String idCliente) {
 		GuiUtils.setIconaFinestra(this);
@@ -38,30 +40,30 @@ public class ViewContropropostaAgente extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 
-		JPanel panel = new JPanel();
+		final JPanel panel = new JPanel();
 		panel.setBackground(new Color(240, 248, 255));
 		panel.setBounds(0, 0, 506, 279);
 		contentPane.add(panel);
 		panel.setLayout(null);
 
-		JLabel lblDatiAgente = new JLabel("L'agente <nome> <cognome>");
+		final JLabel lblDatiAgente = new JLabel("L'agente <nome> <cognome>");
 		lblDatiAgente.setFont(new Font("Tahoma", Font.BOLD, 11));
 		lblDatiAgente.setHorizontalAlignment(SwingConstants.CENTER);
 		lblDatiAgente.setBounds(47, 37, 420, 14);
 		panel.add(lblDatiAgente);
 
-		JLabel lblDataRisposta = new JLabel("in data: <data>");
+		final JLabel lblDataRisposta = new JLabel("in data: <data>");
 		lblDataRisposta.setHorizontalAlignment(SwingConstants.CENTER);
 		lblDataRisposta.setFont(new Font("Tahoma", Font.BOLD, 11));
 		lblDataRisposta.setBounds(47, 62, 420, 14);
 		panel.add(lblDataRisposta);
 
-		JLabel lblControproposta = new JLabel("ha risposto con la seguente controproposta:");
+		final JLabel lblControproposta = new JLabel("ha risposto con la seguente controproposta:");
 		lblControproposta.setHorizontalAlignment(SwingConstants.CENTER);
 		lblControproposta.setFont(new Font("Tahoma", Font.BOLD, 11));
 		lblControproposta.setBounds(47, 87, 420, 14);
 		panel.add(lblControproposta);
-		JLabel lblValoreControproposta = new JLabel("<valore>");
+		final JLabel lblValoreControproposta = new JLabel("<valore>");
 		lblValoreControproposta.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		lblValoreControproposta.setHorizontalAlignment(SwingConstants.CENTER);
 		lblValoreControproposta.setBounds(196, 141, 113, 31);
@@ -69,27 +71,26 @@ public class ViewContropropostaAgente extends JFrame {
 
 		// recupero il valore della controproposta
 
-		OfferteController controller = new OfferteController();
-		//datiControproposta = controller.getControproposta(idOfferta, idCliente);
+		final OfferteController controller = new OfferteController();
+		// datiControproposta = controller.getControproposta(idOfferta, idCliente);
 
-		RispostaOfferta risposta = controller.getDettagliRispostaAttiva(idOfferta);
+		final RispostaOfferta risposta = controller.getDettagliRispostaAttiva(idOfferta);
 
-		if(risposta != null) {
-			lblDatiAgente.setText("L'agente "+risposta.getNomeAgente()+" "+risposta.getCognomeAgente());
+		if (risposta != null) {
+			lblDatiAgente.setText("L'agente " + risposta.getNomeAgente() + " " + risposta.getCognomeAgente());
 
-			String dataFormattata = TableUtils.formattaData(risposta.getDataRisposta());
+			final String dataFormattata = TableUtils.formattaData(risposta.getDataRisposta());
 			lblDataRisposta.setText("in data: " + dataFormattata);
 
-			String importoFormattato = TableUtils.formattaPrezzo(risposta.getImportoControproposta());
+			final String importoFormattato = TableUtils.formattaPrezzo(risposta.getImportoControproposta());
 			lblValoreControproposta.setText(importoFormattato);
-		}
-		else{
+		} else {
 			lblDatiAgente.setText("L'agente <nome> <cognome>");
 			lblDataRisposta.setText("in data: <nessuna>");
 			lblValoreControproposta.setText("€ <valore>");
 		}
 
-		JButton btnTornaIndietro = new JButton("Torna indietro");
+		final JButton btnTornaIndietro = new JButton("Torna indietro");
 		getRootPane().setDefaultButton(btnTornaIndietro);
 
 		btnTornaIndietro.addActionListener(new ActionListener() {

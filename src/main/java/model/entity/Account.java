@@ -24,8 +24,8 @@ public class Account {
 	}
 
 	// Costruttore per registrazione/update con tutti i campi
-	public Account(String id, String email, String password, String nome, String cognome,
-			String citta, String telefono, String cap, String indirizzo, String ruolo) {
+	public Account(String id, String email, String password, String nome, String cognome, String citta, String telefono,
+			String cap, String indirizzo, String ruolo) {
 		setIdAccount(id);
 		this.email = email;
 		this.password = password;
@@ -39,8 +39,8 @@ public class Account {
 	}
 
 	// Costruttore per profilo (senza password)
-	public Account(String id, String email, String nome, String cognome,
-			String citta, String telefono, String cap, String indirizzo, String ruolo) {
+	public Account(String id, String email, String nome, String cognome, String citta, String telefono, String cap,
+			String indirizzo, String ruolo) {
 		setIdAccount(id);
 		this.email = email;
 		this.nome = nome;

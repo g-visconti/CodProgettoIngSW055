@@ -20,8 +20,8 @@ public class TextAreaRenderer extends JTextArea implements TableCellRenderer {
 	}
 
 	@Override
-	public Component getTableCellRendererComponent(JTable table, Object value,
-			boolean isSelected, boolean hasFocus, int row, int column) {
+	public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
+			int row, int column) {
 
 		setText(value == null ? "" : value.toString());
 
@@ -43,7 +43,7 @@ public class TextAreaRenderer extends JTextArea implements TableCellRenderer {
 		setFont(table.getFont());
 
 		// Imposta dimensioni per il wrapping
-		int width = table.getColumnModel().getColumn(column).getWidth() - 10;
+		final int width = table.getColumnModel().getColumn(column).getWidth() - 10;
 		setSize(width, table.getRowHeight());
 
 		return this;

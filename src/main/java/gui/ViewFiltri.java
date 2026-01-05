@@ -29,20 +29,20 @@ import util.InputUtils;
 public class ViewFiltri extends JFrame {
 	private static final long serialVersionUID = 1L;
 	// Attributi della classe ViewFiltri
-	private Preferences prefs;
-	private JPanel contentPane;
+	private final Preferences prefs;
+	private final JPanel contentPane;
 	// attributi che serviranno per settare gli input ricevuti all'interno della
 	// classe Filtri
-	private JComboBox<String> comboBoxPMin;
-	private JComboBox<String> comboBoxPMax;
-	private JComboBox<String> comboBoxSMin;
-	private JComboBox<String> comboBoxSMax;
-	private JComboBox<String> comboBoxNumLocali;
-	private JComboBox<String> comboBoxPiano;
-	private JComboBox<String> comboBoxNumBagni;
-	private JCheckBox chckbxAscensore;
-	private JCheckBox chckbxPortineria;
-	private JCheckBox chckbxClimatizzazione;
+	private final JComboBox<String> comboBoxPMin;
+	private final JComboBox<String> comboBoxPMax;
+	private final JComboBox<String> comboBoxSMin;
+	private final JComboBox<String> comboBoxSMax;
+	private final JComboBox<String> comboBoxNumLocali;
+	private final JComboBox<String> comboBoxPiano;
+	private final JComboBox<String> comboBoxNumBagni;
+	private final JCheckBox chckbxAscensore;
+	private final JCheckBox chckbxPortineria;
+	private final JCheckBox chckbxClimatizzazione;
 
 	// Costruttore che crea il frame
 	public ViewFiltri(String tipologiaAppartamento) {
@@ -83,11 +83,11 @@ public class ViewFiltri extends JFrame {
 		}
 		}
 
-		String[] opSupMin = { "Indifferente", "40", "60", "80", "100", "120", "150", "180", "200", "300", "500" };
-		String[] opSupMax = { "Indifferente", "40", "60", "80", "100", "120", "150", "180", "200", "300", "500" };
-		String[] opNumLocali = { "Indifferente", "1", "2", "3", "4", "5" };
-		String[] opNumBagni = { "Indifferente", "1", "2", "3", "4" };
-		String[] opPiano = { "Indifferente", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" };
+		final String[] opSupMin = { "Indifferente", "40", "60", "80", "100", "120", "150", "180", "200", "300", "500" };
+		final String[] opSupMax = { "Indifferente", "40", "60", "80", "100", "120", "150", "180", "200", "300", "500" };
+		final String[] opNumLocali = { "Indifferente", "1", "2", "3", "4", "5" };
+		final String[] opNumBagni = { "Indifferente", "1", "2", "3", "4" };
+		final String[] opPiano = { "Indifferente", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" };
 
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		this.setBounds(100, 100, 937, 454);
@@ -98,20 +98,20 @@ public class ViewFiltri extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 
-		JPanel panelTitolo = new JPanel();
+		final JPanel panelTitolo = new JPanel();
 		panelTitolo.setBounds(0, 0, 935, 429);
 		contentPane.add(panelTitolo);
 		panelTitolo.setLayout(null);
 
-		SwingUtilities.invokeLater(() -> this.requestFocusInWindow());
+		SwingUtilities.invokeLater(this::requestFocusInWindow);
 
 		// Titolo schermata
-		JLabel lblFiltri = new JLabel("Qui puoi selezionare i filtri di ricerca");
+		final JLabel lblFiltri = new JLabel("Qui puoi selezionare i filtri di ricerca");
 		lblFiltri.setBounds(27, 23, 359, 22);
 		panelTitolo.add(lblFiltri);
 		lblFiltri.setFont(new Font("Tahoma", Font.BOLD, 18));
 
-		JLabel lblPrezzoMinimo = new JLabel("Prezzo minimo (€)");
+		final JLabel lblPrezzoMinimo = new JLabel("Prezzo minimo (€)");
 		lblPrezzoMinimo.setHorizontalAlignment(SwingConstants.CENTER);
 		lblPrezzoMinimo.setFont(new Font("Tahoma", Font.BOLD, 11));
 		lblPrezzoMinimo.setBounds(145, 92, 122, 14);
@@ -126,7 +126,7 @@ public class ViewFiltri extends JFrame {
 		panelTitolo.add(comboBoxPMin);
 		comboBoxPMin.setSelectedItem(prefs.get("prezzoMin", "Indifferente"));
 
-		JLabel lblPrezzoMassimo = new JLabel("Prezzo massimo (€)");
+		final JLabel lblPrezzoMassimo = new JLabel("Prezzo massimo (€)");
 		lblPrezzoMassimo.setHorizontalAlignment(SwingConstants.CENTER);
 		lblPrezzoMassimo.setFont(new Font("Tahoma", Font.BOLD, 11));
 		lblPrezzoMassimo.setBounds(313, 92, 122, 14);
@@ -141,7 +141,7 @@ public class ViewFiltri extends JFrame {
 		panelTitolo.add(comboBoxPMax);
 		comboBoxPMax.setSelectedItem(prefs.get("prezzoMax", "Indifferente"));
 
-		JLabel lblSuperficieMinima = new JLabel("Superficie minima (mq)");
+		final JLabel lblSuperficieMinima = new JLabel("Superficie minima (mq)");
 		lblSuperficieMinima.setHorizontalAlignment(SwingConstants.CENTER);
 		lblSuperficieMinima.setFont(new Font("Tahoma", Font.BOLD, 11));
 		lblSuperficieMinima.setBounds(478, 92, 141, 14);
@@ -156,7 +156,7 @@ public class ViewFiltri extends JFrame {
 		panelTitolo.add(comboBoxSMin);
 		comboBoxSMin.setSelectedItem(prefs.get("supMin", "Indifferente"));
 
-		JLabel lblSuperficieMassima = new JLabel("Superficie massima (mq)");
+		final JLabel lblSuperficieMassima = new JLabel("Superficie massima (mq)");
 		lblSuperficieMassima.setHorizontalAlignment(SwingConstants.CENTER);
 		lblSuperficieMassima.setFont(new Font("Tahoma", Font.BOLD, 11));
 		lblSuperficieMassima.setBounds(638, 92, 148, 14);
@@ -171,7 +171,7 @@ public class ViewFiltri extends JFrame {
 		panelTitolo.add(comboBoxSMax);
 		comboBoxSMax.setSelectedItem(prefs.get("supMax", "Indifferente"));
 
-		JLabel lblNumeroLocali = new JLabel("Numero locali");
+		final JLabel lblNumeroLocali = new JLabel("Numero locali");
 		lblNumeroLocali.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblNumeroLocali.setFont(new Font("Tahoma", Font.BOLD, 11));
 		lblNumeroLocali.setBounds(170, 219, 97, 14);
@@ -184,7 +184,7 @@ public class ViewFiltri extends JFrame {
 		panelTitolo.add(comboBoxNumLocali);
 		comboBoxNumLocali.setSelectedItem(prefs.get("numLocali", "Indifferente"));
 
-		JLabel lblPiano = new JLabel("Piano");
+		final JLabel lblPiano = new JLabel("Piano");
 		lblPiano.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblPiano.setFont(new Font("Tahoma", Font.BOLD, 11));
 		lblPiano.setBounds(170, 300, 97, 14);
@@ -197,7 +197,7 @@ public class ViewFiltri extends JFrame {
 		panelTitolo.add(comboBoxPiano);
 		comboBoxPiano.setSelectedItem(prefs.get("piano", "Indifferente"));
 
-		JLabel lblNumeroBagni = new JLabel("Numero bagni");
+		final JLabel lblNumeroBagni = new JLabel("Numero bagni");
 		lblNumeroBagni.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblNumeroBagni.setFont(new Font("Tahoma", Font.BOLD, 11));
 		lblNumeroBagni.setBounds(170, 259, 97, 14);
@@ -231,7 +231,7 @@ public class ViewFiltri extends JFrame {
 		chckbxClimatizzazione.setSelected(prefs.getBoolean("climatizzazione", false));
 
 		// Bottoni di gestione della finestra
-		JButton btnSalvaFiltri = new JButton("Salva");
+		final JButton btnSalvaFiltri = new JButton("Salva");
 
 		getRootPane().setDefaultButton(btnSalvaFiltri);
 		btnSalvaFiltri.addActionListener(new ActionListener() {
@@ -258,7 +258,7 @@ public class ViewFiltri extends JFrame {
 		btnSalvaFiltri.setBounds(494, 372, 185, 23);
 		panelTitolo.add(btnSalvaFiltri);
 
-		JButton btnAnnulla = new JButton("Annulla");
+		final JButton btnAnnulla = new JButton("Annulla");
 		btnAnnulla.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -272,12 +272,12 @@ public class ViewFiltri extends JFrame {
 		btnAnnulla.setBounds(250, 372, 185, 23);
 		panelTitolo.add(btnAnnulla);
 
-		JButton btnReset = new JButton("Reset filtri");
+		final JButton btnReset = new JButton("Reset filtri");
 		btnReset.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// Mostra una finestra di conferma
-				int scelta = JOptionPane.showConfirmDialog(null, "Sei sicuro di voler resettare i filtri?",
+				final int scelta = JOptionPane.showConfirmDialog(null, "Sei sicuro di voler resettare i filtri?",
 						"Conferma Reset", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 
 				// Se l'utente ha cliccato "Sì", esegue il reset
@@ -314,18 +314,19 @@ public class ViewFiltri extends JFrame {
 
 	private Filtri creaFiltriDaInput() {
 		// Legge e converte i valori dalle combobox
-		Integer prezzoMin = InputUtils.parseComboInteger(comboBoxPMin);
-		Integer prezzoMax = InputUtils.parseComboInteger(comboBoxPMax);
-		Integer supMin = InputUtils.parseComboInteger(comboBoxSMin);
-		Integer supMax = InputUtils.parseComboInteger(comboBoxSMax);
-		String piano = comboBoxPiano.getSelectedItem().toString();
-		Integer numLocali = InputUtils.parseComboInteger(comboBoxNumLocali);
-		Integer numBagni = InputUtils.parseComboInteger(comboBoxNumBagni);
-		Boolean ascensore = chckbxAscensore.isSelected() ? Boolean.TRUE : null;
-		Boolean portineria = chckbxPortineria.isSelected() ? Boolean.TRUE : null;
-		Boolean climatizzazione = chckbxClimatizzazione.isSelected() ? Boolean.TRUE : null;
+		final Integer prezzoMin = InputUtils.parseComboInteger(comboBoxPMin);
+		final Integer prezzoMax = InputUtils.parseComboInteger(comboBoxPMax);
+		final Integer supMin = InputUtils.parseComboInteger(comboBoxSMin);
+		final Integer supMax = InputUtils.parseComboInteger(comboBoxSMax);
+		final String piano = comboBoxPiano.getSelectedItem().toString();
+		final Integer numLocali = InputUtils.parseComboInteger(comboBoxNumLocali);
+		final Integer numBagni = InputUtils.parseComboInteger(comboBoxNumBagni);
+		final Boolean ascensore = chckbxAscensore.isSelected() ? Boolean.TRUE : null;
+		final Boolean portineria = chckbxPortineria.isSelected() ? Boolean.TRUE : null;
+		final Boolean climatizzazione = chckbxClimatizzazione.isSelected() ? Boolean.TRUE : null;
 
-		return new Filtri(prezzoMin, prezzoMax, supMin, supMax, piano, numLocali, numBagni, ascensore, portineria, climatizzazione);
+		return new Filtri(prezzoMin, prezzoMax, supMin, supMax, piano, numLocali, numBagni, ascensore, portineria,
+				climatizzazione);
 
 	}
 

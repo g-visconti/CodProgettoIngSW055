@@ -2,7 +2,9 @@ package controller;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+
 import org.mindrot.jbcrypt.BCrypt;
+
 import dao.AccountDAO;
 import dao.AgenteImmobiliareDAO;
 import dao.AmministratoreDiSupportoDAO;
@@ -14,174 +16,185 @@ import model.entity.Cliente;
 
 public class AccessController {
 
-    public AccessController() {
-    }
+	public AccessController() {
+	}
 
-    // Login: verifica credenziali
-    public boolean checkCredenziali(String email, String password) throws SQLException {
-        Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
-        AccountDAO accountDAO = new AccountDAO(connAWS);
-        return accountDAO.checkCredenziali(email, password);
-    }
+	// Login: verifica credenziali
+	public boolean checkCredenziali(String email, String password) throws SQLException {
+		final Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
+		final AccountDAO accountDAO = new AccountDAO(connAWS);
+		return accountDAO.checkCredenziali(email, password);
+	}
 
-    // Controlla se l'email è già registrata
-    public boolean checkUtente(String email) throws SQLException {
-        Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
-        AccountDAO accountDAO = new AccountDAO(connAWS);
+	// Controlla se l'email è già registrata
+	public boolean checkUtente(String email) throws SQLException {
+		final Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
+		final AccountDAO accountDAO = new AccountDAO(connAWS);
 
-        boolean exists = accountDAO.emailEsiste(email);
-        System.out.println(exists ? "Email già registrata." : "Inserire la password");
-        return exists;
-    }
-    // Registrazione nuovo Account
-    public void registraNuovoUtente(String email, String password, String ruolo) {
-        try {
-            Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
-            AccountDAO accountDAO = new AccountDAO(connAWS);
-            ClienteDAO clienteDAO = new ClienteDAO(connAWS);
+		final boolean exists = accountDAO.emailEsiste(email);
+		System.out.println(exists ? "Email già registrata." : "Inserire la password");
+		return exists;
+	}
 
-            if (accountDAO.emailEsiste(email)) {
-                System.out.println("Email già registrata.");
-                return;
-            }
+	// Registrazione nuovo Account
+	public void registraNuovoUtente(String email, String password, String ruolo) {
+		try {
+			final Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
+			final AccountDAO accountDAO = new AccountDAO(connAWS);
+			final ClienteDAO clienteDAO = new ClienteDAO(connAWS);
 
-            Cliente nuovoCliente = new Cliente(email, password, ruolo);
+			if (accountDAO.emailEsiste(email)) {
+				System.out.println("Email già registrata.");
+				return;
+			}
 
-            // Inserisci in Account e recupera idAccount generato
-            String idGenerato = accountDAO.insertAccount(nuovoCliente);
+			final Cliente nuovoCliente = new Cliente(email, password, ruolo);
 
-            // Imposta idCliente uguale all'idAccount appena generato
-            nuovoCliente.setIdAccount(idGenerato);
+			// Inserisci in Account e recupera idAccount generato
+			final String idGenerato = accountDAO.insertAccount(nuovoCliente);
 
-            // Inserisci in Cliente con idCliente e email valorizzati
-            clienteDAO.insertCliente(nuovoCliente);
+			// Imposta idCliente uguale all'idAccount appena generato
+			nuovoCliente.setIdAccount(idGenerato);
 
-            System.out.println("Utente registrato con successo!");
+			// Inserisci in Cliente con idCliente e email valorizzati
+			clienteDAO.insertCliente(nuovoCliente);
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
+			System.out.println("Utente registrato con successo!");
 
-    // Registrazione nuovo Agente
-    public void registraNuovoAgente(String email, String password, String nome, String cognome, String citta,
-                                    String telefono, String cap, String indirizzo, String ruolo, String agenzia) {
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
 
-        Connection connAWS = null;
+	// Registrazione nuovo Agente
+	public void registraNuovoAgente(String email, String password, String nome, String cognome, String citta,
+			String telefono, String cap, String indirizzo, String ruolo, String agenzia) {
 
-        try {
-            connAWS = ConnessioneDatabase.getInstance().getConnection();
-            connAWS.setAutoCommit(false);
+		Connection connAWS = null;
 
-            AccountDAO accountDAO = new AccountDAO(connAWS);
-            AgenteImmobiliareDAO agenteDAO = new AgenteImmobiliareDAO(connAWS);
+		try {
+			connAWS = ConnessioneDatabase.getInstance().getConnection();
+			connAWS.setAutoCommit(false);
 
-            if (accountDAO.emailEsiste(email)) {
-                System.out.println("Email già registrata.");
-                return;
-            }
+			final AccountDAO accountDAO = new AccountDAO(connAWS);
+			final AgenteImmobiliareDAO agenteDAO = new AgenteImmobiliareDAO(connAWS);
 
-            String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
+			if (accountDAO.emailEsiste(email)) {
+				System.out.println("Email già registrata.");
+				return;
+			}
 
-            AgenteImmobiliare nuovoAgente = new AgenteImmobiliare(
-                    null, email, hashedPassword, nome, cognome,
-                    citta, telefono, cap, indirizzo, ruolo, agenzia
-            );
+			final String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
 
-            String idGenerato = accountDAO.insertAccount(nuovoAgente);
-            nuovoAgente.setIdAccount(idGenerato);
+			final AgenteImmobiliare nuovoAgente = new AgenteImmobiliare(null, email, hashedPassword, nome, cognome,
+					citta, telefono, cap, indirizzo, ruolo, agenzia);
 
-            agenteDAO.insertAgente(nuovoAgente);
+			final String idGenerato = accountDAO.insertAccount(nuovoAgente);
+			nuovoAgente.setIdAccount(idGenerato);
 
-            connAWS.commit();
-            System.out.println("Agente registrato con successo!");
+			agenteDAO.insertAgente(nuovoAgente);
 
-        } catch (SQLException e) {
-            if (connAWS != null) try { connAWS.rollback(); } catch (SQLException ignore) {}
-            e.printStackTrace();
-        } finally {
-            if (connAWS != null) try { connAWS.setAutoCommit(true); } catch (SQLException ignore) {}
-        }
-    }
+			connAWS.commit();
+			System.out.println("Agente registrato con successo!");
 
-    // Registrazione nuovo Cliente
-    public void registraNuovoCliente(String email, String password, String nome, String cognome, String citta,
-                                     String telefono, String cap, String indirizzo, String ruolo) {
+		} catch (SQLException e) {
+			if (connAWS != null) {
+				try {
+					connAWS.rollback();
+				} catch (SQLException ignore) {
+				}
+			}
+			e.printStackTrace();
+		} finally {
+			if (connAWS != null) {
+				try {
+					connAWS.setAutoCommit(true);
+				} catch (SQLException ignore) {
+				}
+			}
+		}
+	}
 
-        try {
-            Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
-            AccountDAO accountDAO = new AccountDAO(connAWS);
-            ClienteDAO clienteDAO = new ClienteDAO(connAWS);
+	// Registrazione nuovo Cliente
+	public void registraNuovoCliente(String email, String password, String nome, String cognome, String citta,
+			String telefono, String cap, String indirizzo, String ruolo) {
 
-            if (accountDAO.emailEsiste(email)) {
-                System.out.println("Email già registrata.");
-                return;
-            }
+		try {
+			final Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
+			final AccountDAO accountDAO = new AccountDAO(connAWS);
+			final ClienteDAO clienteDAO = new ClienteDAO(connAWS);
 
-            String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
+			if (accountDAO.emailEsiste(email)) {
+				System.out.println("Email già registrata.");
+				return;
+			}
 
-            Cliente nuovoCliente = new Cliente(
-                    null, email, hashedPassword, nome, cognome,
-                    citta, telefono, cap, indirizzo, ruolo
-            );
+			final String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
 
-            String idGenerato = accountDAO.insertAccount(nuovoCliente);
-            nuovoCliente.setIdAccount(idGenerato);
+			final Cliente nuovoCliente = new Cliente(null, email, hashedPassword, nome, cognome, citta, telefono, cap,
+					indirizzo, ruolo);
 
-            clienteDAO.insertCliente(nuovoCliente);
+			final String idGenerato = accountDAO.insertAccount(nuovoCliente);
+			nuovoCliente.setIdAccount(idGenerato);
 
-            System.out.println("Cliente registrato con successo!");
+			clienteDAO.insertCliente(nuovoCliente);
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
+			System.out.println("Cliente registrato con successo!");
 
-    // Registrazione nuovo Supporto
-    public void registraNuovoSupporto(String email, String password, String nome, String cognome, String citta,
-                                      String telefono, String cap, String indirizzo, String ruolo, String agenzia) {
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
 
-        Connection connAWS = null;
+	// Registrazione nuovo Supporto
+	public void registraNuovoSupporto(String email, String password, String nome, String cognome, String citta,
+			String telefono, String cap, String indirizzo, String ruolo, String agenzia) {
 
-        try {
-            connAWS = ConnessioneDatabase.getInstance().getConnection();
-            connAWS.setAutoCommit(false);
+		Connection connAWS = null;
 
-            AccountDAO accountDAO = new AccountDAO(connAWS);
-            AmministratoreDiSupportoDAO supportoDAO = new AmministratoreDiSupportoDAO(connAWS);
-            AgenteImmobiliareDAO agenteDAO = new AgenteImmobiliareDAO(connAWS);
+		try {
+			connAWS = ConnessioneDatabase.getInstance().getConnection();
+			connAWS.setAutoCommit(false);
 
-            if (accountDAO.emailEsiste(email)) {
-                System.out.println("Email già registrata.");
-                return;
-            }
+			final AccountDAO accountDAO = new AccountDAO(connAWS);
+			final AmministratoreDiSupportoDAO supportoDAO = new AmministratoreDiSupportoDAO(connAWS);
+			final AgenteImmobiliareDAO agenteDAO = new AgenteImmobiliareDAO(connAWS);
 
-            String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
+			if (accountDAO.emailEsiste(email)) {
+				System.out.println("Email già registrata.");
+				return;
+			}
 
-            AmministratoreDiSupporto supporto = new AmministratoreDiSupporto(
-                    null, email, hashedPassword, nome, cognome,
-                    citta, telefono, cap, indirizzo, ruolo, agenzia
-            );
+			final String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
 
-            String idGenerato = accountDAO.insertAccount(supporto);
-            supporto.setIdAccount(idGenerato);
+			final AmministratoreDiSupporto supporto = new AmministratoreDiSupporto(null, email, hashedPassword, nome,
+					cognome, citta, telefono, cap, indirizzo, ruolo, agenzia);
 
-            agenteDAO.insertAgente(supporto);
-            supportoDAO.insertSupporto(supporto);
+			final String idGenerato = accountDAO.insertAccount(supporto);
+			supporto.setIdAccount(idGenerato);
 
-            connAWS.commit();
-            System.out.println("Supporto registrato con successo!");
+			agenteDAO.insertAgente(supporto);
+			supportoDAO.insertSupporto(supporto);
 
-        } catch (SQLException e) {
-            if (connAWS != null) try { connAWS.rollback(); } catch (SQLException ignore) {}
-            e.printStackTrace();
-        } finally {
-            if (connAWS != null) try { connAWS.setAutoCommit(true); } catch (SQLException ignore) {}
-        }
-    }
+			connAWS.commit();
+			System.out.println("Supporto registrato con successo!");
 
-   
-    
+		} catch (SQLException e) {
+			if (connAWS != null) {
+				try {
+					connAWS.rollback();
+				} catch (SQLException ignore) {
+				}
+			}
+			e.printStackTrace();
+		} finally {
+			if (connAWS != null) {
+				try {
+					connAWS.setAutoCommit(true);
+				} catch (SQLException ignore) {
+				}
+			}
+		}
+	}
 
-   
 }

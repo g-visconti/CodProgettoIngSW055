@@ -6,33 +6,33 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class AmministratoreDAO {
-    private Connection conn;
+	private final Connection conn;
 
-    public AmministratoreDAO(Connection conn) {
-        this.conn = conn;
-    }
-    
-    public String getAgenziaByEmail(String emailAdmin) {
-        String agenzia = null;
-        String sql = """
-            SELECT aa."agenzia"
-            FROM "AmministratoreAgenzia" aa
-            JOIN "Account" acc ON aa.id = acc."idAccount"
-            WHERE acc."email" = ?
-        """;
+	public AmministratoreDAO(Connection conn) {
+		this.conn = conn;
+	}
 
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, emailAdmin);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    agenzia = rs.getString("agenzia");
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+	public String getAgenziaByEmail(String emailAdmin) {
+		String agenzia = null;
+		final String sql = """
+				    SELECT aa."agenzia"
+				    FROM "AmministratoreAgenzia" aa
+				    JOIN "Account" acc ON aa.id = acc."idAccount"
+				    WHERE acc."email" = ?
+				""";
 
-        return agenzia;
-    }
+		try (PreparedStatement ps = conn.prepareStatement(sql)) {
+			ps.setString(1, emailAdmin);
+			try (ResultSet rs = ps.executeQuery()) {
+				if (rs.next()) {
+					agenzia = rs.getString("agenzia");
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return agenzia;
+	}
 
 }

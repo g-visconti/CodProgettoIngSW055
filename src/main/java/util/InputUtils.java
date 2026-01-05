@@ -4,6 +4,10 @@ import javax.swing.JComboBox;
 
 public class InputUtils {
 
+	private InputUtils() {
+		throw new IllegalStateException("Utility class");
+	}
+
 	// Converte una stringa di testo in un valore intero
 	public static Integer parseInteger(String text) {
 		try {
@@ -15,7 +19,7 @@ public class InputUtils {
 
 	// Converte il valore testuale di una combobox in un valore intero
 	public static Integer parseComboInteger(JComboBox<String> combo) {
-		String selected = (String) combo.getSelectedItem();
+		final String selected = (String) combo.getSelectedItem();
 		if (selected == null || selected.equalsIgnoreCase("Indifferente") || selected.isEmpty()) {
 			return null;
 		}
@@ -30,9 +34,9 @@ public class InputUtils {
 	public static String capitalizzaParole(String input) {
 		// Converto l'input tutto in lettere minuscole
 		// divido in stringhe rimuovendo una o più occorenze degli spazi bianchi
-		String[] parole = input.toLowerCase().split("\\s+");
+		final String[] parole = input.toLowerCase().split("\\s+");
 		// Alternativa per costruire stringhe come concatenazione di parole
-		StringBuilder risultato = new StringBuilder();
+		final StringBuilder risultato = new StringBuilder();
 
 		for (String parola : parole) {
 			if (!parola.isEmpty()) {

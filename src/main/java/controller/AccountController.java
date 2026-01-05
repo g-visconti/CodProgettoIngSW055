@@ -19,46 +19,47 @@ public class AccountController {
 	public AccountController() {
 	}
 
-
-	//Recupera ID da email
+	// Recupera ID da email
 	public String emailToId(String email) throws SQLException {
-		Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
-		AccountDAO accountDAO = new AccountDAO(connAWS);
+		final Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
+		final AccountDAO accountDAO = new AccountDAO(connAWS);
 		return accountDAO.getId(email);
 	}
 
-	//Recupera ID account da email
+	// Recupera ID account da email
 	public String getIdAccountByEmail(String email) throws SQLException {
-		Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
-		AccountDAO accountDAO = new AccountDAO(connAWS);
+		final Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
+		final AccountDAO accountDAO = new AccountDAO(connAWS);
 		return accountDAO.getIdAccountByEmail(email);
 	}
 
 	/**
-	 * Tale metodo serve al recupero delle informazioni del profilo utente attualmente in sessione
+	 * Tale metodo serve al recupero delle informazioni del profilo utente
+	 * attualmente in sessione
+	 * 
 	 * @param emailUtente
 	 * @return
 	 * @throws SQLException
 	 */
 	public AccountInfoDTO getInfoProfilo(String emailUtente) throws SQLException {
 		try (Connection connAWS = ConnessioneDatabase.getInstance().getConnection()) {
-			AccountDAO accountDAO = new AccountDAO(connAWS);
+			final AccountDAO accountDAO = new AccountDAO(connAWS);
 			return accountDAO.getInfoProfiloDAO(emailUtente);
 		}
 	}
 
-	//Recupera ruolo (admin, agente, cliente)
+	// Recupera ruolo (admin, agente, cliente)
 	public String getRuoloByEmail(String email) throws SQLException {
-		Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
-		AccountDAO accountDAO = new AccountDAO(connAWS);
+		final Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
+		final AccountDAO accountDAO = new AccountDAO(connAWS);
 		return accountDAO.getRuoloByEmail(email);
 	}
 
-	//Recupera dettagli di un agente tramite ID
+	// Recupera dettagli di un agente tramite ID
 	public Account recuperaDettagliAgente(String idAccount) {
 		try {
-			Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
-			AccountDAO accountDAO = new AccountDAO(connAWS);
+			final Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
+			final AccountDAO accountDAO = new AccountDAO(connAWS);
 			return accountDAO.getAccountDettagli(idAccount);
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -66,20 +67,20 @@ public class AccountController {
 		}
 	}
 
-	//Cambio password
+	// Cambio password
 	public boolean updatePassword(String emailAssociata, String pass, String confermaPass) throws SQLException {
-		Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
-		AccountDAO accountDAO = new AccountDAO(connAWS);
+		final Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
+		final AccountDAO accountDAO = new AccountDAO(connAWS);
 
 		return accountDAO.cambiaPassword(emailAssociata, pass, confermaPass);
 	}
 
-	//Recupera l'agenzia
+	// Recupera l'agenzia
 	public String getAgenzia(String email) {
 		String agenzia = null;
 		try {
-			Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
-			AmministratoreDAO adminDAO = new AmministratoreDAO(connAWS);
+			final Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
+			final AmministratoreDAO adminDAO = new AmministratoreDAO(connAWS);
 			agenzia = adminDAO.getAgenziaByEmail(email);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -87,14 +88,15 @@ public class AccountController {
 		return agenzia;
 	}
 
-	public boolean inserisciRispostaOfferta(long idOfferta, String idAgente, String tipoRisposta, Double importoControproposta) {
+	public boolean inserisciRispostaOfferta(long idOfferta, String idAgente, String tipoRisposta,
+			Double importoControproposta) {
 		try {
-			Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
-			RispostaOffertaDAO rispostaDAO = new RispostaOffertaDAO(connAWS);
+			final Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
+			final RispostaOffertaDAO rispostaDAO = new RispostaOffertaDAO(connAWS);
 
 			// Recupera nome e cognome dell'agente
-			AccountDAO accountDAO = new AccountDAO(connAWS);
-			Account agente = accountDAO.getAccountById(idAgente);
+			final AccountDAO accountDAO = new AccountDAO(connAWS);
+			final Account agente = accountDAO.getAccountById(idAgente);
 
 			if (agente == null) {
 				JOptionPane.showMessageDialog(null, "Agente non trovato!");
@@ -105,20 +107,16 @@ public class AccountController {
 			rispostaDAO.disattivaRispostePrecedenti(idOfferta);
 
 			// Crea e inserisci nuova risposta
-			RispostaOfferta risposta = new RispostaOfferta(
-					idOfferta,
-					idAgente,
-					agente.getNome(),  // Usa nome dell'agente
+			final RispostaOfferta risposta = new RispostaOfferta(idOfferta, idAgente, agente.getNome(), // Usa nome
+																										// dell'agente
 					agente.getCognome(), // Usa cognome dell'agente
-					tipoRisposta,
-					importoControproposta
-					);
+					tipoRisposta, importoControproposta);
 
-			boolean successo = rispostaDAO.inserisciRispostaOfferta(risposta);
+			final boolean successo = rispostaDAO.inserisciRispostaOfferta(risposta);
 
 			// Se l'inserimento è riuscito, aggiorna lo stato dell'offerta
 			if (successo) {
-				OffertaInizialeDAO offertaDAO = new OffertaInizialeDAO(connAWS);
+				final OffertaInizialeDAO offertaDAO = new OffertaInizialeDAO(connAWS);
 				offertaDAO.aggiornaStatoOfferta(idOfferta, tipoRisposta);
 			}
 

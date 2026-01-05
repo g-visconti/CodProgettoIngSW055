@@ -17,16 +17,14 @@ public class ConnessioneDatabase {
 
 	// Attributi
 	private static ConnessioneDatabase instance;
-	private final String nome = "postgres";
-	private final String password = "PostgresDB";
-	private final String url = "jdbc:postgresql://postgresdb.c3qu8gqaic94.eu-west-1.rds.amazonaws.com:5432/DietiEstates25DB";
 	private static final String DRIVER = "org.postgresql.Driver";
-
-	// Connessione
-	private Connection connection;
-
 	// Logger per la gestione degli errori
 	private static final Logger logger = Logger.getLogger(ConnessioneDatabase.class.getName());
+	private final String nome = "postgres";
+	private final String password = "PostgresDB";
+	private final String url = "jdbc:postgresql://database-1.cshockuiujqi.us-east-1.rds.amazonaws.com:5432/DietiEstates25DB";
+	// Connessione
+	private Connection connection;
 
 	// Costruttore privato
 	private ConnessioneDatabase() throws SQLException {
@@ -50,14 +48,14 @@ public class ConnessioneDatabase {
 			if (e.getCause() instanceof UnknownHostException) {
 				logger.log(Level.SEVERE, "Host del database non raggiungibile.", e);
 				JOptionPane.showMessageDialog(null,
-						"Attenzione: il database al momento non è raggiungibile.\n" +
-						"Verifica la connessione di rete e riprova.",
+						"Attenzione: il database al momento non è raggiungibile.\n"
+								+ "Verifica la connessione di rete e riprova.",
 						"Connessione non disponibile", JOptionPane.WARNING_MESSAGE);
 			} else {
 				logger.log(Level.SEVERE, "Errore di connessione al database.", e);
 				JOptionPane.showMessageDialog(null,
-						"Si è verificato un errore durante la connessione al database.\n" +
-						"Controlla la connessione Internet o riprova più tardi.",
+						"Si è verificato un errore durante la connessione al database.\n"
+								+ "Controlla la connessione Internet o riprova più tardi.",
 						"Errore di connessione", JOptionPane.ERROR_MESSAGE);
 			}
 			throw e; // rilancia per permettere gestione a livello superiore, se serve
@@ -66,7 +64,7 @@ public class ConnessioneDatabase {
 
 	/**
 	 * Restituisce la connessione al database.
-	 * 
+	 *
 	 * @return La connessione al database.
 	 */
 	public Connection getConnection() {
@@ -76,7 +74,7 @@ public class ConnessioneDatabase {
 	/**
 	 * Restituisce l'istanza del singleton per la connessione al database. Se la
 	 * connessione è chiusa, la ricrea.
-	 * 
+	 *
 	 * @return L'istanza della connessione.
 	 * @throws SQLException Se non riesce a creare la connessione.
 	 */

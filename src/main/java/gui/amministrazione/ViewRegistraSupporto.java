@@ -35,23 +35,23 @@ public class ViewRegistraSupporto extends JFrame {
 	 */
 	private static final long serialVersionUID = 1L;
 	private final CognitoAuthService authService;
-	private JPanel contentPane;
-	private JTextField Nome_Utente;
-	private JTextField Cognome_Utente;
-	private JTextField Telefono_Utente;
-	private JTextField Citta_Utente;
-	private JTextField Indirizzo_Utente;
-	private JPasswordField Conferma_Utente;
-	private JPasswordField Password_Utente;
-	private JPanel panel;
-	private JLabel lblNewLabel_1;
-	private JTextField Cap_Utente;
-	private JLabel lblCognomeError;
-	private JLabel lblCittaError;
-	private JLabel lblTelefonoError;
-	private JLabel lblCapError;
-	private JLabel lblIndirizzoError;
-	private String ruolo = "Supporto";
+	private final JPanel contentPane;
+	private final JTextField Nome_Utente;
+	private final JTextField Cognome_Utente;
+	private final JTextField Telefono_Utente;
+	private final JTextField Citta_Utente;
+	private final JTextField Indirizzo_Utente;
+	private final JPasswordField Conferma_Utente;
+	private final JPasswordField Password_Utente;
+	private final JPanel panel;
+	private final JLabel lblNewLabel_1;
+	private final JTextField Cap_Utente;
+	private final JLabel lblCognomeError;
+	private final JLabel lblCittaError;
+	private final JLabel lblTelefonoError;
+	private final JLabel lblCapError;
+	private final JLabel lblIndirizzoError;
+	private final String ruolo = "Supporto";
 
 	/**
 	 * Create the frame.
@@ -132,19 +132,19 @@ public class ViewRegistraSupporto extends JFrame {
 		Cognome_Utente.setColumns(10);
 		labelClicked(Cognome_Utente, "Cognome");
 
-		JLabel lblPassDimError = new JLabel("Inserire una password di almeno 6 caratteri.");
+		final JLabel lblPassDimError = new JLabel("Inserire una password di almeno 6 caratteri.");
 		lblPassDimError.setFont(new Font("Tahoma", Font.BOLD, 11));
 		lblPassDimError.setBounds(69, 281, 371, 20);
 		panel.add(lblPassDimError);
 		lblPassDimError.setHorizontalAlignment(SwingConstants.LEFT);
 
-		JLabel lblPassNumError = new JLabel("La password deve contenere almeno un numero.");
+		final JLabel lblPassNumError = new JLabel("La password deve contenere almeno un numero.");
 		lblPassNumError.setFont(new Font("Tahoma", Font.BOLD, 11));
 		lblPassNumError.setBounds(69, 312, 371, 20);
 		panel.add(lblPassNumError);
 		lblPassNumError.setHorizontalAlignment(SwingConstants.LEFT);
 
-		JLabel lblPassConfError = new JLabel("Conferma la password.");
+		final JLabel lblPassConfError = new JLabel("Conferma la password.");
 		lblPassConfError.setFont(new Font("Tahoma", Font.BOLD, 11));
 		lblPassConfError.setHorizontalAlignment(SwingConstants.LEFT);
 		lblPassConfError.setBounds(69, 343, 133, 20);
@@ -180,7 +180,7 @@ public class ViewRegistraSupporto extends JFrame {
 		Cap_Utente.setColumns(10);
 		labelClicked(Cap_Utente, "CAP");
 
-		JLabel lblNameError = new JLabel("Nome non valido");
+		final JLabel lblNameError = new JLabel("Nome non valido");
 		lblNameError.setForeground(new Color(255, 0, 0));
 		lblNameError.setVisible(false);
 		lblNameError.setFont(new Font("Tahoma", Font.PLAIN, 11));
@@ -222,12 +222,12 @@ public class ViewRegistraSupporto extends JFrame {
 		lblIndirizzoError.setBounds(68, 217, 134, 14);
 		panel.add(lblIndirizzoError);
 
-		JButton btnNewButton = new JButton("Registra supporto");
+		final JButton btnNewButton = new JButton("Registra supporto");
 		btnNewButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
-				String nome = Nome_Utente.getText();
+				final String nome = Nome_Utente.getText();
 				if (!nome.matches("[a-zA-Z�-�\\s]+")) {
 					lblNameError.setVisible(true);
 					Nome_Utente.setText("Nome");
@@ -235,7 +235,7 @@ public class ViewRegistraSupporto extends JFrame {
 					lblNameError.setVisible(false);
 				}
 
-				String cognome = Cognome_Utente.getText();
+				final String cognome = Cognome_Utente.getText();
 				if (!cognome.matches("[a-zA-Z�-�\\s]+")) {
 					lblCognomeError.setVisible(true);
 					Cognome_Utente.setText("Cognome");
@@ -243,7 +243,7 @@ public class ViewRegistraSupporto extends JFrame {
 					lblCognomeError.setVisible(false);
 				}
 
-				String citta = Citta_Utente.getText();
+				final String citta = Citta_Utente.getText();
 				if (!citta.matches("[a-zA-Z�-�\\s]+")) {
 					lblCittaError.setVisible(true);
 					Citta_Utente.setText("Citt�");
@@ -251,7 +251,7 @@ public class ViewRegistraSupporto extends JFrame {
 					lblCittaError.setVisible(false);
 				}
 
-				String telefono = Telefono_Utente.getText().trim();
+				final String telefono = Telefono_Utente.getText().trim();
 
 				if (!telefono.matches("\\d{1,15}")) {
 
@@ -261,7 +261,7 @@ public class ViewRegistraSupporto extends JFrame {
 					lblTelefonoError.setVisible(false);
 				}
 
-				String cap = Cap_Utente.getText().trim();
+				final String cap = Cap_Utente.getText().trim();
 
 				if (!cap.matches("\\d{1,5}")) {
 
@@ -271,7 +271,7 @@ public class ViewRegistraSupporto extends JFrame {
 					lblCapError.setVisible(false);
 				}
 
-				String indirizzo = Indirizzo_Utente.getText();
+				final String indirizzo = Indirizzo_Utente.getText();
 				if (!indirizzo.matches("[a-zA-Z�-�\\s]+")) {
 					lblIndirizzoError.setVisible(true);
 					Indirizzo_Utente.setText("Indirizzo");
@@ -279,13 +279,13 @@ public class ViewRegistraSupporto extends JFrame {
 					lblIndirizzoError.setVisible(false);
 				}
 
-				char[] passwordChar = Password_Utente.getPassword();
-				String passwordUtente = new String(passwordChar);
+				final char[] passwordChar = Password_Utente.getPassword();
+				final String passwordUtente = new String(passwordChar);
 
-				boolean success = authService.registerUser(Email_Utente, passwordUtente, Email_Utente);
+				final boolean success = authService.registerUser(Email_Utente, passwordUtente, Email_Utente);
 
 				if (success) {
-					AccessController cont1 = new AccessController();
+					final AccessController cont1 = new AccessController();
 					cont1.registraNuovoSupporto(Email_Utente, passwordUtente, nome, cognome, citta, telefono, cap,
 							indirizzo, ruolo, agenzia);
 
@@ -295,7 +295,7 @@ public class ViewRegistraSupporto extends JFrame {
 							"Errore nella registrazione", JOptionPane.ERROR_MESSAGE);
 				}
 
-				ViewDashboard schermata = new ViewDashboard(Email_Utente);
+				final ViewDashboard schermata = new ViewDashboard(Email_Utente);
 				schermata.setVisible(true);
 
 			}

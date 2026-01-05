@@ -14,7 +14,8 @@ public class RispostaOfferta {
 	private Boolean attiva;
 
 	// Costruttore con parametri
-	public RispostaOfferta(Long offertaInizialeAssociata, String agenteAssociato, String nomeAgente, String cognomeAgente, String tipoRisposta, Double importoControproposta) {
+	public RispostaOfferta(Long offertaInizialeAssociata, String agenteAssociato, String nomeAgente,
+			String cognomeAgente, String tipoRisposta, Double importoControproposta) {
 		this.offertaInizialeAssociata = offertaInizialeAssociata;
 		this.agenteAssociato = agenteAssociato;
 		setNomeAgente(nomeAgente);

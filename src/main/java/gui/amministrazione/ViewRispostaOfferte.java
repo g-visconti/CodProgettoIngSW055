@@ -23,8 +23,9 @@ import util.GuiUtils;
 public class ViewRispostaOfferte extends JFrame {
 
 	private static final long serialVersionUID = 1L;
-	private JPanel contentPane;
-	private JTextField txtControproposta; // Cambia da lblOfferta
+	private final JPanel contentPane;
+	private final JTextField txtControproposta; // Cambia da lblOfferta
+
 	/**
 	 * Launch the application.
 	 */
@@ -34,7 +35,6 @@ public class ViewRispostaOfferte extends JFrame {
 		System.out.println("Costruttore - idOfferta: " + idOfferta);
 		System.out.println("Costruttore - idAgente: " + idAgente);
 		System.out.println("=== FINE DEBUG ViewRispostaOfferte ===");
-
 
 		// Imposta l'icona di DietiEstates25 alla finestra in uso
 		GuiUtils.setIconaFinestra(this);
@@ -51,9 +51,7 @@ public class ViewRispostaOfferte extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 
-
-
-		JLabel lblDescrizione = new JLabel("Scegliere un'opzione sull'offerta proposta");
+		final JLabel lblDescrizione = new JLabel("Scegliere un'opzione sull'offerta proposta");
 		lblDescrizione.setHorizontalAlignment(SwingConstants.CENTER);
 		lblDescrizione.setFont(new Font("Tahoma", Font.PLAIN, 18));
 		lblDescrizione.setBounds(47, 21, 483, 24);
@@ -64,43 +62,42 @@ public class ViewRispostaOfferte extends JFrame {
 		contentPane.add(txtControproposta);
 		txtControproposta.setColumns(10);
 
-		JLabel lblProposta = new JLabel("Controproposta: €");
+		final JLabel lblProposta = new JLabel("Controproposta: €");
 		lblProposta.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblProposta.setFont(new Font("Tahoma", Font.BOLD, 11));
 		lblProposta.setBounds(47, 191, 132, 19);
 		contentPane.add(lblProposta);
 
-		JLabel lblOppureProponiUna = new JLabel("oppure proporre una nuova offerta");
+		final JLabel lblOppureProponiUna = new JLabel("oppure proporre una nuova offerta");
 		lblOppureProponiUna.setHorizontalAlignment(SwingConstants.CENTER);
 		lblOppureProponiUna.setFont(new Font("Tahoma", Font.PLAIN, 18));
 		lblOppureProponiUna.setBounds(51, 146, 483, 24);
 		contentPane.add(lblOppureProponiUna);
 
-		JButton btnAccetta = new JButton("Accetta");
+		final JButton btnAccetta = new JButton("Accetta");
 		btnAccetta.setForeground(Color.WHITE);
 		btnAccetta.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 11));
 		btnAccetta.setBackground(Color.GREEN);
 
-		JButton btnRifiuta = new JButton("Rifiuta");
+		final JButton btnRifiuta = new JButton("Rifiuta");
 		btnRifiuta.setForeground(Color.WHITE);
 		btnRifiuta.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 11));
 		btnRifiuta.setBackground(Color.RED);
 
-		JButton btnControproposta = new JButton("Controproposta");
+		final JButton btnControproposta = new JButton("Controproposta");
 		getRootPane().setDefaultButton(btnControproposta);
 		btnControproposta.setForeground(new Color(255, 255, 255));
 		btnControproposta.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 11));
 		btnControproposta.setBackground(SystemColor.textHighlight);
 
 		// **RECUPERA LO STATO DELL'OFFERTA PER SAPIRE SE È GIÀ VALUTATA**
-		OfferteController controller = new OfferteController();
-		OffertaIniziale offerta = controller.getOffertaById(idOfferta);
+		final OfferteController controller = new OfferteController();
+		final OffertaIniziale offerta = controller.getOffertaById(idOfferta);
 
 		boolean isOffertaGiàValutata = false;
 		if (offerta != null) {
-			String stato = offerta.getStato();
-			isOffertaGiàValutata = stato != null &&
-					!stato.trim().equalsIgnoreCase("In attesa");
+			final String stato = offerta.getStato();
+			isOffertaGiàValutata = stato != null && !stato.trim().equalsIgnoreCase("In attesa");
 			System.out.println("DEBUG - Stato offerta: '" + stato + "'");
 			System.out.println("DEBUG - Offerta già valutata: " + isOffertaGiàValutata);
 		}
@@ -127,29 +124,19 @@ public class ViewRispostaOfferte extends JFrame {
 
 		System.out.println("=== FINE DEBUG ViewRispostaOfferte ===");
 
-
 		// L'agente accetta la proposta del cliente
-
-
 
 		btnAccetta.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				int conferma = JOptionPane.showConfirmDialog(
-						null,
-						"Sei sicuro di voler accettare questa offerta?",
-						"Conferma accettazione",
-						JOptionPane.YES_NO_OPTION
-						);
+				final int conferma = JOptionPane.showConfirmDialog(null,
+						"Sei sicuro di voler accettare questa offerta?", "Conferma accettazione",
+						JOptionPane.YES_NO_OPTION);
 
 				if (conferma == JOptionPane.YES_OPTION) {
-					OfferteController controller = new OfferteController();
-					boolean successo = controller.inserisciRispostaOfferta(
-							idOfferta,
-							idAgente,
-							"Accettata",
-							null
-							);
+					final OfferteController controller = new OfferteController();
+					final boolean successo = controller.inserisciRispostaOfferta(idOfferta, idAgente, "Accettata",
+							null);
 
 					if (successo) {
 						JOptionPane.showMessageDialog(null, "Offerta accettata con successo!");
@@ -166,26 +153,16 @@ public class ViewRispostaOfferte extends JFrame {
 
 		// L'agente rifiuta l'offerta proposta dal cliente
 
-
-
 		btnRifiuta.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				int conferma = JOptionPane.showConfirmDialog(
-						null,
-						"Sei sicuro di voler rifiutare questa offerta?",
-						"Conferma rifiuto",
-						JOptionPane.YES_NO_OPTION
-						);
+				final int conferma = JOptionPane.showConfirmDialog(null,
+						"Sei sicuro di voler rifiutare questa offerta?", "Conferma rifiuto", JOptionPane.YES_NO_OPTION);
 
 				if (conferma == JOptionPane.YES_OPTION) {
-					OfferteController controller = new OfferteController();
-					boolean successo = controller.inserisciRispostaOfferta(
-							idOfferta,
-							idAgente,
-							"Rifiutata",
-							null
-							);
+					final OfferteController controller = new OfferteController();
+					final boolean successo = controller.inserisciRispostaOfferta(idOfferta, idAgente, "Rifiutata",
+							null);
 
 					if (successo) {
 						JOptionPane.showMessageDialog(null, "Offerta rifiutata con successo!");
@@ -200,17 +177,14 @@ public class ViewRispostaOfferte extends JFrame {
 		btnRifiuta.setBounds(314, 72, 131, 23);
 		contentPane.add(btnRifiuta);
 
-
 		// Controproposta dell'agente
-
-
 
 		btnControproposta.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				double controproposta;
+				final double controproposta;
 				try {
-					String testo = txtControproposta.getText();
+					final String testo = txtControproposta.getText();
 					controproposta = Double.parseDouble(testo);
 
 					if (controproposta <= 0) {
@@ -222,13 +196,9 @@ public class ViewRispostaOfferte extends JFrame {
 					return;
 				}
 
-				OfferteController controller = new OfferteController();
-				boolean successo = controller.inserisciRispostaOfferta(
-						idOfferta,
-						idAgente,
-						"Controproposta",
-						controproposta
-						);
+				final OfferteController controller = new OfferteController();
+				final boolean successo = controller.inserisciRispostaOfferta(idOfferta, idAgente, "Controproposta",
+						controproposta);
 
 				if (successo) {
 					JOptionPane.showMessageDialog(null, "Controproposta inviata con successo!");

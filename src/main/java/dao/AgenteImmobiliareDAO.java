@@ -7,7 +7,7 @@ import java.sql.SQLException;
 import model.entity.AgenteImmobiliare;
 
 public class AgenteImmobiliareDAO {
-	private Connection conn;
+	private final Connection conn;
 
 	public AgenteImmobiliareDAO(Connection conn) {
 		this.conn = conn;
@@ -15,7 +15,7 @@ public class AgenteImmobiliareDAO {
 
 	public void insertAgente(AgenteImmobiliare agente) throws SQLException {
 		// ID già presente, passato da Account
-		String sql = "INSERT INTO \"AgenteImmobiliare\" (id, agenzia) VALUES (?, ?)";
+		final String sql = "INSERT INTO \"AgenteImmobiliare\" (id, agenzia) VALUES (?, ?)";
 		try (PreparedStatement ps = conn.prepareStatement(sql)) {
 			ps.setString(1, agente.getIdAccount()); // ID generato dal DB in Account
 			ps.setString(2, agente.getAgenzia());
