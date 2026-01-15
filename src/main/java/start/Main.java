@@ -9,13 +9,16 @@ public class Main {
 	public static void main(String[] args) {
 
 		/*
-		 *
-		 * Accesso generico 1 Admin 2 Supporto Gallo 3 Agente Magnini 4 Agente Torre 5
-		 * Utente
+		 * * Accesso generico
+		 * 1 Admin
+		 * 2 Supporto Gallo
+		 * 3 Agente Magnini
+		 * 4 Agente Torre
+		 * 5 Utente
 		 *
 		 */
 
-		final int x = 5;
+		final int x = 3;
 
 		try {
 			switch (x) {
