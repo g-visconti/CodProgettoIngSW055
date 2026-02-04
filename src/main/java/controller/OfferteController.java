@@ -180,7 +180,7 @@ public class OfferteController {
 
 			// Crea e inserisci nuova risposta
 			final RispostaOfferta risposta = new RispostaOfferta(idOfferta, agente.getIdAccount(), // Usa l'ID
-																									// dell'account
+					// dell'account
 					agente.getNome(), agente.getCognome(), tipoRispostaNormalizzato, // Usa il tipo normalizzato
 					importoControproposta);
 
@@ -210,7 +210,7 @@ public class OfferteController {
 				JOptionPane.showMessageDialog(null,
 						"Errore: Tipo risposta non valido.\n"
 								+ "I valori accettati sono: 'Accettata', 'Rifiutata', 'Controproposta'",
-						"Errore di validazione", JOptionPane.ERROR_MESSAGE);
+								"Errore di validazione", JOptionPane.ERROR_MESSAGE);
 			} else {
 				JOptionPane.showMessageDialog(null, "Errore durante l'inserimento della risposta: " + e.getMessage(),
 						"Errore database", JOptionPane.ERROR_MESSAGE);
@@ -470,4 +470,11 @@ public class OfferteController {
 		}
 	}
 
+	public boolean isValidControproposta(double controproposta, double offertaIniziale) {
+		if (controproposta <= 0) {
+			return false;
+		}
+
+		return controproposta > offertaIniziale;
+	}
 }

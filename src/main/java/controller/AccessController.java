@@ -19,6 +19,42 @@ public class AccessController {
 	public AccessController() {
 	}
 
+	public boolean isValidEmail(String email, boolean allowEmpty) {
+		if (email == null) {
+			return false;
+		}
+
+		String trimmed = email.trim();
+
+		if (trimmed.isEmpty()) {
+			return allowEmpty;
+		}
+
+		String regex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
+		return trimmed.matches(regex);
+	}
+
+	public boolean isValidPassword(String password, String confermaPassword) {
+		if (password == null || confermaPassword == null) {
+			return false;
+		}
+
+		if (!password.equals(confermaPassword)) {
+			return false;
+		}
+
+		if (password.length() < 6) {
+			return false;
+		}
+
+		// almeno un numero
+		if (!password.matches(".*\\d.*")) {
+			return false;
+		}
+
+		return true;
+	}
+
 	// Login: verifica credenziali
 	public boolean checkCredenziali(String email, String password) throws SQLException {
 		final Connection connAWS = ConnessioneDatabase.getInstance().getConnection();

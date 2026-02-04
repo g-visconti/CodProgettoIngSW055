@@ -240,15 +240,15 @@ public class ViewCaricaImmobile extends JFrame {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				try {
-					final ImmobileController con = new ImmobileController();
+					ImmobileController con = new ImmobileController();
 
-					final String titolo = titolofield.getText();
-					final String indirizzo = indirizzofield.getText();
-					final String localita = localitafield.getText();
-					final String descrizione = descrizionefield.getText();
-					final String tipologia = (String) tipologiafield.getSelectedItem();
+					String titolo = titolofield.getText();
+					String indirizzo = indirizzofield.getText();
+					String localita = localitafield.getText();
+					String descrizione = descrizionefield.getText();
+					String tipologia = (String) tipologiafield.getSelectedItem();
 
-					final int dimensione;
+					int dimensione;
 					try {
 						dimensione = Integer.parseInt(dimensionefield.getText().trim());
 					} catch (NumberFormatException ex) {
@@ -256,7 +256,7 @@ public class ViewCaricaImmobile extends JFrame {
 						return;
 					}
 
-					final int prezzo;
+					int prezzo;
 					try {
 						prezzo = Integer.parseInt(prezzofield.getText().trim());
 					} catch (NumberFormatException ex) {
@@ -264,22 +264,29 @@ public class ViewCaricaImmobile extends JFrame {
 						return;
 					}
 
-					final String pianoStr = pianofield.getSelectedItem().toString();
-					final int piano = pianoStr.equals("-") ? -1 : Integer.parseInt(pianoStr);
+					String pianoStr = pianofield.getSelectedItem().toString();
+					int piano = pianoStr.equals("-") ? -1 : Integer.parseInt(pianoStr);
 
-					final int bagni = (Integer) bagnifield.getValue();
-					final int locali = (Integer) localifield.getValue();
-					if (titolo.isBlank() || indirizzo.isBlank() || localita.isBlank() || descrizione.isBlank()) {
-						JOptionPane.showMessageDialog(null, "Compila tutti i campi obbligatori.");
+					int bagni = (Integer) bagnifield.getValue();
+					int locali = (Integer) localifield.getValue();
+
+					try {
+						con.validaImmobile(
+								titolo,
+								indirizzo,
+								localita,
+								descrizione,
+								tipologia,
+								dimensione,
+								prezzo,
+								piano
+								);
+					} catch (IllegalArgumentException ex) {
+						JOptionPane.showMessageDialog(null, ex.getMessage());
 						return;
 					}
 
-					if ("-".equals(tipologia)) {
-						JOptionPane.showMessageDialog(null, "Seleziona una tipologia valida.");
-						return;
-					}
-
-					final JSONObject filtri = new JSONObject();
+					JSONObject filtri = new JSONObject();
 					filtri.put("ascensore", ascensorefield.isSelected());
 					filtri.put("portineria", portineriafield.isSelected());
 					filtri.put("climatizzazione", climatizzazionefield.isSelected());
@@ -287,27 +294,35 @@ public class ViewCaricaImmobile extends JFrame {
 					filtri.put("numeroBagni", bagni);
 					filtri.put("numeroLocali", locali);
 
-					final Immobile immobile;
-					final AccountController controller = new AccountController();
-					final String idAgenteAssociato = controller.getIdAccountByEmail(emailAgente);
+					AccountController controller = new AccountController();
+					String idAgenteAssociato = controller.getIdAccountByEmail(emailAgente);
 
 					if ("undef".equals(idAgenteAssociato)) {
 						JOptionPane.showMessageDialog(null, "Agente non trovato, impossibile associare immobile.");
 						return;
 					}
+
+					Immobile immobile;
 					if ("Affitto".equalsIgnoreCase(tipologia)) {
-						immobile = new ImmobileInAffitto(titolo, indirizzo, localita, dimensione, descrizione,
-								tipologia, filtri, idAgenteAssociato, prezzo);
+						immobile = new ImmobileInAffitto(
+								titolo, indirizzo, localita, dimensione,
+								descrizione, tipologia, filtri,
+								idAgenteAssociato, prezzo
+								);
 					} else if ("Vendita".equalsIgnoreCase(tipologia)) {
-						immobile = new ImmobileInVendita(titolo, indirizzo, localita, dimensione, descrizione,
-								tipologia, filtri, idAgenteAssociato, prezzo);
+						immobile = new ImmobileInVendita(
+								titolo, indirizzo, localita, dimensione,
+								descrizione, tipologia, filtri,
+								idAgenteAssociato, prezzo
+								);
 					} else {
 						JOptionPane.showMessageDialog(null, "Tipologia non valida");
 						return;
 					}
+
 					immobile.setImmagini(immaginiCaricate);
 
-					final boolean successo = con.caricaImmobile(immobile);
+					boolean successo = con.caricaImmobile(immobile);
 
 					if (successo) {
 						JOptionPane.showMessageDialog(null, "Immobile caricato con successo");
@@ -316,7 +331,7 @@ public class ViewCaricaImmobile extends JFrame {
 					}
 
 				} catch (Exception ex) {
-					ex.printStackTrace(); // utile per il debug
+					ex.printStackTrace();
 					JOptionPane.showMessageDialog(null, "Errore generico durante il caricamento dell'immobile");
 				}
 			}

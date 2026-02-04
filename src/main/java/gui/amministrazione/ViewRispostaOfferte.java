@@ -182,29 +182,35 @@ public class ViewRispostaOfferte extends JFrame {
 		btnControproposta.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				final double controproposta;
 				try {
-					final String testo = txtControproposta.getText();
-					controproposta = Double.parseDouble(testo);
+					double controproposta = Double.parseDouble(txtControproposta.getText());
 
-					if (controproposta <= 0) {
-						JOptionPane.showMessageDialog(null, "L'offerta deve essere un valore positivo.");
+					OffertaIniziale offerta = controller.getOffertaById(idOfferta);
+					double offertaIniziale = offerta.getImportoProposto();
+
+					OfferteController controller = new OfferteController();
+					if (!controller.isValidControproposta(controproposta, offertaIniziale)) {
+						JOptionPane.showMessageDialog(null,
+								"La controproposta deve essere positiva e superiore all'offerta iniziale.");
 						return;
 					}
+
+					boolean successo = controller.inserisciRispostaOfferta(
+							idOfferta,
+							idAgente,
+							"Controproposta",
+							controproposta
+							);
+
+					if (successo) {
+						JOptionPane.showMessageDialog(null, "Controproposta inviata con successo!");
+						dispose();
+					} else {
+						JOptionPane.showMessageDialog(null, "Errore durante l'invio della controproposta.");
+					}
+
 				} catch (NumberFormatException ex) {
-					JOptionPane.showMessageDialog(null, "Inserisci un valore numerico valido per l'offerta.");
-					return;
-				}
-
-				final OfferteController controller = new OfferteController();
-				final boolean successo = controller.inserisciRispostaOfferta(idOfferta, idAgente, "Controproposta",
-						controproposta);
-
-				if (successo) {
-					JOptionPane.showMessageDialog(null, "Controproposta inviata con successo!");
-					dispose();
-				} else {
-					JOptionPane.showMessageDialog(null, "Errore durante l'invio della controproposta.");
+					JOptionPane.showMessageDialog(null, "Inserisci un valore numerico valido per la controproposta.");
 				}
 			}
 		});

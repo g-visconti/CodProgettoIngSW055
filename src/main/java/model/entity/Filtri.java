@@ -1,6 +1,6 @@
 package model.entity;
 
-public class Filtri extends Ricerca {
+public class Filtri {
 	// Attributi
 	public Integer prezzoMin;
 	public Integer prezzoMax;

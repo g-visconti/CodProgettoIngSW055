@@ -116,10 +116,10 @@ public class ImmobileController {
 			// Renderer
 			tableRisultati.getColumnModel().getColumn(1).setCellRenderer(new Base64ImageRenderer());
 			tableRisultati.getColumnModel().getColumn(2)
-					.setCellRenderer(new TextBoldRenderer(false, new Color(50, 133, 177)));
+			.setCellRenderer(new TextBoldRenderer(false, new Color(50, 133, 177)));
 			tableRisultati.getColumnModel().getColumn(3).setCellRenderer(new TextAreaRenderer());
 			tableRisultati.getColumnModel().getColumn(4)
-					.setCellRenderer(new TextBoldRenderer(true, new Color(0, 0, 0)));
+			.setCellRenderer(new TextBoldRenderer(true, new Color(0, 0, 0)));
 
 			return model.getRowCount();
 
@@ -127,5 +127,49 @@ public class ImmobileController {
 			e.printStackTrace();
 		}
 		return 0;
+	}
+
+	public void validaImmobile(
+			String titolo,
+			String indirizzo,
+			String localita,
+			String descrizione,
+			String tipologia,
+			int dimensione,
+			int prezzo,
+			int piano
+			) {
+
+		if (titolo == null || titolo.isBlank()) {
+			throw new IllegalArgumentException("Titolo mancante");
+		}
+
+		if (indirizzo == null || indirizzo.isBlank()) {
+			throw new IllegalArgumentException("Indirizzo mancante");
+		}
+
+		if (localita == null || localita.isBlank()) {
+			throw new IllegalArgumentException("Località mancante");
+		}
+
+		if (descrizione == null || descrizione.isBlank()) {
+			throw new IllegalArgumentException("Descrizione mancante");
+		}
+
+		if (tipologia == null || "-".equals(tipologia)) {
+			throw new IllegalArgumentException("Tipologia non valida");
+		}
+
+		if (dimensione <= 0) {
+			throw new IllegalArgumentException("Dimensione non valida");
+		}
+
+		if (prezzo <= 0) {
+			throw new IllegalArgumentException("Prezzo non valido");
+		}
+
+		if (piano < -1) {
+			throw new IllegalArgumentException("Piano non valido");
+		}
 	}
 }
