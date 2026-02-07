@@ -30,6 +30,37 @@ import gui.amministrazione.ViewDashboardDietiEstates;
 import gui.utenza.ViewDashboard;
 import util.GuiUtils;
 
+/**
+ * Finestra per l'autenticazione tramite email e password in DietiEstates25.
+ * Questa interfaccia permette agli utenti già registrati di accedere al sistema
+ * inserendo la propria password dopo aver specificato l'email nella schermata precedente.
+ *
+ * <p>La finestra è divisa in due sezioni principali:
+ * <ul>
+ *   <li>Pannello sinistro: contiene logo e titolo dell'applicazione</li>
+ *   <li>Pannello destro: contiene il campo password, l'email confermata e i pulsanti di controllo</li>
+ * </ul>
+ *
+ * <p>Caratteristiche del campo password:
+ * <ul>
+ *   <li>Placeholder "******" che scompare all'interazione</li>
+ *   <li>Gestione intelligente del focus e del contenuto</li>
+ *   <li>Reset automatico quando si clicca fuori dal campo se vuoto</li>
+ * </ul>
+ *
+ * <p>Flussi di autenticazione in base al ruolo:
+ * <ul>
+ *   <li>Cliente: redirezione a {@link ViewDashboard}</li>
+ *   <li>Agente/Supporto/Admin: redirezione a {@link ViewDashboardDietiEstates}</li>
+ * </ul>
+ *
+ * @author IngSW2425_055 Team
+ * @see AccessController
+ * @see AccountController
+ * @see ViewAccesso
+ * @see ViewDashboard
+ * @see ViewDashboardDietiEstates
+ */
 public class ViewAccessoConPassword extends JFrame {
 
 	private static final long serialVersionUID = 1L;
@@ -40,7 +71,17 @@ public class ViewAccessoConPassword extends JFrame {
 	private final JPasswordField passwordField;
 
 	/**
-	 * Create the frame.
+	 * Costruttore della finestra di accesso con password.
+	 * Inizializza tutti i componenti grafici e configura i listener per la gestione
+	 * dell'autenticazione tramite password.
+	 *
+	 * <p>La finestra mostra l'email precedentemente inserita dall'utente e richiede
+	 * l'inserimento della password corrispondente per completare l'accesso.
+	 *
+	 * @param emailInserita Email dell'utente che sta tentando l'accesso.
+	 *                      Viene visualizzata nella finestra per conferma e
+	 *                      utilizzata per la verifica delle credenziali.
+	 * @throws IllegalArgumentException Se l'email è null o vuota
 	 */
 	public ViewAccessoConPassword(String emailInserita) {
 		// Imposta l'icona di DietiEstates25 alla finestra in uso
@@ -62,20 +103,20 @@ public class ViewAccessoConPassword extends JFrame {
 		contentPane.add(panelLogo);
 		panelLogo.setLayout(null);
 
-		final JLabel testlogo = new JLabel("New label");
-		testlogo.setBounds(95, 176, 259, 249);
-		panelLogo.add(testlogo);
-		testlogo.setOpaque(true);
+		final JLabel lblLogoDieti = new JLabel("New label");
+		lblLogoDieti.setBounds(95, 176, 259, 249);
+		panelLogo.add(lblLogoDieti);
+		lblLogoDieti.setOpaque(true);
 
 		final URL pathlogo = getClass().getClassLoader().getResource("images/DietiEstatesLogo.png");
-		testlogo.setIcon(new ImageIcon(pathlogo));
+		lblLogoDieti.setIcon(new ImageIcon(pathlogo));
 
-		final JLabel lblNewLabel = new JLabel("DietiEstates25");
-		lblNewLabel.setBounds(2, 39, 445, 32);
-		panelLogo.add(lblNewLabel);
-		lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		lblNewLabel.setForeground(new Color(27, 99, 142));
-		lblNewLabel.setFont(new Font("Tahoma", Font.BOLD, 30));
+		final JLabel lblDieti = new JLabel("DietiEstates25");
+		lblDieti.setBounds(2, 39, 445, 32);
+		panelLogo.add(lblDieti);
+		lblDieti.setHorizontalAlignment(SwingConstants.CENTER);
+		lblDieti.setForeground(new Color(27, 99, 142));
+		lblDieti.setFont(new Font("Tahoma", Font.BOLD, 30));
 
 		final JPanel panelAccesso = new JPanel();
 
@@ -97,6 +138,11 @@ public class ViewAccessoConPassword extends JFrame {
 		panelAccesso.add(txtAccediORegistrati);
 		txtAccediORegistrati.setColumns(10);
 
+		/**
+		 * Campo di testo per l'inserimento della password con placeholder dinamico.
+		 * Il campo gestisce automaticamente la visualizzazione del placeholder "******"
+		 * che scompare quando l'utente inizia a digitare o clicca sul campo.
+		 */
 		passwordField = new JPasswordField();
 		// se inizio a digitare dei tasti il campo si resetta scrivendo il nuovo testo
 		passwordField.addKeyListener(new KeyAdapter() {
@@ -161,6 +207,11 @@ public class ViewAccessoConPassword extends JFrame {
 		lblEmailAttuale.setBounds(144, 88, 178, 20);
 		panelAccesso.add(lblEmailAttuale);
 
+		/**
+		 * Pulsante per tornare alla schermata di accesso principale.
+		 * Chiude la finestra corrente e riapre {@link ViewAccesso} per permettere
+		 * all'utente di inserire un'email diversa o utilizzare altri metodi di accesso.
+		 */
 		final JButton btnTornaIndietro = new JButton("Torna indietro");
 		btnTornaIndietro.addMouseListener(new MouseAdapter() {
 			@Override
@@ -172,27 +223,47 @@ public class ViewAccessoConPassword extends JFrame {
 			}
 		});
 
+		/**
+		 * Pulsante per confermare l'accesso con le credenziali inserite.
+		 * Verifica la correttezza della password tramite {@link AccessController}
+		 * e in base al ruolo dell'utente reindirizza alla dashboard appropriata.
+		 */
 		final JButton btnAccedi = new JButton("Accedi");
 		// Bottone predefinito alla pressione del tasto Enter
 		getRootPane().setDefaultButton(btnAccedi);
 
 		btnAccedi.addActionListener(new ActionListener() {
+			/**
+			 * Gestisce il processo di autenticazione quando viene premuto il pulsante "Accedi".
+			 *
+			 * <p>Il metodo:
+			 * <ol>
+			 *   <li>Recupera la password inserita dall'utente</li>
+			 *   <li>Verifica le credenziali tramite {@link AccessController#checkCredenziali(String, String)}</li>
+			 *   <li>Se le credenziali sono corrette, determina il ruolo dell'utente tramite {@link AccountController#getRuoloByEmail(String)}</li>
+			 *   <li>Reindirizza alla dashboard appropriata in base al ruolo:
+			 *     <ul>
+			 *       <li>Cliente: {@link ViewDashboard}</li>
+			 *       <li>Agente/Supporto/Admin: {@link ViewDashboardDietiEstates}</li>
+			 *     </ul>
+			 *   </li>
+			 *   <li>Mostra messaggi di errore in caso di password errata o ruolo non riconosciuto</li>
+			 * </ol>
+			 *
+			 * @param e Evento dell'azione del pulsante
+			 * @throws SQLException Se si verifica un errore durante l'accesso al database
+			 */
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// Condizione da inserire
 				final AccessController con = new AccessController();
 				@SuppressWarnings("deprecation")
 				final String passwordInserita = passwordField.getText();
 				try {
 					if (con.checkCredenziali(emailInserita, passwordInserita)) {
-						/*
-						 * DISTINGUO I 4 CASI D'USO DI ACCESSO PER UTENTE AGENTE AMMINISTRATORE DI
-						 * SUPPORTO (ad Admin) ADMIN
-						 */
 						// Guardo com'è strutturato l'id associato alla email, uso un metodo nel
 						// controller
-						final AccountController con1 = new AccountController();
-						final String ruolo = con1.getRuoloByEmail(emailInserita);
+						final AccountController controller = new AccountController();
+						final String ruolo = controller.getRuoloByEmail(emailInserita);
 
 						switch (ruolo) {
 						case "Cliente" -> {
@@ -218,7 +289,6 @@ public class ViewAccessoConPassword extends JFrame {
 								"Errore inserimento dei dati", JOptionPane.INFORMATION_MESSAGE);
 					}
 				} catch (SQLException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 
@@ -238,6 +308,5 @@ public class ViewAccessoConPassword extends JFrame {
 		btnTornaIndietro.setBackground(SystemColor.textHighlight);
 		btnTornaIndietro.setBounds(53, 382, 114, 23);
 		panelAccesso.add(btnTornaIndietro);
-
 	}
 }

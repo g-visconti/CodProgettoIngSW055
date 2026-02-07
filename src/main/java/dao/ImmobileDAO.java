@@ -27,13 +27,55 @@ import model.entity.Immobile;
 import model.entity.ImmobileInAffitto;
 import model.entity.ImmobileInVendita;
 
+/**
+ * Data Access Object per la gestione degli immobili nel sistema.
+ * Fornisce metodi per interagire con le tabelle "Immobile", "ImmobileInAffitto"
+ * e "ImmobileInVendita" del database, gestendo tutte le operazioni CRUD.
+ *
+ * <p>Questa classe gestisce:
+ * <ul>
+ *   <li>Caricamento di nuovi immobili in affitto e vendita</li>
+ *   <li>Recupero degli immobili con filtri avanzati</li>
+ *   <li>Gestione dello storico offerte per clienti e agenti</li>
+ *   <li>Recupero di immobili specifici per ID</li>
+ *   <li>Conversione di immagini in formato Base64 per il database</li>
+ * </ul>
+ *
+ * <p>Nota: Utilizza JSONB per memorizzare filtri e immagini nel database PostgreSQL,
+ * permettendo una struttura flessibile e query avanzate sui campi JSON.
+ *
+ * @author IngSW2425_055 Team
+ * @see Immobile
+ * @see ImmobileInAffitto
+ * @see ImmobileInVendita
+ * @see Connection
+ */
 public class ImmobileDAO {
 	private Connection connection;
 
+	/**
+	 * Costruttore per ImmobileDAO.
+	 * Inizializza il DAO con una connessione al database.
+	 *
+	 * @param connection Connessione al database da utilizzare per tutte le operazioni
+	 * @throws IllegalArgumentException Se la connessione è null
+	 */
 	public ImmobileDAO(Connection connection) {
 		this.connection = connection;
 	}
 
+	/**
+	 * Carica un immobile in affitto nel database.
+	 *
+	 * <p>Questo metodo inserisce prima i dati generali dell'immobile nella tabella "Immobile",
+	 * poi i dati specifici per l'affitto nella tabella "ImmobileInAffitto".
+	 * Le immagini vengono convertite in Base64 e memorizzate come JSONB.
+	 *
+	 * @param immobile Oggetto ImmobileInAffitto contenente tutti i dati dell'immobile
+	 * @throws SQLException Se si verifica un errore durante l'inserimento nel database
+	 * @throws IllegalArgumentException Se l'immobile è null o contiene dati non validi
+	 * @see ImmobileInAffitto
+	 */
 	public void caricaImmobileInAffitto(ImmobileInAffitto immobile) throws SQLException {
 		final String query1 = "INSERT INTO \"Immobile\" (titolo, indirizzo, localita, dimensione, descrizione, tipologia, filtri, immagini, \"agenteAssociato\") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING \"idImmobile\"";
 
@@ -81,6 +123,18 @@ public class ImmobileDAO {
 		}
 	}
 
+	/**
+	 * Carica un immobile in vendita nel database.
+	 *
+	 * <p>Questo metodo inserisce prima i dati generali dell'immobile nella tabella "Immobile",
+	 * poi i dati specifici per la vendita nella tabella "ImmobileInVendita".
+	 * Le immagini vengono convertite in Base64 e memorizzate come JSONB.
+	 *
+	 * @param immobile Oggetto ImmobileInVendita contenente tutti i dati dell'immobile
+	 * @throws SQLException Se si verifica un errore durante l'inserimento nel database
+	 * @throws IllegalArgumentException Se l'immobile è null o contiene dati non validi
+	 * @see ImmobileInVendita
+	 */
 	public void caricaImmobileInVendita(ImmobileInVendita immobile) throws SQLException {
 		final String query1 = "INSERT INTO \"Immobile\" (titolo, indirizzo, localita, dimensione, descrizione, tipologia, filtri, immagini, \"agenteAssociato\") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING \"idImmobile\"";
 
@@ -128,6 +182,18 @@ public class ImmobileDAO {
 		}
 	}
 
+	/**
+	 * Recupera le offerte proposte da un cliente specifico.
+	 *
+	 * <p>Questo metodo recupera tutte le offerte iniziali fatte da un cliente,
+	 * incluse le informazioni sull'immobile associato e lo stato dell'offerta.
+	 * Utile per visualizzare lo storico delle offerte del cliente.
+	 *
+	 * @param emailUtente Email del cliente di cui recuperare le offerte
+	 * @return Lista di StoricoClienteDTO contenenti le informazioni sulle offerte
+	 * @throws RuntimeException Se si verifica un errore durante l'accesso al database
+	 * @see StoricoClienteDTO
+	 */
 	public List<StoricoClienteDTO> getDatiOfferteProposte(String emailUtente) {
 		final String query = "SELECT oi.\"idOfferta\" as \"idOfferta\", i.\"immagini\" as \"Foto\", i.\"tipologia\" as \"Categoria\", i.\"descrizione\" as \"Descrizione\", "
 				+ "oi.\"dataOfferta\" as \"Data\", oi.\"importoProposto\" as \"Prezzo proposto\", oi.\"stato\" as \"stato\" "
@@ -190,6 +256,18 @@ public class ImmobileDAO {
 		return risultati;
 	}
 
+	/**
+	 * Recupera le offerte ricevute da un agente immobiliare.
+	 *
+	 * <p>Questo metodo recupera tutte le offerte iniziali fatte sui immobili
+	 * gestiti da un agente specifico. Utile per permettere all'agente di
+	 * valutare e gestire le offerte ricevute.
+	 *
+	 * @param emailAgente Email dell'agente di cui recuperare le offerte ricevute
+	 * @return Lista di StoricoAgenteDTO contenenti le informazioni sulle offerte
+	 * @throws SQLException Se si verifica un errore durante l'accesso al database
+	 * @see StoricoAgenteDTO
+	 */
 	public List<StoricoAgenteDTO> getDatiOfferteRicevuteAgente(String emailAgente) throws SQLException {
 		final List<StoricoAgenteDTO> offerte = new ArrayList<>();
 
@@ -209,7 +287,7 @@ public class ImmobileDAO {
 			try (ResultSet rs = pstmt.executeQuery()) {
 				while (rs.next()) {
 					final StoricoAgenteDTO offerta = new StoricoAgenteDTO(rs.getLong("idOfferta"),
-							rs.getString("primaImmagine"), // Base64 o percorso immagine
+							rs.getString("primaImmagine"), // Base64
 							rs.getString("categoria"), rs.getString("descrizione"),
 							rs.getTimestamp("dataOfferta").toLocalDateTime(), rs.getBigDecimal("importoProposto"),
 							rs.getString("stato"));
@@ -221,6 +299,21 @@ public class ImmobileDAO {
 		return offerte;
 	}
 
+	/**
+	 * Recupera un immobile completo dal database basandosi sul suo ID.
+	 *
+	 * <p>Questo metodo recupera tutti i dati dell'immobile, inclusi filtri,
+	 * immagini e prezzo specifico (mensile per affitto, totale per vendita).
+	 * Le immagini vengono decodificate da Base64 a byte array.
+	 *
+	 * @param idimmobile ID dell'immobile da recuperare
+	 * @return Oggetto Immobile (o sottoclasse appropriata) con tutti i dati,
+	 *         null se l'immobile non viene trovato
+	 * @throws SQLException Se si verifica un errore durante l'accesso al database
+	 * @see Immobile
+	 * @see ImmobileInAffitto
+	 * @see ImmobileInVendita
+	 */
 	public Immobile getImmobileById(long idimmobile) throws SQLException {
 		final String sqlBase = "SELECT * FROM \"Immobile\" WHERE \"idImmobile\" = ?";
 		Immobile immobile = null;
@@ -254,7 +347,7 @@ public class ImmobileDAO {
 					immobile.setFiltriFromJson(filtri);
 				}
 
-				// *** Recupero immagini da JSONB (array di stringhe Base64) ***
+				// Recupero immagini da JSONB (array di stringhe Base64)
 				final String immaginiJson = rs.getString("immagini");
 				if (immaginiJson != null && !immaginiJson.isEmpty()) {
 					final JSONArray jsonArray = new JSONArray(immaginiJson);
@@ -294,8 +387,17 @@ public class ImmobileDAO {
 		return immobile;
 	}
 
-	// Nuovo metodo helper per costruire query comune (RIMUOVI LA SECONDA
-	// DEFINIZIONE DUPLICATA)
+	/**
+	 * Costruisce la query base per la ricerca di immobili.
+	 *
+	 * <p>Metodo privato che costruisce la parte iniziale della query SQL
+	 * basandosi sulla tipologia (Affitto/Vendita) e sul tipo di ricerca.
+	 *
+	 * @param tipologia Tipologia dell'immobile ("Affitto" o "Vendita")
+	 * @param ricercaDTO DTO contenente i criteri di ricerca
+	 * @return Stringa SQL con la query base
+	 * @see RicercaDTO
+	 */
 	private String costruisciQueryBase(String tipologia, RicercaDTO ricercaDTO) {
 		String query = "";
 
@@ -313,7 +415,6 @@ public class ImmobileDAO {
 					+ "i.\"descrizione\" ILIKE '%' || ? || '%') " + "AND i.\"tipologia\" = ? ";
 		}
 
-		// Aggiungi filtro per agente se necessario
 		if (ricercaDTO.getTipoRicerca() == RicercaDTO.TipoRicerca.I_MIEI_IMMOBILI && ricercaDTO.getEmailUtente() != null
 				&& !ricercaDTO.getEmailUtente().isEmpty()) {
 			query += " AND i.\"agenteAssociato\" = (SELECT \"idAccount\" FROM \"Account\" WHERE \"email\" = ?) ";
@@ -322,6 +423,18 @@ public class ImmobileDAO {
 		return query;
 	}
 
+	/**
+	 * Aggiunge i filtri alla query SQL esistente.
+	 *
+	 * <p>Metodo privato che estende una query SQL aggiungendo le condizioni
+	 * di filtro basate sull'oggetto Filtri fornito.
+	 *
+	 * @param query Query SQL base a cui aggiungere i filtri
+	 * @param filtri Oggetto contenente i criteri di filtro
+	 * @param tipologia Tipologia dell'immobile ("Affitto" o "Vendita")
+	 * @return Query SQL estesa con le condizioni di filtro
+	 * @see Filtri
+	 */
 	private String aggiungiFiltriQuery(String query, Filtri filtri, String tipologia) {
 		if (filtri == null) {
 			return query;
@@ -369,6 +482,19 @@ public class ImmobileDAO {
 		return query;
 	}
 
+	/**
+	 * Aggiunge i parametri dei filtri allo PreparedStatement.
+	 *
+	 * <p>Metodo privato che imposta i valori dei parametri per i filtri
+	 * nello PreparedStatement, gestendo tutti i tipi di filtro supportati.
+	 *
+	 * @param ps PreparedStatement a cui aggiungere i parametri
+	 * @param filtri Oggetto contenente i valori dei filtri
+	 * @param index Indice corrente per l'impostazione dei parametri
+	 * @return Nuovo indice dopo aver aggiunto tutti i parametri
+	 * @throws SQLException Se si verifica un errore durante l'impostazione dei parametri
+	 * @see Filtri
+	 */
 	private int aggiungiParametriFiltri(PreparedStatement ps, Filtri filtri, int index) throws SQLException {
 		if (filtri == null) {
 			return index;
@@ -418,12 +544,24 @@ public class ImmobileDAO {
 		return index;
 	}
 
-	// Metodi aggiornati che accettano RicercaDTO
+	/**
+	 * Recupera gli immobili in affitto in base ai criteri di ricerca specificati.
+	 *
+	 * <p>Questo metodo esegue una query complessa con filtri avanzati per trovare
+	 * immobili in affitto che corrispondono ai criteri specificati nel RicercaDTO.
+	 * Le immagini vengono decodificate da Base64 a byte array.
+	 *
+	 * @param ricercaDTO DTO contenente tutti i criteri di ricerca e filtri
+	 * @return Lista di ImmobileInAffitto che soddisfano i criteri di ricerca,
+	 *         lista vuota se nessun immobile viene trovato o in caso di errore
+	 * @see ImmobileInAffitto
+	 * @see RicercaDTO
+	 */
 	public List<ImmobileInAffitto> getImmobiliAffitto(RicercaDTO ricercaDTO) {
 		final List<ImmobileInAffitto> immobili = new ArrayList<>();
 
 		String query = costruisciQueryBase("Affitto", ricercaDTO);
-		query = aggiungiFiltriQuery(query, ricercaDTO.getFiltri(), "Affitto"); // CORRETTO: aggiunto "Affitto"
+		query = aggiungiFiltriQuery(query, ricercaDTO.getFiltri(), "Affitto");
 		query += " ORDER BY i.\"idImmobile\" DESC ";
 
 		try (PreparedStatement ps = connection.prepareStatement(query)) {
@@ -439,14 +577,13 @@ public class ImmobileDAO {
 			ps.setString(index, ricercaDTO.getTipologiaImmobile());
 			index++;
 
-			// Parametro per filtro agente (se presente)
+			// Parametro per filtro agente
 			if (ricercaDTO.getTipoRicerca() == RicercaDTO.TipoRicerca.I_MIEI_IMMOBILI
 					&& ricercaDTO.getEmailUtente() != null && !ricercaDTO.getEmailUtente().isEmpty()) {
 				ps.setString(index, ricercaDTO.getEmailUtente());
 				index++;
 			}
 
-			// Aggiungi parametri dei filtri
 			index = aggiungiParametriFiltri(ps, ricercaDTO.getFiltri(), index);
 
 			final ResultSet rs = ps.executeQuery();
@@ -484,7 +621,19 @@ public class ImmobileDAO {
 		}
 	}
 
-	// Metodo per vendita con RicercaDTO
+	/**
+	 * Recupera gli immobili in vendita in base ai criteri di ricerca specificati.
+	 *
+	 * <p>Questo metodo esegue una query complessa con filtri avanzati per trovare
+	 * immobili in vendita che corrispondono ai criteri specificati nel RicercaDTO.
+	 * Le immagini vengono decodificate da Base64 a byte array.
+	 *
+	 * @param ricercaDTO DTO contenente tutti i criteri di ricerca e filtri
+	 * @return Lista di ImmobileInVendita che soddisfano i criteri di ricerca,
+	 *         lista vuota se nessun immobile viene trovato o in caso di errore
+	 * @see ImmobileInVendita
+	 * @see RicercaDTO
+	 */
 	public List<ImmobileInVendita> getImmobiliVendita(RicercaDTO ricercaDTO) {
 		final List<ImmobileInVendita> immobili = new ArrayList<>();
 
@@ -505,14 +654,13 @@ public class ImmobileDAO {
 			ps.setString(index, ricercaDTO.getTipologiaImmobile());
 			index++;
 
-			// Parametro per filtro agente (se presente)
+			// Parametro per filtro agente
 			if (ricercaDTO.getTipoRicerca() == RicercaDTO.TipoRicerca.I_MIEI_IMMOBILI
 					&& ricercaDTO.getEmailUtente() != null && !ricercaDTO.getEmailUtente().isEmpty()) {
 				ps.setString(index, ricercaDTO.getEmailUtente());
 				index++;
 			}
 
-			// Aggiungi parametri dei filtri
 			index = aggiungiParametriFiltri(ps, ricercaDTO.getFiltri(), index);
 
 			final ResultSet rs = ps.executeQuery();
@@ -550,14 +698,41 @@ public class ImmobileDAO {
 		}
 	}
 
+	/**
+	 * Renderer personalizzato per celle di tabella che contengono testo multilinea.
+	 *
+	 * <p>Classe interna che estende JTextArea per fornire un renderer di celle
+	 * che gestisca correttamente il testo multilinea con word wrapping.
+	 * Utilizzata per visualizzare descrizioni lunghe nelle tabelle di immobili.
+	 *
+	 * @author IngSW2425_055 Team
+	 * @see JTextArea
+	 * @see TableCellRenderer
+	 */
 	@SuppressWarnings("serial")
 	static class TextAreaRenderer extends JTextArea implements TableCellRenderer {
+
+		/**
+		 * Costruttore per TextAreaRenderer.
+		 * Configura il componente per il wrapping di testo e parole.
+		 */
 		public TextAreaRenderer() {
 			setLineWrap(true);
 			setWrapStyleWord(true);
 			setOpaque(true);
 		}
 
+		/**
+		 * Restituisce il componente configurato per il rendering della cella.
+		 *
+		 * @param table Tabella a cui appartiene la cella
+		 * @param value Valore della cella
+		 * @param isSelected true se la cella è selezionata
+		 * @param hasFocus true se la cella ha il focus
+		 * @param row Indice della riga
+		 * @param column Indice della colonna
+		 * @return Componente configurato per il rendering
+		 */
 		@Override
 		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
 				int row, int column) {
@@ -573,28 +748,4 @@ public class ImmobileDAO {
 			return this;
 		}
 	}
-
-	// ========================== METODI PER RICERCA CON RICERCADTO
-	// ==========================
-
-	// ========================== METODI VECCHI PER COMPATIBILITÀ
-	// ==========================
-	/*
-	 * // Mantieni i metodi vecchi per retrocompatibilità public
-	 * List<ImmobileInAffitto> getImmobiliAffitto(String campoPieno, Filtri filtri)
-	 * { RicercaDTO ricercaDTO = new RicercaDTO();
-	 * ricercaDTO.setQueryRicerca(campoPieno);
-	 * ricercaDTO.setTipologiaImmobile("Affitto"); ricercaDTO.setFiltri(filtri);
-	 * ricercaDTO.setTipoRicerca(RicercaDTO.TipoRicerca.TUTTI_I_RISULTATI);
-	 * 
-	 * return getImmobiliAffitto(ricercaDTO); }
-	 * 
-	 * public List<ImmobileInVendita> getImmobiliVendita(String campoPieno, Filtri
-	 * filtri) { RicercaDTO ricercaDTO = new RicercaDTO();
-	 * ricercaDTO.setQueryRicerca(campoPieno);
-	 * ricercaDTO.setTipologiaImmobile("Vendita"); ricercaDTO.setFiltri(filtri);
-	 * ricercaDTO.setTipoRicerca(RicercaDTO.TipoRicerca.TUTTI_I_RISULTATI);
-	 * 
-	 * return getImmobiliVendita(ricercaDTO); }
-	 */
 }

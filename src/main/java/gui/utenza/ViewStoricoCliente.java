@@ -25,6 +25,29 @@ import controller.AccountController;
 import controller.OfferteController;
 import util.GuiUtils;
 
+/**
+ * Finestra per la visualizzazione dello storico delle offerte proposte da un cliente.
+ * Questa interfaccia permette al cliente di consultare tutte le offerte precedentemente
+ * inviate, visualizzarne lo stato (accettata, rifiutata, in attesa, controproposta)
+ * e interagire con le controproposte degli agenti.
+ *
+ * <p>La finestra è divisa in due sezioni principali:
+ * <ul>
+ *   <li>Pannello comandi: contiene titolo, descrizione, pulsante di navigazione e informazioni utente</li>
+ *   <li>Tabella risultati: visualizza tutte le offerte con dettagli e stato di avanzamento</li>
+ * </ul>
+ *
+ * <p>Interazioni disponibili:
+ * <ul>
+ *   <li>Visualizzazione dello stato dell'offerta</li>
+ *   <li>Apertura della finestra di gestione controproposte per le offerte in tale stato</li>
+ *   <li>Navigazione indietro verso la dashboard</li>
+ * </ul>
+ *
+ * @author IngSW2425_055 Team
+ * @see OfferteController
+ * @see ViewContropropostaAgente
+ */
 public class ViewStoricoCliente extends JFrame {
 
 	private static final long serialVersionUID = 1L;
@@ -32,7 +55,18 @@ public class ViewStoricoCliente extends JFrame {
 	private final JPanel contentPane;
 
 	/**
-	 * Create the frame ViewOfferte.
+	 * Costruttore della finestra di visualizzazione storico cliente.
+	 * Inizializza tutti i componenti grafici, configura il layout e carica i dati
+	 * delle offerte proposte dal cliente specificato.
+	 *
+	 * <p>La finestra viene impostata a schermo intero e divisa in due sezioni:
+	 * un pannello superiore con comandi e informazioni, e un pannello inferiore
+	 * con la tabella delle offerte.
+	 *
+	 * @param emailUtente Email del cliente di cui visualizzare lo storico offerte.
+	 *                    Utilizzata per recuperare i dati dal database e per
+	 *                    visualizzare l'identità dell'utente connesso.
+	 * @throws IllegalArgumentException Se l'email dell'utente è null o vuota
 	 */
 	public ViewStoricoCliente(String emailUtente) {
 		// Imposta l'icona di DietiEstates25 alla finestra in uso
@@ -134,7 +168,6 @@ public class ViewStoricoCliente extends JFrame {
 		panelRisultati.add(scrollPane);
 
 		// Crea il modello dati della tabella
-		@SuppressWarnings("serial")
 		final DefaultTableModel model = new DefaultTableModel(new Object[][] {},
 				new String[] { "Foto", "Categoria", "Descrizione", "Data", "Prezzo proposto", "Stato" }) {
 			@Override
@@ -160,7 +193,7 @@ public class ViewStoricoCliente extends JFrame {
 		tableStoricoOfferte.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		tableStoricoOfferte.setSelectionBackground(new Color(226, 226, 226));
 
-		// Configura larghezze colonne (aggiornate per 3 colonne)
+		// Configura larghezze colonne
 		final int[] preferredWidths = { 100, 100, 400, 120, 120, 80 };
 		for (int i = 0; i < preferredWidths.length; i++) {
 			final TableColumn col = tableStoricoOfferte.getColumnModel().getColumn(i);
@@ -175,17 +208,27 @@ public class ViewStoricoCliente extends JFrame {
 		final OfferteController controller = new OfferteController();
 		controller.riempiTableOfferteProposte(tableStoricoOfferte, emailUtente);
 
-		// IMPORTANTE: Ora aggiungi il listener DOPO che la tabella è stata popolata
+		/**
+		 * Gestisce la selezione di una riga nella tabella delle offerte.
+		 * A seconda dello stato dell'offerta selezionata, mostra messaggi informativi
+		 * o apre la finestra di gestione controproposte.
+		 *
+		 * <p>Azioni in base allo stato:
+		 * <ul>
+		 *   <li>"Accettata": mostra messaggio di conferma</li>
+		 *   <li>"Rifiutata": mostra messaggio di rifiuto</li>
+		 *   <li>"In attesa": mostra messaggio di attesa</li>
+		 *   <li>"Controproposta": apre {@link ViewContropropostaAgente}</li>
+		 * </ul>
+		 *
+		 * @throws SQLException Se si verifica un errore durante il recupero dell'ID cliente
+		 */
 		tableStoricoOfferte.getSelectionModel().addListSelectionListener(e -> {
 			if (!e.getValueIsAdjusting()) {
 				final int selectedRow = tableStoricoOfferte.getSelectedRow();
 				if (selectedRow != -1) {
-					// NOTA: Ora la tabella ha 7 colonne (0-6) invece di 6 (0-5)
-					// perché nel Controller viene aggiunta anche la colonna ID nascosta
-					final String stato = (String) tableStoricoOfferte.getValueAt(selectedRow, 6); // Stato è alla
-																									// colonna 6
+					final String stato = (String) tableStoricoOfferte.getValueAt(selectedRow, 6);
 
-					// Puoi usare lo stato per varie azioni:
 					switch (stato) {
 					case "Accettata" -> JOptionPane.showMessageDialog(null, "L'agente ha accettato la sua proposta",
 							"Messaggio informativo", JOptionPane.INFORMATION_MESSAGE);
@@ -195,7 +238,6 @@ public class ViewStoricoCliente extends JFrame {
 							"La proposta è ancora in attesa di essere valutata dall'agente",
 							"Messaggio informativo", JOptionPane.INFORMATION_MESSAGE);
 					case "Controproposta" -> {
-						// L'idOfferta è nascosto alla colonna 0
 						final Long idOfferta = (Long) tableStoricoOfferte.getValueAt(selectedRow, 0);
 						String idCliente = "undef";
 						try {

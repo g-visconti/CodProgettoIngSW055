@@ -17,13 +17,34 @@ import javax.swing.SpringLayout;
 import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
-//import javax.swing.table.DefaultTableModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
 import controller.OfferteController;
 import util.GuiUtils;
 
+/**
+ * Finestra per la visualizzazione dello storico delle offerte ricevute dall'agente immobiliare.
+ * Questa interfaccia mostra un elenco completo di tutte le offerte proposte dai clienti per
+ * gli immobili gestiti dall'agente, con la possibilità di visualizzare i dettagli di ciascuna offerta.
+ *
+ * <p>La finestra è strutturata in due aree principali:
+ * <ul>
+ *   <li>Pannello comandi: contiene il titolo, informazioni sull'agente e pulsante per tornare indietro
+ *   <li>Tabella risultati: visualizza tutte le offerte con informazioni essenziali (foto, descrizione, prezzo, stato)
+ * </ul>
+ *
+ * <p>Interattività:
+ * <ul>
+ *   <li>Click su una riga della tabella per visualizzare i dettagli dell'offerta
+ *   <li>Differenziazione tra offerte "In attesa" (da valutare) e offerte già "Valutato" (visualizzazione dettagli)
+ *   <li>Navigazione contestuale in base allo stato dell'offerta
+ * </ul>
+ *
+ * @author IngSW2425_055 Team
+ * @see OfferteController#riempiTableOfferteRicevuteAgente(JTable, String)
+ * @see ViewOffertaProposta
+ */
 public class ViewStoricoAgente extends JFrame {
 
 	private static final long serialVersionUID = 1L;
@@ -31,7 +52,24 @@ public class ViewStoricoAgente extends JFrame {
 	private final JPanel contentPane;
 
 	/**
-	 * Create the frame ViewOfferte.
+	 * Costruttore della finestra dello storico agente.
+	 * Inizializza l'interfaccia grafica a schermo intero e carica lo storico delle offerte
+	 * ricevute dall'agente specificato.
+	 *
+	 * <p>La finestra include:
+	 * <ul>
+	 *   <li>Intestazione con logo, titolo e informazioni dell'agente
+	 *   <li>Tabella con colonne per: Foto, Categoria, Descrizione, Data, Prezzo proposto, Stato
+	 *   <li>Colonna ID nascosta per uso interno
+	 *   <li>Gestione eventi per la selezione delle righe
+	 * </ul>
+	 *
+	 * @param emailAgente Email dell'agente immobiliare di cui visualizzare lo storico offerte
+	 *                    Viene utilizzata per recuperare solo le offerte associate a questo agente
+	 *
+	 * @throws IllegalArgumentException Se l'email dell'agente è null o vuota
+	 *
+	 * @see OfferteController#riempiTableOfferteRicevuteAgente(JTable, String)
 	 */
 	public ViewStoricoAgente(String emailAgente) {
 		// Imposta l'icona di DietiEstates25 alla finestra in uso
@@ -86,6 +124,12 @@ public class ViewStoricoAgente extends JFrame {
 		sl_panelComandi.putConstraint(SpringLayout.SOUTH, btnTornaIndietro, 39, SpringLayout.NORTH, panelComandi);
 		sl_panelComandi.putConstraint(SpringLayout.EAST, btnTornaIndietro, 38, SpringLayout.WEST, panelComandi);
 		btnTornaIndietro.addActionListener(new ActionListener() {
+			/**
+			 * Gestisce il click sul pulsante "Torna indietro".
+			 * Chiude la finestra corrente e ritorna alla dashboard dell'agente.
+			 *
+			 * @param e L'evento dell'azione che ha triggerato la chiusura
+			 */
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				dispose();
@@ -133,14 +177,13 @@ public class ViewStoricoAgente extends JFrame {
 		panelRisultati.add(scrollPane);
 
 		// Crea il modello dati della tabella
-		@SuppressWarnings("serial")
 		final DefaultTableModel model = new DefaultTableModel(new Object[][] {},
 				new String[] { "ID", "Foto", "Categoria", "Descrizione", "Data", "Prezzo proposto", "Stato" }) {
 			@Override
 			public Class<?> getColumnClass(int columnIndex) {
 				return switch (columnIndex) {
-				case 0 -> Long.class; // ID (nascosto)
-				case 1 -> String.class; // Base64 immagini
+				case 0 -> Long.class;
+				case 1 -> String.class;
 				case 2, 3, 4, 5, 6 -> String.class;
 				default -> Object.class;
 				};
@@ -160,7 +203,7 @@ public class ViewStoricoAgente extends JFrame {
 		tableStoricoOfferte.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		tableStoricoOfferte.setSelectionBackground(new Color(226, 226, 226));
 
-		// Configura larghezze colonne (aggiornate per 3 colonne)
+		// Configura larghezze colonne
 		final int[] preferredWidths = { 0, 100, 100, 400, 120, 120, 80 }; // Larghezza 0 per ID nascosto
 		for (int i = 0; i < preferredWidths.length; i++) {
 			final TableColumn col = tableStoricoOfferte.getColumnModel().getColumn(i);
@@ -185,8 +228,8 @@ public class ViewStoricoAgente extends JFrame {
 			if (!e.getValueIsAdjusting()) {
 				final int selectedRow = tableStoricoOfferte.getSelectedRow();
 				if (selectedRow != -1) {
-					final String stato = (String) tableStoricoOfferte.getValueAt(selectedRow, 6); // Colonna 6 = Stato
-																									// (era 5)
+					final String stato = (String) tableStoricoOfferte.getValueAt(selectedRow, 6);
+
 					System.out.println("Stato offerta selezionata: " + stato);
 
 					// Recupera l'ID dell'offerta dalla colonna 0
@@ -210,8 +253,6 @@ public class ViewStoricoAgente extends JFrame {
 						return;
 					}
 
-					// Recupera l'ID dell'agente dall'email (dovrai aggiungere questa funzionalità)
-					// Per ora passiamo l'email direttamente
 					switch (stato) {
 					case "Valutato" -> // Apri comunque i dettagli dell'offerta
 					apriDettagliOfferta(idOfferta, emailAgente);
@@ -224,12 +265,32 @@ public class ViewStoricoAgente extends JFrame {
 
 	}
 
+	/**
+	 * Apre la finestra dei dettagli di un'offerta già valutata.
+	 * Questa vista permette di visualizzare le informazioni complete di un'offerta
+	 * che è già stata processata (stato "Valutato").
+	 *
+	 * @param idOfferta ID dell'offerta di cui visualizzare i dettagli
+	 * @param emailAgente Email dell'agente che sta visualizzando l'offerta
+	 *
+	 * @see ViewOffertaProposta
+	 */
 	private void apriDettagliOfferta(Long idOfferta, String emailAgente) {
 		final ViewOffertaProposta viewOfferta = new ViewOffertaProposta(idOfferta, emailAgente);
 		viewOfferta.setLocationRelativeTo(null);
 		viewOfferta.setVisible(true);
 	}
 
+	/**
+	 * Apre la finestra di valutazione di un'offerta in attesa.
+	 * Questa vista permette all'agente di valutare e rispondere a un'offerta
+	 * che è ancora nello stato "In attesa".
+	 *
+	 * @param idOfferta ID dell'offerta da valutare
+	 * @param emailAgente Email dell'agente che sta valutando l'offerta
+	 *
+	 * @see ViewOffertaProposta
+	 */
 	private void apriValutazioneOfferta(Long idOfferta, String emailAgente) {
 		final ViewOffertaProposta viewOfferta = new ViewOffertaProposta(idOfferta, emailAgente);
 		viewOfferta.setLocationRelativeTo(null);

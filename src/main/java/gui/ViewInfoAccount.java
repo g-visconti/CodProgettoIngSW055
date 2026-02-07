@@ -20,15 +20,50 @@ import controller.AccountController;
 import model.dto.AccountInfoDTO;
 import util.GuiUtils;
 
+/**
+ * Finestra per la visualizzazione delle informazioni dell'account utente in DietiEstates25.
+ * Mostra tutti i dettagli personali dell'utente autenticato in un'interfaccia organizzata e leggibile.
+ *
+ * <p>Le informazioni visualizzate includono:
+ * <ul>
+ *   <li>Dati identificativi: nome utente e ruolo</li>
+ *   <li>Informazioni di contatto: telefono, indirizzo, città</li>
+ *   <li>Dati personali relativi al profilo</li>
+ * </ul>
+ *
+ * <p>La finestra recupera i dati tramite il {@link AccountController} utilizzando l'email
+ * dell'utente come chiave di identificazione e li presenta in un layout strutturato con
+ * label descrittive e campi di visualizzazione.
+ *
+ * @author IngSW2425_055 Team
+ * @see AccountController
+ * @see AccountInfoDTO
+ * @see GuiUtils
+ */
 public class ViewInfoAccount extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	private final JPanel contentPane;
 
+
 	/**
-	 * Create the frame.
+	 * Costruttore della finestra di visualizzazione informazioni account.
+	 * Inizializza tutti i componenti grafici e recupera le informazioni del profilo
+	 * dall'utente specificato per popolare l'interfaccia.
 	 *
-	 * @throws SQLException
+	 * <p>La finestra è divisa in sezioni logiche:
+	 * <ul>
+	 *   <li>Intestazione con titolo</li>
+	 *   <li>Sezione informazioni base (nome utente, ruolo)</li>
+	 *   <li>Sezione informazioni aggiuntive (contatti, ubicazione)</li>
+	 *   <li>Pulsante di chiusura</li>
+	 * </ul>
+	 *
+	 * @param emailUtente Email dell'utente di cui visualizzare le informazioni.
+	 *                    Utilizzata per recuperare i dati dal database tramite
+	 *                    {@link AccountController#getInfoProfilo(String)}.
+	 * @throws IllegalArgumentException Se l'email è null o vuota
+	 * @throws SQLException Se si verifica un errore durante l'accesso al database
 	 */
 	public ViewInfoAccount(String emailUtente) {
 		setTitle("DietiEstates25 - Informazioni sull'account");
@@ -129,13 +164,11 @@ public class ViewInfoAccount extends JFrame {
 			e.printStackTrace();
 		}
 		if (infoProfilo != null) {
-			// Usa nome completo invece di solo nome
 			lblNomeUtenteRes.setText(infoProfilo.getNomeCompleto());
 			lblRuoloRes.setText(infoProfilo.getRuolo());
 			lblTelefonoRes.setText(infoProfilo.getTelefono());
 			lblCittaRes.setText(infoProfilo.getCitta());
 			lblIndirizzoRes.setText(infoProfilo.getIndirizzo());
-			// Se hai bisogno di altre informazioni puoi aggiungere altre label
 		}
 
 		final JLabel lblAltreInfo = new JLabel("Altre informazioni:");
@@ -144,11 +177,23 @@ public class ViewInfoAccount extends JFrame {
 		lblAltreInfo.setBounds(150, 236, 195, 22);
 		panel.add(lblAltreInfo);
 
+		/**
+		 * Pulsante per tornare alla dashboard principale.
+		 * Chiude la finestra corrente senza effettuare alcuna modifica,
+		 * permettendo all'utente di tornare all'interfaccia precedente.
+		 */
 		final JButton btnTornaAllaDashboard = new JButton("Torna alla dashboard");
 		// Bottone predefinito alla pressione del tasto Enter
 		getRootPane().setDefaultButton(btnTornaAllaDashboard);
 
 		btnTornaAllaDashboard.addMouseListener(new MouseAdapter() {
+			/**
+			 * Gestisce il click sul pulsante "Torna alla dashboard".
+			 * Chiude semplicemente la finestra corrente senza salvare
+			 * o modificare alcun dato.
+			 *
+			 * @param e Evento del mouse che ha triggerato l'azione
+			 */
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				dispose();

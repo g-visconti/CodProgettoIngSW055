@@ -43,9 +43,29 @@ import model.entity.Filtri;
 import util.GuiUtils;
 import util.InputUtils;
 
+/**
+ * Dashboard principale dell'applicazione DietiEstates25.
+ * Questa finestra rappresenta l'interfaccia centrale dopo il login,
+ * mostrando funzionalità diverse in base al ruolo dell'utente (Admin, Supporto, Agente).
+ *
+ * <p>La dashboard include:
+ * <ul>
+ *   <li>Area di ricerca con filtri avanzati</li>
+ *   <li>Tabella dei risultati degli immobili</li>
+ *   <li>Funzionalità specifiche per ruolo (aggiunta utenti, caricamento immobili, ecc.)</li>
+ *   <li>Menu utente per la gestione del profilo</li>
+ *   <li>Pulsanti per offerte proposte e caricamento immobili</li>
+ * </ul>
+ *
+ * @author IngSW2425_055 Team
+ * @see AccountController
+ * @see ImmobileController
+ * @see ViewFiltri
+ */
 public class ViewDashboardDietiEstates extends JFrame {
 
 	private static final long serialVersionUID = 1L;
+	// attributi
 	private String idAgente = null;
 	private final String emailAgente;
 	private String ruoloDietiEstates = "non definito";
@@ -59,10 +79,24 @@ public class ViewDashboardDietiEstates extends JFrame {
 	private JComboBox<String> comboBoxAppartamento;
 	private JComboBox<String> comboBoxFiltraImmobili;
 	private int numeroRisultatiTrovati;
-	private JLabel lblEmailAccesso; // Variabile di istanza per memorizzare il riferimento
+	private JLabel lblEmailAccesso;
+
+	// costruttore
 
 	/**
-	 * Create the frame ViewDashboardAdmin.
+	 * Costruttore della dashboard principale.
+	 * Inizializza l'interfaccia grafica e configura i componenti in base al ruolo dell'utente.
+	 *
+	 * <p>La dashboard viene configurata dinamicamente in base al ruolo dell'utente:
+	 * <ul>
+	 *   <li><b>Admin</b>: Accesso completo a tutte le funzionalità, inclusa l'aggiunta di altri admin</li>
+	 *   <li><b>Supporto</b>: Può aggiungere agenti immobiliari</li>
+	 *   <li><b>Agente</b>: Accesso alle funzionalità base e gestione dei propri immobili</li>
+	 * </ul>
+	 *
+	 * @param emailAgente Email dell'utente che accede alla dashboard.
+	 *                    Utilizzata per determinare il ruolo e personalizzare l'interfaccia.
+	 * @throws SQLException Se si verificano errori nel recupero delle informazioni dal database
 	 */
 	public ViewDashboardDietiEstates(String emailAgente) {
 		// Imposta l'icona di DietiEstates25 alla finestra in uso
@@ -102,22 +136,48 @@ public class ViewDashboardDietiEstates extends JFrame {
 		}
 
 		// Crea il pannello di ricerca comune a tutti i ruoli
-		final JPanel ricerca = createRicercaPanel(emailAgente, opAppartamento, opFiltraImmobili, sl_dashboard,
-				dashboard);
+		final JPanel ricerca = createRicercaPanel(emailAgente, opAppartamento, opFiltraImmobili, sl_dashboard, dashboard);
 
 		// Configurazioni specifiche per ruolo
 		switch (ruoloDietiEstates) {
 		case "Admin", "Supporto" -> // Per Admin e Supporto aggiungiamo il menu per aggiungere utenti
 		setupAdminSupportoUI(ricerca, emailAgente, ruoloDietiEstates);
-		case "Agente" -> // Per Agente configuramo l'action listener specifico
+		case "Agente" -> // Per Agente configuriamo l'action listener specifico
 		setupAgenteUI(ricerca, emailAgente);
 		default -> dispose();
 		}
 
-		// Pannello per i risultati della ricerca (COMUNE A TUTTI)
+		// Pannello per i risultati della ricerca
 		setupRisultatiPanel(emailAgente, sl_dashboard, dashboard);
 	}
 
+	// metodi
+
+	/**
+	 * Crea e configura il pannello di ricerca principale.
+	 * Questo pannello contiene tutti i controlli per eseguire ricerche di immobili:
+	 * campo di testo, combo box per tipologia, filtri e pulsante di ricerca.
+	 *
+	 * <p>Il pannello include:
+	 * <ul>
+	 *   <li>Campo di ricerca con testo placeholder</li>
+	 *   <li>Combo box per selezionare tipologia (Vendita/Affitto)</li>
+	 *   <li>Combo box per filtrare risultati (Tutti/I miei immobili)</li>
+	 *   <li>Icona per filtri avanzati</li>
+	 *   <li>Pulsante di esecuzione ricerca</li>
+	 *   <li>Informazioni utente e logout</li>
+	 * </ul>
+	 *
+	 * @param emailAgente Email dell'utente per personalizzare le etichette
+	 * @param opAppartamento Array di opzioni per la combo box di tipologia
+	 * @param opFiltraImmobili Array di opzioni per il filtraggio risultati
+	 * @param sl_dashboard Layout della dashboard principale
+	 * @param dashboard Pannello contenitore principale
+	 * @return JPanel configurato per la ricerca
+	 *
+	 * @see GuiUtils#setIconaLabel(JLabel, String)
+	 * @see GuiUtils#setIconaButton(JButton, String)
+	 */
 	private JPanel createRicercaPanel(String emailAgente, String[] opAppartamento, String[] opFiltraImmobili,
 			SpringLayout sl_dashboard, JPanel dashboard) {
 		final JPanel ricerca = new JPanel();
@@ -252,6 +312,24 @@ public class ViewDashboardDietiEstates extends JFrame {
 		return ricerca;
 	}
 
+	/**
+	 * Configura l'interfaccia utente per i ruoli Admin e Supporto.
+	 * Aggiunge le funzionalità specifiche per questi ruoli, come la possibilità
+	 * di aggiungere nuovi utenti al sistema.
+	 *
+	 * <p>Le differenze tra Admin e Supporto:
+	 * <ul>
+	 *   <li><b>Admin</b>: Può aggiungere sia amministratori di supporto che agenti</li>
+	 *   <li><b>Supporto</b>: Può aggiungere solo agenti immobiliari</li>
+	 * </ul>
+	 *
+	 * @param ricerca Pannello di ricerca dove aggiungere le funzionalità
+	 * @param emailAgente Email dell'utente corrente
+	 * @param ruolo Ruolo dell'utente (Admin o Supporto)
+	 *
+	 * @see ViewInserimentoEmail
+	 * @see AccountController#getAgenzia(String)
+	 */
 	private void setupAdminSupportoUI(JPanel ricerca, String emailAgente, String ruolo) {
 		final SpringLayout sl_ricerca = (SpringLayout) ricerca.getLayout();
 
@@ -356,6 +434,17 @@ public class ViewDashboardDietiEstates extends JFrame {
 		}
 	}
 
+	/**
+	 * Configura l'interfaccia utente per il ruolo Agente.
+	 * Personalizza la dashboard con le funzionalità specifiche per gli agenti immobiliari,
+	 * come il caricamento di nuovi immobili e la visualizzazione delle offerte proposte.
+	 *
+	 * @param ricerca Pannello di ricerca da configurare
+	 * @param emailAgente Email dell'agente corrente
+	 *
+	 * @see #ricercaImmobili()
+	 * @see #ottieniIdAccount(String)
+	 */
 	private void setupAgenteUI(JPanel ricerca, String emailAgente) {
 		setTitle("DietiEstates25 - Dashboard per l'Agente immobiliare");
 
@@ -385,6 +474,27 @@ public class ViewDashboardDietiEstates extends JFrame {
 		}
 	}
 
+	/**
+	 * Configura il pannello per la visualizzazione dei risultati della ricerca.
+	 * Questo pannello contiene una tabella per mostrare gli immobili trovati
+	 * e pulsanti per azioni specifiche (caricamento immobili, visualizzazione offerte).
+	 *
+	 * <p>Il pannello include:
+	 * <ul>
+	 *   <li>Tabella scrollabile con i risultati</li>
+	 *   <li>Etichetta con il conteggio dei risultati</li>
+	 *   <li>Pulsante "Carica immobile" (solo per agenti)</li>
+	 *   <li>Pulsante "Vedi offerte proposte"</li>
+	 * </ul>
+	 *
+	 * @param emailAgente Email dell'utente per configurare i listener
+	 * @param sl_dashboard Layout della dashboard principale
+	 * @param dashboard Pannello contenitore principale
+	 *
+	 * @see ViewImmobile
+	 * @see ViewCaricaImmobile
+	 * @see ViewStoricoAgente
+	 */
 	private void setupRisultatiPanel(String emailAgente, SpringLayout sl_dashboard, JPanel dashboard) {
 		// Pannello per i risultati della ricerca
 		final JPanel risultatiDaRicerca = new JPanel();
@@ -486,6 +596,16 @@ public class ViewDashboardDietiEstates extends JFrame {
 		risultatiDaRicerca.add(btnCaricaImmobile);
 	}
 
+	/**
+	 * Configura i listener per il campo di ricerca.
+	 * Gestisce il comportamento del campo di testo quando viene cliccato o quando
+	 * l'utente inizia a digitare, mostrando/nascondendo il testo placeholder.
+	 *
+	 * @param ricerca Pannello di ricerca a cui aggiungere i listener
+	 *
+	 * @see KeyAdapter
+	 * @see MouseAdapter
+	 */
 	private void setupCampoRicercaListeners(JPanel ricerca) {
 		campoRicerca.addKeyListener(new KeyAdapter() {
 			@Override
@@ -509,6 +629,16 @@ public class ViewDashboardDietiEstates extends JFrame {
 		});
 	}
 
+	/**
+	 * Configura il listener per l'etichetta di logout.
+	 * Gestisce il processo di logout dell'utente, chiudendo la connessione
+	 * al database e tornando alla schermata di accesso.
+	 *
+	 * @param logoutLabel Etichetta a cui associare il listener di logout
+	 *
+	 * @see ConnessioneDatabase#closeConnection()
+	 * @see ViewAccesso
+	 */
 	private void setupLogoutListener(JLabel logoutLabel) {
 		logoutLabel.addMouseListener(new MouseAdapter() {
 			@Override
@@ -537,6 +667,17 @@ public class ViewDashboardDietiEstates extends JFrame {
 		});
 	}
 
+	/**
+	 * Configura il menu contestuale per l'utente.
+	 * Crea un popup menu che appare cliccando sull'icona utente,
+	 * offrendo opzioni per visualizzare informazioni account e modificare la password.
+	 *
+	 * @param userLabel Etichetta dell'utente a cui associare il menu
+	 * @param emailAgente Email dell'utente per passare alle view di gestione
+	 *
+	 * @see ViewInfoAccount
+	 * @see ViewModificaPassword
+	 */
 	private void setupUserMenu(JLabel userLabel, String emailAgente) {
 		final JPopupMenu menuUtente = new JPopupMenu();
 		final JMenuItem visualizzaInfoAccount = new JMenuItem("Visualizza informazioni sull'account");
@@ -573,6 +714,16 @@ public class ViewDashboardDietiEstates extends JFrame {
 		});
 	}
 
+	/**
+	 * Configura le etichette di benvenuto e email nel pannello di ricerca.
+	 * Mostra l'email dell'utente corrente e un messaggio di benvenuto personalizzato.
+	 *
+	 * @param ricerca Pannello di ricerca dove aggiungere le etichette
+	 * @param sl_ricerca Layout del pannello di ricerca
+	 * @param lblTitolo Etichetta del titolo per il posizionamento relativo
+	 * @param emailAgente Email da visualizzare
+	 * @param btnEseguiRicerca Pulsante di ricerca per il posizionamento relativo
+	 */
 	private void setupBenvenutoLabels(JPanel ricerca, SpringLayout sl_ricerca, JLabel lblTitolo, String emailAgente,
 			JButton btnEseguiRicerca) {
 		final JLabel lblBenvenuto = new JLabel("Accesso effettuato con:");
@@ -602,11 +753,24 @@ public class ViewDashboardDietiEstates extends JFrame {
 		ricerca.add(lblEmailAccesso);
 	}
 
+	/**
+	 * Restituisce l'etichetta contenente l'email dell'utente corrente.
+	 *
+	 * @return JLabel con l'email dell'utente
+	 */
 	private JLabel getLblEmailAccesso() {
 		return lblEmailAccesso;
 	}
 
 	// Metodi helper per trovare componenti
+
+	/**
+	 * Cerca un'etichetta nel pannello specificato in base al testo del tooltip.
+	 *
+	 * @param panel Pannello in cui cercare
+	 * @param tooltip Testo del tooltip da cercare
+	 * @return JLabel trovata o null se non trovata
+	 */
 	private JLabel findLabelByTooltip(JPanel panel, String tooltip) {
 		for (Component comp : panel.getComponents()) {
 			if (comp instanceof JLabel label) {
@@ -618,6 +782,13 @@ public class ViewDashboardDietiEstates extends JFrame {
 		return null;
 	}
 
+	/**
+	 * Cerca un'etichetta nel pannello specificato in base al testo.
+	 *
+	 * @param panel Pannello in cui cercare
+	 * @param text Testo da cercare
+	 * @return JLabel trovata o null se non trovata
+	 */
 	private JLabel findLabelByText(JPanel panel, String text) {
 		for (Component comp : panel.getComponents()) {
 			if (comp instanceof JLabel label) {
@@ -629,6 +800,13 @@ public class ViewDashboardDietiEstates extends JFrame {
 		return null;
 	}
 
+	/**
+	 * Cerca un pulsante nel pannello specificato in base al testo del tooltip.
+	 *
+	 * @param panel Pannello in cui cercare
+	 * @param tooltip Testo del tooltip da cercare
+	 * @return JButton trovato o null se non trovato
+	 */
 	private JButton findButtonByTooltip(JPanel panel, String tooltip) {
 		for (Component comp : panel.getComponents()) {
 			if (comp instanceof JButton button) {
@@ -640,6 +818,16 @@ public class ViewDashboardDietiEstates extends JFrame {
 		return null;
 	}
 
+	/**
+	 * Recupera l'ID account associato all'email specificata.
+	 * Il risultato viene memorizzato nella variabile d'istanza idAgente
+	 * per utilizzi successivi nell'applicazione.
+	 *
+	 * @param emailAgente Email dell'agente di cui recuperare l'ID
+	 * @throws SQLException Se si verificano errori nel recupero dal database
+	 *
+	 * @see AccountController#getIdAccountByEmail(String)
+	 */
 	private void ottieniIdAccount(String emailAgente) {
 		if (idAgente == null) {
 			final AccountController controller = new AccountController();
@@ -653,6 +841,24 @@ public class ViewDashboardDietiEstates extends JFrame {
 		}
 	}
 
+	/**
+	 * Esegue una ricerca di immobili in base ai criteri selezionati.
+	 * Recupera i parametri dai controlli dell'interfaccia, crea un DTO di ricerca
+	 * e popola la tabella dei risultati con gli immobili trovati.
+	 *
+	 * <p>La ricerca considera:
+	 * <ul>
+	 *   <li>Testo inserito nel campo di ricerca</li>
+	 *   <li>Tipologia selezionata (Vendita/Affitto)</li>
+	 *   <li>Filtri avanzati impostati</li>
+	 *   <li>Tipo di ricerca (Tutti i risultati/I miei immobili)</li>
+	 * </ul>
+	 *
+	 * @throws IllegalArgumentException Se il campo di ricerca è vuoto o contiene il testo placeholder
+	 *
+	 * @see ImmobileController#riempiTableRisultati(JTable, RicercaDTO)
+	 * @see InputUtils#capitalizzaParole(String)
+	 */
 	private void ricercaImmobili() {
 		final ImmobileController controller = new ImmobileController();
 
@@ -691,6 +897,10 @@ public class ViewDashboardDietiEstates extends JFrame {
 		lblRisultati.setText("Immobili trovati: " + numeroRisultatiTrovati);
 	}
 
+	/**
+	 * Gestisce il comportamento del campo di ricerca quando viene cliccato o inizia la digitazione.
+	 * Rimuove il testo placeholder se presente.
+	 */
 	private void setCampoDiTestoIn() {
 		campoPieno = campoRicerca.getText();
 		if (campoPieno.equals("Cerca scrivendo una via, una zona o una parola chiave")) {
@@ -699,6 +909,10 @@ public class ViewDashboardDietiEstates extends JFrame {
 		}
 	}
 
+	/**
+	 * Gestisce il comportamento del campo di ricerca quando perde il focus.
+	 * Ripristina il testo placeholder se il campo è vuoto.
+	 */
 	private void setCampoDiTestoOut() {
 		campoPieno = campoRicerca.getText();
 		if (campoPieno.equals(campoVuoto)) {
@@ -706,11 +920,4 @@ public class ViewDashboardDietiEstates extends JFrame {
 			campoRicerca.setFont(new Font("Yu Gothic UI Semibold", Font.ITALIC, 11));
 		}
 	}
-
-	// METODI PRIVATI
-
-	// METODI DI SUPPORTO
-
-	// METODI ESISTENTI (rimangono invariati)
-
 }

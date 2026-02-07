@@ -11,9 +11,45 @@ import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
 
+/**
+ * Renderer personalizzato per celle di tabella che contengono immagini in formato Base64.
+ * Questa classe estende {@link ColorazioneAlternataRenderer} per mantenere l'alternanza
+ * dei colori delle righe e fornisce la funzionalità di decodifica e visualizzazione
+ * di immagini codificate in Base64.
+ *
+ * <p>Il renderer:
+ * <ul>
+ *   <li>Decodifica la stringa Base64 in un'immagine</li>
+ *   <li>Ridimensiona l'immagine per adattarla alle dimensioni della cella</li>
+ *   <li>Mantiene le proporzioni originali dell'immagine</li>
+ *   <li>Mostra messaggi alternativi se l'immagine non è disponibile</li>
+ * </ul>
+ *
+ * @author IngSW2425_055 Team
+ * @see ColorazioneAlternataRenderer
+ * @see JTable
+ * @see Base64
+ */
 @SuppressWarnings("serial")
 public class Base64ImageRenderer extends ColorazioneAlternataRenderer {
 
+	/**
+	 * Restituisce il componente utilizzato per disegnare la cella della tabella.
+	 * Decodifica la stringa Base64, ridimensiona l'immagine e la visualizza nella cella.
+	 * Se non è presente un'immagine valida, mostra un testo alternativo.
+	 *
+	 * @param table La tabella a cui appartiene la cella
+	 * @param value Il valore della cella (stringa Base64 o null)
+	 * @param isSelected True se la cella è selezionata
+	 * @param hasFocus True se la cella ha il focus
+	 * @param row L'indice della riga
+	 * @param column L'indice della colonna
+	 * @return Il componente JLabel configurato per visualizzare l'immagine o il testo alternativo
+	 *
+	 * @throws IllegalArgumentException Se il valore Base64 non è valido o non può essere decodificato
+	 * @see Base64#getDecoder()
+	 * @see ImageIcon
+	 */
 	@Override
 	public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
 			int row, int column) {
@@ -53,7 +89,7 @@ public class Base64ImageRenderer extends ColorazioneAlternataRenderer {
 			}
 		} catch (Exception e) {
 			label.setIcon(null);
-			label.setText("❌");
+			label.setText("x");
 		}
 
 		return label;

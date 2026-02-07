@@ -28,24 +28,48 @@ import controller.AccessController;
 import gui.utenza.ViewDashboard;
 import util.GuiUtils;
 
+/**
+ * Finestra per la registrazione di un nuovo agente immobiliare nel sistema.
+ * Questa interfaccia permette agli amministratori di inserire tutti i dati necessari
+ * per creare un nuovo account agente, con validazione in tempo reale dei campi.
+ *
+ * <p>La finestra include campi per:
+ * <ul>
+ *   <li>Dati anagrafici (nome, cognome)</li>
+ *   <li>Dati di contatto (telefono, email preimpostata)</li>
+ *   <li>Indirizzo di residenza (città, indirizzo, CAP)</li>
+ *   <li>Creazione password con validazione</li>
+ *   <li>Associazione all'agenzia di provenienza</li>
+ * </ul>
+ *
+ * <p>La validazione include:
+ * <ul>
+ *   <li>Controllo formato campi testuali</li>
+ *   <li>Validazione numerica per telefono e CAP</li>
+ *   <li>Registrazione su servizio di autenticazione AWS Cognito</li>
+ *   <li>Salvataggio nel database postgresdb di AWS</li>
+ * </ul>
+ *
+ * @author IngSW2425_055 Team
+ * @see CognitoAuthService
+ * @see AccessController
+ * @see ViewDashboard
+ */
 public class ViewRegistraAgente extends JFrame {
-
-	/**
-	 *
-	 */
 	private static final long serialVersionUID = 1L;
+	// attributi
 	private final CognitoAuthService authService;
 	private final JPanel contentPane;
-	private final JTextField Nome_Utente;
-	private final JTextField Cognome_Utente;
-	private final JTextField Telefono_Utente;
-	private final JTextField Citta_Utente;
-	private final JTextField Indirizzo_Utente;
-	private final JPasswordField Conferma_Utente;
-	private final JPasswordField Password_Utente;
+	private final JTextField txtNome;
+	private final JTextField txtCognome;
+	private final JTextField txtTelefono;
+	private final JTextField txtCitta;
+	private final JTextField txtIndirizzo;
+	private final JPasswordField txtConfirmPass;
+	private final JPasswordField txtPass;
 	private final JPanel panel;
-	private final JLabel lblNewLabel_1;
-	private final JTextField Cap_Utente;
+	private final JLabel lblRegistraAgente;
+	private final JTextField txtCap;
 	private final JLabel lblCognomeError;
 	private final JLabel lblCittaError;
 	private final JLabel lblTelefonoError;
@@ -53,11 +77,31 @@ public class ViewRegistraAgente extends JFrame {
 	private final JLabel lblIndirizzoError;
 	private final String ruolo = "Agente";
 
-	/**
-	 * Create the frame.
-	 */
 
-	public ViewRegistraAgente(String Email_Utente, String agenzia) {
+	// costruttore
+
+	/**
+	 * Costruttore della finestra di registrazione agente.
+	 * Inizializza tutti i componenti grafici e configura i listener per la validazione
+	 * in tempo reale dei dati inseriti.
+	 *
+	 * <p>La finestra prevede:
+	 * <ul>
+	 *   <li>Campo email precompilato (non modificabile)</li>
+	 *   <li>Validazione con espressioni regolari per tutti i campi</li>
+	 *   <li>Messaggi di errore contestuali sotto ogni campo</li>
+	 *   <li>Integrazione con AWS Cognito per l'autenticazione</li>
+	 *   <li>Registrazione nel database tramite AccessController</li>
+	 * </ul>
+	 *
+	 * @param emailAgente Email di lavoro del nuovo agente (già inserita nella fase precedente)
+	 * @param agenzia Nome dell'agenzia a cui associare il nuovo agente
+	 *
+	 * @see CognitoAuthServiceImpl#registerUser(String, String, String)
+	 * @see AccessController#registraNuovoAgente(String, String, String, String, String, String, String, String, String, String)
+	 * @see GuiUtils#setIconaFinestra(JFrame)
+	 */
+	public ViewRegistraAgente(String emailAgente, String agenzia) {
 		authService = new CognitoAuthServiceImpl();
 
 		setTitle("DietiEstates25 - Registra un nuovo agente immobiliare");
@@ -75,62 +119,62 @@ public class ViewRegistraAgente extends JFrame {
 
 		panel = new JPanel();
 		panel.setBackground(SystemColor.menu);
-		panel.setBounds(0, 0, 457, 593);
+		panel.setBounds(0, 0, 443, 579);
 		contentPane.add(panel);
 		panel.setLayout(null);
 		SwingUtilities.invokeLater(() -> requestFocusInWindow());
 
-		Citta_Utente = new JTextField();
-		Citta_Utente.setFont(new Font("Tahoma", Font.BOLD, 11));
-		Citta_Utente.setBounds(225, 142, 133, 25);
-		panel.add(Citta_Utente);
-		Citta_Utente.setText("Citt\u00E0");
-		Citta_Utente.setColumns(10);
-		labelClicked(Citta_Utente, "Città");
+		txtCitta = new JTextField();
+		txtCitta.setFont(new Font("Tahoma", Font.BOLD, 11));
+		txtCitta.setBounds(225, 142, 133, 25);
+		panel.add(txtCitta);
+		txtCitta.setText("Citt\u00E0");
+		txtCitta.setColumns(10);
+		labelClicked(txtCitta, "Città");
 
-		Password_Utente = new JPasswordField();
-		Password_Utente.setFont(new Font("Tahoma", Font.BOLD, 11));
-		Password_Utente.setBounds(69, 245, 133, 25);
-		panel.add(Password_Utente);
-		Password_Utente.addMouseListener(new MouseAdapter() {
+		txtPass = new JPasswordField();
+		txtPass.setFont(new Font("Tahoma", Font.BOLD, 11));
+		txtPass.setBounds(69, 245, 133, 25);
+		panel.add(txtPass);
+		txtPass.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				Password_Utente.setText("");
+				txtPass.setText("");
 			}
 		});
-		Password_Utente.setVerifyInputWhenFocusTarget(false);
-		Password_Utente.setToolTipText("");
-		Password_Utente.setText("*****");
+		txtPass.setVerifyInputWhenFocusTarget(false);
+		txtPass.setToolTipText("");
+		txtPass.setText("******");
 
-		Conferma_Utente = new JPasswordField();
-		Conferma_Utente.setFont(new Font("Tahoma", Font.BOLD, 11));
-		Conferma_Utente.setBounds(225, 245, 133, 25);
-		panel.add(Conferma_Utente);
-		Conferma_Utente.setText("*****");
-		Conferma_Utente.setVerifyInputWhenFocusTarget(false);
-		Conferma_Utente.addMouseListener(new MouseAdapter() {
+		txtConfirmPass = new JPasswordField();
+		txtConfirmPass.setFont(new Font("Tahoma", Font.BOLD, 11));
+		txtConfirmPass.setBounds(225, 245, 133, 25);
+		panel.add(txtConfirmPass);
+		txtConfirmPass.setText("******");
+		txtConfirmPass.setVerifyInputWhenFocusTarget(false);
+		txtConfirmPass.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				Conferma_Utente.setText("");
+				txtConfirmPass.setText("");
 			}
 		});
-		Conferma_Utente.setToolTipText("");
+		txtConfirmPass.setToolTipText("");
 
-		Indirizzo_Utente = new JTextField();
-		Indirizzo_Utente.setFont(new Font("Tahoma", Font.BOLD, 11));
-		Indirizzo_Utente.setBounds(69, 194, 133, 25);
-		panel.add(Indirizzo_Utente);
-		Indirizzo_Utente.setText("Indirizzo");
-		Indirizzo_Utente.setColumns(10);
-		labelClicked(Indirizzo_Utente, "Indirizzo");
+		txtIndirizzo = new JTextField();
+		txtIndirizzo.setFont(new Font("Tahoma", Font.BOLD, 11));
+		txtIndirizzo.setBounds(69, 194, 133, 25);
+		panel.add(txtIndirizzo);
+		txtIndirizzo.setText("Indirizzo");
+		txtIndirizzo.setColumns(10);
+		labelClicked(txtIndirizzo, "Indirizzo");
 
-		Cognome_Utente = new JTextField();
-		Cognome_Utente.setFont(new Font("Tahoma", Font.BOLD, 11));
-		Cognome_Utente.setBounds(225, 85, 133, 25);
-		panel.add(Cognome_Utente);
-		Cognome_Utente.setText("Cognome");
-		Cognome_Utente.setColumns(10);
-		labelClicked(Cognome_Utente, "Cognome");
+		txtCognome = new JTextField();
+		txtCognome.setFont(new Font("Tahoma", Font.BOLD, 11));
+		txtCognome.setBounds(225, 85, 133, 25);
+		panel.add(txtCognome);
+		txtCognome.setText("Cognome");
+		txtCognome.setColumns(10);
+		labelClicked(txtCognome, "Cognome");
 
 		final JLabel lblPassDimError = new JLabel("Inserire una password di almeno 6 caratteri.");
 		lblPassDimError.setFont(new Font("Tahoma", Font.BOLD, 11));
@@ -150,35 +194,35 @@ public class ViewRegistraAgente extends JFrame {
 		lblPassConfError.setBounds(69, 343, 133, 20);
 		panel.add(lblPassConfError);
 
-		Nome_Utente = new JTextField();
-		Nome_Utente.setCaretColor(new Color(0, 0, 51));
-		Nome_Utente.setFont(new Font("Tahoma", Font.BOLD, 11));
-		Nome_Utente.setBounds(69, 85, 133, 25);
-		panel.add(Nome_Utente);
-		Nome_Utente.setText("Nome");
-		Nome_Utente.setColumns(10);
-		labelClicked(Nome_Utente, "Nome");
+		txtNome = new JTextField();
+		txtNome.setCaretColor(new Color(0, 0, 51));
+		txtNome.setFont(new Font("Tahoma", Font.BOLD, 11));
+		txtNome.setBounds(69, 85, 133, 25);
+		panel.add(txtNome);
+		txtNome.setText("Nome");
+		txtNome.setColumns(10);
+		labelClicked(txtNome, "Nome");
 
-		Telefono_Utente = new JTextField();
-		Telefono_Utente.setFont(new Font("Tahoma", Font.BOLD, 11));
-		Telefono_Utente.setBounds(69, 142, 133, 25);
-		panel.add(Telefono_Utente);
-		Telefono_Utente.setText("Telefono");
-		Telefono_Utente.setColumns(10);
-		labelClicked(Telefono_Utente, "Telefono");
+		txtTelefono = new JTextField();
+		txtTelefono.setFont(new Font("Tahoma", Font.BOLD, 11));
+		txtTelefono.setBounds(69, 142, 133, 25);
+		panel.add(txtTelefono);
+		txtTelefono.setText("Telefono");
+		txtTelefono.setColumns(10);
+		labelClicked(txtTelefono, "Telefono");
 
-		lblNewLabel_1 = new JLabel("Inserire i dati dell'agente:");
-		lblNewLabel_1.setFont(new Font("Tahoma", Font.BOLD, 13));
-		lblNewLabel_1.setBounds(69, 22, 224, 41);
-		panel.add(lblNewLabel_1);
+		lblRegistraAgente = new JLabel("Inserire i dati dell'agente:");
+		lblRegistraAgente.setFont(new Font("Tahoma", Font.BOLD, 13));
+		lblRegistraAgente.setBounds(69, 22, 224, 41);
+		panel.add(lblRegistraAgente);
 
-		Cap_Utente = new JTextField();
-		Cap_Utente.setFont(new Font("Tahoma", Font.BOLD, 11));
-		Cap_Utente.setText("CAP");
-		Cap_Utente.setBounds(225, 194, 68, 25);
-		panel.add(Cap_Utente);
-		Cap_Utente.setColumns(10);
-		labelClicked(Cap_Utente, "CAP");
+		txtCap = new JTextField();
+		txtCap.setFont(new Font("Tahoma", Font.BOLD, 11));
+		txtCap.setText("CAP");
+		txtCap.setBounds(225, 194, 68, 25);
+		panel.add(txtCap);
+		txtCap.setColumns(10);
+		labelClicked(txtCap, "CAP");
 
 		final JLabel lblNameError = new JLabel("Nome non valido");
 		lblNameError.setForeground(new Color(255, 0, 0));
@@ -222,71 +266,97 @@ public class ViewRegistraAgente extends JFrame {
 		lblIndirizzoError.setBounds(68, 217, 134, 14);
 		panel.add(lblIndirizzoError);
 
-		final JButton btnNewButton = new JButton("Registra agente");
-		btnNewButton.addActionListener(new ActionListener() {
+		final JButton btnRegistraAgente = new JButton("Registra agente");
+		btnRegistraAgente.addActionListener(new ActionListener() {
+			/**
+			 * Gestisce il click sul pulsante di registrazione.
+			 * Esegue la validazione di tutti i campi, registra l'utente su AWS Cognito,
+			 * salva i dati nel database locale e reindirizza alla dashboard.
+			 *
+			 * <p>Processo di validazione:
+			 * <ul>
+			 *   <li>Nome e cognome: solo lettere e spazi</li>
+			 *   <li>Telefono: solo numeri (max 15 cifre)</li>
+			 *   <li>Città e indirizzo: solo lettere e spazi</li>
+			 *   <li>CAP: solo numeri (max 5 cifre)</li>
+			 * </ul>
+			 *
+			 * <p>In caso di successo:
+			 * <ol>
+			 *   <li>Registra l'utente su AWS Cognito</li>
+			 *   <li>Salva i dati nel database locale</li>
+			 *   <li>Chiude la finestra corrente</li>
+			 *   <li>Apre la dashboard dell'utente</li>
+			 * </ol>
+			 *
+			 * @param e Evento di azione generato dal click sul pulsante
+			 *
+			 * @see CognitoAuthService#registerUser(String, String, String)
+			 * @see AccessController#registraNuovoAgente(String, String, String, String, String, String, String, String, String, String)
+			 */
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
-				final String nome = Nome_Utente.getText();
+				final String nome = txtNome.getText();
 				if (!nome.matches("[a-zA-Z�-�\\s]+")) {
 					lblNameError.setVisible(true);
-					Nome_Utente.setText("Nome");
+					txtNome.setText("Nome");
 				} else {
 					lblNameError.setVisible(false);
 				}
 
-				final String cognome = Cognome_Utente.getText();
+				final String cognome = txtCognome.getText();
 				if (!cognome.matches("[a-zA-Z�-�\\s]+")) {
 					lblCognomeError.setVisible(true);
-					Cognome_Utente.setText("Cognome");
+					txtCognome.setText("Cognome");
 				} else {
 					lblCognomeError.setVisible(false);
 				}
 
-				final String citta = Citta_Utente.getText();
+				final String citta = txtCitta.getText();
 				if (!citta.matches("[a-zA-Z�-�\\s]+")) {
 					lblCittaError.setVisible(true);
-					Citta_Utente.setText("Citt�");
+					txtCitta.setText("Citt�");
 				} else {
 					lblCittaError.setVisible(false);
 				}
 
-				final String telefono = Telefono_Utente.getText().trim();
+				final String telefono = txtTelefono.getText().trim();
 
 				if (!telefono.matches("\\d{1,15}")) {
 
 					lblTelefonoError.setVisible(true);
-					Telefono_Utente.setText("Telefono");
+					txtTelefono.setText("Telefono");
 				} else {
 					lblTelefonoError.setVisible(false);
 				}
 
-				final String cap = Cap_Utente.getText().trim();
+				final String cap = txtCap.getText().trim();
 
 				if (!cap.matches("\\d{1,5}")) {
 
 					lblCapError.setVisible(true);
-					Cap_Utente.setText("CAP");
+					txtCap.setText("CAP");
 				} else {
 					lblCapError.setVisible(false);
 				}
 
-				final String indirizzo = Indirizzo_Utente.getText();
+				final String indirizzo = txtIndirizzo.getText();
 				if (!indirizzo.matches("[a-zA-Z�-�\\s]+")) {
 					lblIndirizzoError.setVisible(true);
-					Indirizzo_Utente.setText("Indirizzo");
+					txtIndirizzo.setText("Indirizzo");
 				} else {
 					lblIndirizzoError.setVisible(false);
 				}
 
-				final char[] passwordChar = Password_Utente.getPassword();
+				final char[] passwordChar = txtPass.getPassword();
 				final String passwordUtente = new String(passwordChar);
 
-				final boolean success = authService.registerUser(Email_Utente, passwordUtente, Email_Utente);
+				final boolean success = authService.registerUser(emailAgente, passwordUtente, emailAgente);
 
 				if (success) {
 					final AccessController cont1 = new AccessController();
-					cont1.registraNuovoAgente(Email_Utente, passwordUtente, nome, cognome, citta, telefono, cap,
+					cont1.registraNuovoAgente(emailAgente, passwordUtente, nome, cognome, citta, telefono, cap,
 							indirizzo, ruolo, agenzia);
 
 					dispose();
@@ -295,19 +365,39 @@ public class ViewRegistraAgente extends JFrame {
 							"Errore nella registrazione", JOptionPane.ERROR_MESSAGE);
 				}
 
-				final ViewDashboard schermata = new ViewDashboard(Email_Utente);
+				final ViewDashboard schermata = new ViewDashboard(emailAgente);
 				schermata.setVisible(true);
 
 			}
 		});
-		btnNewButton.setFocusable(false);
-		btnNewButton.setForeground(Color.WHITE);
-		btnNewButton.setBackground(SystemColor.textHighlight);
-		btnNewButton.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 13));
-		btnNewButton.setBounds(128, 420, 200, 25);
-		panel.add(btnNewButton);
+		btnRegistraAgente.setFocusable(false);
+		btnRegistraAgente.setForeground(Color.WHITE);
+		btnRegistraAgente.setBackground(SystemColor.textHighlight);
+		btnRegistraAgente.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 13));
+		btnRegistraAgente.setBounds(121, 420, 200, 25);
+		panel.add(btnRegistraAgente);
 	}
 
+	// metodi
+
+	/**
+	 * Configura un campo di testo con comportamento da placeholder intelligente.
+	 * Quando il campo riceve il focus, il testo placeholder viene rimosso.
+	 * Quando perde il focus ed è vuoto, il testo placeholder viene ripristinato.
+	 *
+	 * <p>Questo metodo migliora l'usabilità dell'interfaccia fornendo:
+	 * <ul>
+	 *   <li>Testo di esempio quando il campo è vuoto</li>
+	 *   <li>Rimozione automatica del placeholder all'inizio della digitazione</li>
+	 *   <li>Ripristino del placeholder se l'utente non inserisce nulla</li>
+	 * </ul>
+	 *
+	 * @param field Campo di testo da configurare
+	 * @param text Testo placeholder da visualizzare
+	 *
+	 * @see FocusAdapter
+	 * @see JTextField
+	 */
 	public void labelClicked(JTextField field, String text) {
 		field.setText(text);
 
@@ -327,5 +417,4 @@ public class ViewRegistraAgente extends JFrame {
 			}
 		});
 	}
-
 }

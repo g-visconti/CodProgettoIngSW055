@@ -27,28 +27,64 @@ import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 
-import controller.AccountController;
 import controller.ImmobileController;
 import controller.OfferteController;
-import model.entity.Account;
 import model.entity.Immobile;
 import model.entity.ImmobileInAffitto;
 import model.entity.ImmobileInVendita;
 import model.entity.OffertaIniziale;
 import util.GuiUtils;
 
+/**
+ * Finestra per la visualizzazione dei dettagli di un'offerta proposta da un cliente.
+ * Questa interfaccia permette all'agente immobiliare di visualizzare tutte le informazioni
+ * relative a un'offerta ricevuta, inclusi i dettagli dell'immobile e la proposta economica.
+ *
+ * <p>La finestra include:
+ * <ul>
+ *   <li>Galleria immagini dell'immobile con navigazione</li>
+ *   <li>Dettagli tecnici dell'immobile (dimensioni, locali, servizi)</li>
+ *   <li>Descrizione completa dell'immobile</li>
+ *   <li>Pannello con la proposta economica del cliente</li>
+ *   <li>Integrazione con Google Maps per la localizzazione</li>
+ *   <li>Pulsante per rispondere alla proposta o fare una controfferta</li>
+ * </ul>
+ *
+ * @author IngSW2425_055 Team
+ * @see OffertaIniziale
+ * @see Immobile
+ * @see ViewRispostaOfferte
+ */
 public class ViewOffertaProposta extends JFrame {
-
 	private static final long serialVersionUID = 1L;
+	// attributi
 	private JPanel contentPane;
 	private JTextArea descrizioneField;
-	private List<byte[]> immagini; // già esiste nel tuo codice
+	private List<byte[]> immagini;
 	private int indiceFotoCorrente = 0;
-	private OffertaIniziale offertaCorrente; // Aggiungi
-	private boolean isInAttesa; // Aggiungi questa variabile
+	private OffertaIniziale offertaCorrente;
+	private boolean isInAttesa;
+
+	// costruttore
 
 	/**
-	 * Create the frame.
+	 * Costruttore della finestra di visualizzazione offerta.
+	 * Inizializza l'interfaccia con tutti i dettagli dell'offerta e dell'immobile associato.
+	 *
+	 * <p>La finestra viene popolata dinamicamente recuperando:
+	 * <ul>
+	 *   <li>Le informazioni dell'offerta dal database</li>
+	 *   <li>I dettagli completi dell'immobile associato</li>
+	 *   <li>Le immagini dell'immobile</li>
+	 *   <li>Le informazioni del cliente che ha fatto la proposta</li>
+	 * </ul>
+	 *
+	 * @param idOfferta ID dell'offerta da visualizzare
+	 * @param emailAgente Email dell'agente che sta visualizzando l'offerta
+	 *
+	 * @throws IllegalArgumentException Se l'offerta non viene trovata nel database
+	 * @see OfferteController#getOffertaById(long)
+	 * @see ImmobileController#recuperaDettagli(long)
 	 */
 	public ViewOffertaProposta(long idOfferta, String emailAgente) {
 		// Inizializza il controller per recuperare l'offerta
@@ -105,8 +141,8 @@ public class ViewOffertaProposta extends JFrame {
 		JLabel lblTitolo = new JLabel("Tipo, Via XXXX, Quartiere, Città");
 		lblTitolo.setHorizontalAlignment(SwingConstants.CENTER);
 		lblTitolo.setFont(new Font("Segoe UI", Font.BOLD | Font.ITALIC, 17));
-		lblTitolo.setForeground(new Color(45, 45, 45)); // grigio scuro, più soft del nero
-		lblTitolo.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10)); // padding interno
+		lblTitolo.setForeground(new Color(45, 45, 45));
+		lblTitolo.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
 		lblTitolo.setBounds(10, 325, 723, 30);
 		contentPane.add(lblTitolo);
 
@@ -116,13 +152,7 @@ public class ViewOffertaProposta extends JFrame {
 		lblMaps.setBounds(854, 432, 277, 132);
 		contentPane.add(lblMaps);
 
-		JLabel lblVicinanza = new JLabel("Vicino a:");
-		lblVicinanza.setFont(new Font("Segoe UI", Font.BOLD, 12));
-		lblVicinanza.setBounds(854, 575, 277, 30);
-		contentPane.add(lblVicinanza);
-
-		// GOOGLE MAPS
-
+		// interazione con API Places
 		lblMaps.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		lblMaps.addMouseListener(new MouseAdapter() {
 			@Override
@@ -186,43 +216,33 @@ public class ViewOffertaProposta extends JFrame {
 		lblValoreProposta.setBounds(40, 73, 196, 21);
 		panelProponiOfferta.add(lblValoreProposta);
 
-		// **CORREZIONE: Controllo corretto dello stato**
 		if (offertaCorrente != null) {
 			double importoProposto = offertaCorrente.getImportoProposto();
 			String importoFormattato = String.format("€ %,.2f", importoProposto);
 			lblValoreProposta.setText(importoFormattato);
 
-			// DEBUG più dettagliato
-			System.out.println("DEBUG ViewOffertaProposta - Stato offerta letto: '" + offertaCorrente.getStato() + "'");
-
-			// Controlla se lo stato è "In attesa" (con 'I' maiuscola come nel constraint)
 			String stato = offertaCorrente.getStato();
 			isInAttesa = false;
 
 			if (stato != null) {
-				// Rimuovi spazi extra e controlla in modo flessibile
 				stato = stato.trim();
-				System.out.println("DEBUG - Stato dopo trim: '" + stato + "'");
 
 				// Controlla vari modi in cui potrebbe essere scritto
 				isInAttesa = stato.equalsIgnoreCase("In attesa") ||
 						stato.equalsIgnoreCase("IN_ATTESA") ||
 						stato.equalsIgnoreCase("IN ATTESA");
-
-				System.out.println("DEBUG - isInAttesa risultato: " + isInAttesa);
 			}
 
-			// **CONFIGURA IL BOTTONE IN BASE ALLO STATO**
 			if (isInAttesa) {
 				// OFFERTA IN ATTESA: bottone rosso per rispondere
 				btnRispondiCliente.setText("Rispondi al cliente");
-				btnRispondiCliente.setBackground(new Color(204, 0, 0)); // Rosso
+				btnRispondiCliente.setBackground(new Color(204, 0, 0));
 				btnRispondiCliente.setEnabled(true);
 				System.out.println("DEBUG - Bottone configurato: 'Rispondi al cliente' (abilitato)");
 			} else {
 				// OFFERTA GIÀ VALUTATA: bottone blu per nuova proposta
 				btnRispondiCliente.setText("Proponi nuova offerta");
-				btnRispondiCliente.setBackground(new Color(30, 144, 255)); // Blu
+				btnRispondiCliente.setBackground(new Color(30, 144, 255));
 				btnRispondiCliente.setEnabled(true);
 				System.out.println("DEBUG - Bottone configurato: 'Proponi nuova offerta' (abilitato)");
 			}
@@ -237,28 +257,17 @@ public class ViewOffertaProposta extends JFrame {
 			}
 		});
 
-
-
-
 		btnRispondiCliente.setBackground(new Color(204, 0, 0));
 		btnRispondiCliente.setBounds(36, 131, 204, 37);
 		panelProponiOfferta.add(btnRispondiCliente);
 
-
-
-
-
 		JPanel panelDettagliImmobile = new JPanel() {
-
-			/**
-			 *
-			 */
 			private static final long serialVersionUID = 1L;
 
 			@Override
 			protected void paintComponent(Graphics g) {
 				super.paintComponent(g);
-				int arc = 20; // raggio per gli angoli arrotondati
+				int arc = 20;
 				Graphics2D g2 = (Graphics2D) g;
 				g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
@@ -339,7 +348,6 @@ public class ViewOffertaProposta extends JFrame {
 		lblDescrizioneImmobile.setBounds(10, 482, 101, 23);
 		contentPane.add(lblDescrizioneImmobile);
 
-		// CREA IL PANNELLO PER LO SFONDO DELLA DESCRIZIONE
 		JPanel panelDescrizione = new JPanel() {
 			private static final long serialVersionUID = 1L;
 
@@ -350,9 +358,9 @@ public class ViewOffertaProposta extends JFrame {
 				Graphics2D g2 = (Graphics2D) g;
 				g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-				// Colore azzurro tenue (sfondo) - STESSO COLORE DI panelDettagliImmobile
+				// Colore azzurro tenue (sfondo)
 				Color bgColor = new Color(220, 240, 255);
-				// Colore blu bordo - STESSO COLORE DI panelDettagliImmobile
+				// Colore blu bordo
 				Color borderColor = new Color(30, 144, 255);
 
 				// Disegna lo sfondo arrotondato
@@ -367,15 +375,13 @@ public class ViewOffertaProposta extends JFrame {
 		};
 
 		panelDescrizione.setBounds(10, 505, 757, 141);
-		panelDescrizione.setLayout(null); // IMPORTANTE: layout null per posizionare la text area
+		panelDescrizione.setLayout(null);
 		contentPane.add(panelDescrizione);
 
-		// CREA LA TEXT AREA E AGGIUNGILA AL PANNELLO (non al contentPane)
 		descrizioneField = new JTextArea();
-		descrizioneField.setBounds(5, 5, 747, 131); // Posizione relativa al pannello
-		panelDescrizione.add(descrizioneField); // Aggiungi al PANNELLO, non al contentPane
+		descrizioneField.setBounds(5, 5, 747, 131);
+		panelDescrizione.add(descrizioneField);
 
-		// Configura la text area
 		descrizioneField.setLineWrap(true);
 		descrizioneField.setWrapStyleWord(true);
 		descrizioneField.setFont(new Font("Arial", Font.PLAIN, 16));
@@ -386,15 +392,20 @@ public class ViewOffertaProposta extends JFrame {
 		descrizioneField.setBackground(new Color(0, 0, 0, 0));
 		descrizioneField.setBorder(BorderFactory.createEmptyBorder());
 
-		// IMPORTANTE: Porta la text area in primo piano rispetto al pannello
-		//descrizioneField.setComponentZOrder(descrizioneField, 0);
-
 		JPanel panelPrezzoImmobile = new JPanel() {
 			/**
-			 *
+			 * Serial version UID per garantire la compatibilità della serializzazione.
 			 */
 			private static final long serialVersionUID = 1L;
 
+			/**
+			 * Disegna un pannello con sfondo arrotondato e bordo colorato.
+			 * Utilizzato per visualizzare il prezzo dell'immobile con un design distintivo.
+			 *
+			 * @param g Contesto grafico per il disegno
+			 * @see Graphics2D
+			 * @see RenderingHints#KEY_ANTIALIASING
+			 */
 			@Override
 			protected void paintComponent(Graphics g) {
 				super.paintComponent(g);
@@ -402,10 +413,10 @@ public class ViewOffertaProposta extends JFrame {
 				Graphics2D g2 = (Graphics2D) g;
 				g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-				// Colore interno (rosso scuro ma più chiaro)
+				// Colore interno
 				Color bgColor = new Color(200, 60, 60);
 
-				// Colore bordo (rosso più vivo, ma non troppo acceso)
+				// Colore bordo
 				Color borderColor = new Color(180, 0, 0);
 
 				// Disegna sfondo arrotondato
@@ -461,30 +472,11 @@ public class ViewOffertaProposta extends JFrame {
 			} else {
 				lblPrezzo.setText("<html><div style='text-align: center;'>Prezzo: Non disponibile</div></html>");
 			}
-			System.out.println("DEBUG: immobile.getAgenteAssociato() = " + immobile.getAgenteAssociato());
-			AccountController controllerAccount = new AccountController();
-			Account account = controllerAccount.recuperaDettagliAgente(immobile.getAgenteAssociato());
-			System.out.println("DEBUG: account = " + account);
-			/*
-			if ((account != null) && (account != null)) {
-				lblNomeAgente.setText(account.getNome());
-				lblCognomeAgente.setText(account.getCognome());
-				lblEmailAgente.setText(account.getEmail());
-
-				lblTelefonoAgente.setText(account.getTelefono());
-
-				if (account instanceof AgenteImmobiliare) {
-					lblAgenziaAgente.setText(((AgenteImmobiliare) account).getAgenzia());
-				} else {
-					lblAgenziaAgente.setText("Agenzia: N/A");
-				}
-			}*/
 
 			// Visualizza immagini
 			immagini = immobile.getImmagini();
 			indiceFotoCorrente = 0;
 
-			// Usa il metodo di GuiUtils per caricare la prima immagine
 			GuiUtils.caricaImmagineInEtichetta(lblFoto,
 					(immagini != null && !immagini.isEmpty()) ? immagini.get(0) : null,
 							lblFoto.getWidth(),
@@ -503,6 +495,15 @@ public class ViewOffertaProposta extends JFrame {
 			lblFoto.setText("Nessuna immagine disponibile");
 			lblFotoPlus.setText("");
 		}
+
+		/**
+		 * Listener per la navigazione tra le immagini dell'immobile.
+		 * Permette all'utente di cliccare sull'indicatore "+x foto" per
+		 * passare alla prossima immagine nella galleria.
+		 *
+		 * @see MouseAdapter
+		 * @see GuiUtils#caricaImmagineInEtichetta(JLabel, byte[], int, int)
+		 */
 		lblFotoPlus.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -524,42 +525,5 @@ public class ViewOffertaProposta extends JFrame {
 				}
 			}
 		});
-
-		// DEBUG
-
-		// Nel costruttore di ViewOffertaProposta, aggiungi questi debug:
-		System.out.println("=== DEBUG ViewOffertaProposta ===");
-		System.out.println("idOfferta: " + idOfferta);
-		System.out.println("emailAgente passata: " + emailAgente);
-		System.out.println("offertaCorrente: " + offertaCorrente);
-		System.out.println("Stato offerta: '" + offertaCorrente.getStato() + "'");
-		System.out.println("Cliente associato: " + offertaCorrente.getClienteAssociato());
-		System.out.println("Immobile associato: " + offertaCorrente.getImmobileAssociato());
-		System.out.println("Importo proposto: " + offertaCorrente.getImportoProposto());
-		System.out.println("=== FINE DEBUG ===");
-
-		// Modifica il controllo dello stato con più opzioni:
-		String stato = offertaCorrente.getStato();
-		System.out.println("DEBUG - Stato raw: '" + stato + "'");
-		System.out.println("DEBUG - Stato uppercase: '" + stato.toUpperCase() + "'");
-		System.out.println("DEBUG - Contiene 'ATTESA': " + stato.toUpperCase().contains("ATTESA"));
-
-		boolean isInAttesa = false;
-		if (stato != null) {
-			String statoUpper = stato.trim().toUpperCase();
-			isInAttesa = statoUpper.equals("IN_ATTESA") ||
-					statoUpper.equals("IN ATTESA") ||
-					statoUpper.equals("IN-ATTESA") ||
-					statoUpper.contains("ATTESA");
-		}
-
-		System.out.println("DEBUG - isInAttesa risultato: " + isInAttesa);
-
-
-		// Dopo aver impostato il testo della label
-		System.out.println("DEBUG - Testo label valoreProposta: " + lblValoreProposta.getText());
-		System.out.println("DEBUG - Bottone rispondiCliente enabled: " + btnRispondiCliente.isEnabled());
-		System.out.println("DEBUG - Bottone rispondiCliente text: " + btnRispondiCliente.getText());
-
 	}
 }

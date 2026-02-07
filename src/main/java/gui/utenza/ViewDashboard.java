@@ -42,6 +42,34 @@ import model.entity.Filtri;
 import util.GuiUtils;
 import util.InputUtils;
 
+/**
+ * Finestra principale della dashboard per l'utente cliente.
+ * Questa interfaccia rappresenta la schermata principale dopo il login,
+ * permettendo al cliente di cercare immobili, gestire il proprio account
+ * e visualizzare lo storico delle proprie offerte.
+ *
+ * <p>La dashboard è divisa in due aree principali:
+ * <ul>
+ *   <li>Area di ricerca: contiene campo di testo, filtri, tipologia immobile e comandi utente
+ *   <li>Area risultati: mostra gli immobili trovati in una tabella interattiva
+ * </ul>
+ *
+ * <p>Funzionalità incluse:
+ * <ul>
+ *   <li>Ricerca testuale per via, zona o parola chiave
+ *   <li>Filtri avanzati per affinare la ricerca
+ *   <li>Visualizzazione dettagliata degli immobili
+ *   <li>Gestione profilo utente (visualizzazione info, modifica password)
+ *   <li>Accesso allo storico delle offerte proposte
+ *   <li>Logout sicuro dal sistema
+ * </ul>
+ *
+ * @author IngSW2425_055 Team
+ * @see ViewImmobile
+ * @see ViewStoricoCliente
+ * @see ViewInfoAccount
+ * @see ViewModificaPassword
+ */
 public class ViewDashboard extends JFrame {
 
 	private static final long serialVersionUID = 1L;
@@ -58,7 +86,26 @@ public class ViewDashboard extends JFrame {
 	private int numeroRisultatiTrovati;
 
 	/**
-	 * Create the frame ViewDashboard.
+	 * Costruttore della dashboard cliente.
+	 * Inizializza l'interfaccia grafica a schermo intero e configura tutti i componenti
+	 * necessari per la ricerca e visualizzazione degli immobili.
+	 *
+	 * <p>La dashboard viene configurata con:
+	 * <ul>
+	 *   <li>Finestra a schermo intero con layout responsive
+	 *   <li>Pannello di ricerca con campo testuale, filtri e comandi utente
+	 *   <li>Pannello risultati con tabella interattiva
+	 *   <li>Menu contestuale per la gestione del profilo
+	 *   <li>Listener per la gestione degli eventi
+	 * </ul>
+	 *
+	 * @param emailCliente Email del cliente che ha effettuato l'accesso.
+	 *                     Viene utilizzata per personalizzare la dashboard e recuperare i dati utente.
+	 *
+	 * @throws IllegalArgumentException Se l'email del cliente è null o vuota
+	 *
+	 * @see GuiUtils#setIconaFinestra(JFrame)
+	 * @see AccountController#getIdAccountByEmail(String)
 	 */
 	public ViewDashboard(String emailCliente) {
 		// Imposta l'icona di DietiEstates25 alla finestra in uso
@@ -93,8 +140,24 @@ public class ViewDashboard extends JFrame {
 		setupRisultatiPanel(emailCliente, sl_dashboard, dashboard);
 	}
 
-	// METODI PRIVATI
+	// METODI
 
+	/**
+	 * Crea e configura il pannello di ricerca della dashboard.
+	 * Questo pannello contiene tutti i controlli per effettuare ricerche di immobili:
+	 * campo di testo, comboBox per tipologia, pulsanti filtri e gestione utente.
+	 *
+	 * @param emailCliente Email del cliente per personalizzare l'interfaccia
+	 * @param opAppartamento Array delle opzioni di tipologia immobile (Vendita/Affitto)
+	 * @param sl_dashboard Layout della dashboard principale
+	 * @param dashboard Pannello contenitore principale
+	 *
+	 * @return Il pannello di ricerca configurato
+	 *
+	 * @see #setupCampoRicercaListeners(JPanel)
+	 * @see #setupLogoutListener(JLabel)
+	 * @see #setupUserMenu(JLabel, String)
+	 */
 	private JPanel createRicercaPanel(String emailCliente, String[] opAppartamento, SpringLayout sl_dashboard,
 			JPanel dashboard) {
 		final JPanel ricerca = new JPanel();
@@ -168,6 +231,15 @@ public class ViewDashboard extends JFrame {
 		btnEseguiRicerca.setBorderPainted(false);
 
 		btnEseguiRicerca.addActionListener(new ActionListener() {
+			/**
+			 * Gestisce il click sul pulsante di ricerca.
+			 * Avvia la ricerca degli immobili in base ai criteri selezionati
+			 * e popola la tabella dei risultati.
+			 *
+			 * @param e L'evento dell'azione che ha triggerato la ricerca
+			 *
+			 * @see #ricercaImmobili()
+			 */
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				ricercaImmobili();
@@ -213,6 +285,14 @@ public class ViewDashboard extends JFrame {
 		lblFiltri.setToolTipText("Clicca per impostare preferenze aggiuntive, poi esegui la ricerca");
 
 		lblFiltri.addMouseListener(new MouseAdapter() {
+			/**
+			 * Gestisce il click sull'icona dei filtri.
+			 * Apre la finestra di selezione filtri avanzati.
+			 *
+			 * @param e L'evento del mouse che ha triggerato l'apertura dei filtri
+			 *
+			 * @see ViewFiltri
+			 */
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				final String tipologiaAppartamento = (String) comboBoxAppartamento.getSelectedItem();
@@ -227,6 +307,18 @@ public class ViewDashboard extends JFrame {
 		return ricerca;
 	}
 
+	/**
+	 * Crea e configura il pannello dei risultati della ricerca.
+	 * Questo pannello contiene la tabella per visualizzare gli immobili trovati
+	 * e i controlli per navigare nello storico delle offerte.
+	 *
+	 * @param emailCliente Email del cliente per il recupero dell'ID account
+	 * @param sl_dashboard Layout della dashboard principale
+	 * @param dashboard Pannello contenitore principale
+	 *
+	 * @see #ottieniIdAccount(String)
+	 * @see ViewStoricoCliente
+	 */
 	private void setupRisultatiPanel(String emailCliente, SpringLayout sl_dashboard, JPanel dashboard) {
 		final JLayeredPane layeredPane = new JLayeredPane();
 		sl_dashboard.putConstraint(SpringLayout.NORTH, layeredPane, 190, SpringLayout.NORTH, dashboard);
@@ -267,6 +359,15 @@ public class ViewDashboard extends JFrame {
 
 		// Mouse listener per la tabella
 		tableRisultati.addMouseListener(new MouseAdapter() {
+			/**
+			 * Gestisce il click su una riga della tabella risultati.
+			 * Recupera l'ID dell'immobile selezionato e apre la vista dettagliata.
+			 *
+			 * @param e L'evento del mouse che ha triggerato la selezione
+			 *
+			 * @see #ottieniIdAccount(String)
+			 * @see ViewImmobile
+			 */
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if (e.getClickCount() == 1) {
@@ -303,6 +404,14 @@ public class ViewDashboard extends JFrame {
 				risultatiDaRicerca);
 		sl_risultatiDaRicerca.putConstraint(SpringLayout.EAST, btnStoricoMieOfferte, 0, SpringLayout.EAST, scrollPane);
 		btnStoricoMieOfferte.addActionListener(new ActionListener() {
+			/**
+			 * Gestisce il click sul pulsante "Storico delle mie offerte".
+			 * Apre la finestra dello storico delle offerte proposte dal cliente.
+			 *
+			 * @param e L'evento dell'azione che ha triggerato l'apertura dello storico
+			 *
+			 * @see ViewStoricoCliente
+			 */
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				final ViewStoricoCliente viewOfferte = new ViewStoricoCliente(emailCliente);
@@ -317,8 +426,16 @@ public class ViewDashboard extends JFrame {
 		risultatiDaRicerca.add(btnStoricoMieOfferte);
 	}
 
-	// METODI DI SUPPORTO
 
+	/**
+	 * Configura i listener per il campo di ricerca testuale.
+	 * Gestisce il comportamento del placeholder text quando il campo riceve o perde il focus.
+	 *
+	 * @param ricerca Pannello contenitore del campo di ricerca
+	 *
+	 * @see #setCampoDiTestoIn()
+	 * @see #setCampoDiTestoOut()
+	 */
 	private void setupCampoRicercaListeners(JPanel ricerca) {
 		campoRicerca.addKeyListener(new KeyAdapter() {
 			@Override
@@ -342,6 +459,16 @@ public class ViewDashboard extends JFrame {
 		});
 	}
 
+	/**
+	 * Configura il listener per l'icona di logout.
+	 * Gestisce la disconnessione sicura dall'applicazione con conferma utente.
+	 *
+	 * @param logoutLabel Label dell'icona di logout a cui associare il listener
+	 *
+	 * @see ConnessioneDatabase#getInstance()
+	 * @see ConnessioneDatabase#closeConnection()
+	 * @see ViewAccesso
+	 */
 	private void setupLogoutListener(JLabel logoutLabel) {
 		logoutLabel.addMouseListener(new MouseAdapter() {
 			@Override
@@ -370,6 +497,16 @@ public class ViewDashboard extends JFrame {
 		});
 	}
 
+	/**
+	 * Configura il menu contestuale per la gestione del profilo utente.
+	 * Aggiunge le opzioni per visualizzare le informazioni account e modificare la password.
+	 *
+	 * @param userLabel Label dell'icona utente a cui associare il menu
+	 * @param emailCliente Email del cliente per passare alle viste di gestione account
+	 *
+	 * @see ViewInfoAccount
+	 * @see ViewModificaPassword
+	 */
 	private void setupUserMenu(JLabel userLabel, String emailCliente) {
 		final JPopupMenu menuUtente = new JPopupMenu();
 		final JMenuItem visualizzaInfoAccount = new JMenuItem("Visualizza informazioni sull'account");
@@ -406,6 +543,15 @@ public class ViewDashboard extends JFrame {
 		});
 	}
 
+	/**
+	 * Configura le etichette di benvenuto e email nell'intestazione.
+	 * Mostra l'email del cliente che ha effettuato l'accesso.
+	 *
+	 * @param ricerca Pannello di ricerca contenente le etichette
+	 * @param sl_ricerca Layout del pannello di ricerca
+	 * @param lblTitolo Label del titolo per il posizionamento relativo
+	 * @param emailCliente Email da visualizzare nell'intestazione
+	 */
 	private void setupBenvenutoLabels(JPanel ricerca, SpringLayout sl_ricerca, JLabel lblTitolo, String emailCliente) {
 		final JLabel lblBenvenuto = new JLabel("Accesso effettuato con:");
 		sl_ricerca.putConstraint(SpringLayout.NORTH, lblBenvenuto, 0, SpringLayout.NORTH, lblLogout);
@@ -426,7 +572,15 @@ public class ViewDashboard extends JFrame {
 		ricerca.add(lblEmailAccesso);
 	}
 
-	// Metodi helper per trovare componenti
+	/**
+	 * Trova una label all'interno di un pannello in base al suo testo di tooltip.
+	 * Metodo di utilità per la ricerca di componenti nell'interfaccia.
+	 *
+	 * @param panel Pannello in cui cercare la label
+	 * @param tooltip Testo del tooltip da cercare
+	 *
+	 * @return La JLabel trovata, o null se non trovata
+	 */
 	private JLabel findLabelByTooltip(JPanel panel, String tooltip) {
 		for (Component comp : panel.getComponents()) {
 			if (comp instanceof JLabel label) {
@@ -438,8 +592,17 @@ public class ViewDashboard extends JFrame {
 		return null;
 	}
 
-	// METODI ESISTENTI (rimangono invariati)
-
+	/**
+	 * Recupera l'ID account del cliente dal database.
+	 * Questo metodo viene chiamato la prima volta che è necessario l'ID cliente
+	 * e lo memorizza in cache per utilizzi successivi.
+	 *
+	 * @param emailAgente Email del cliente per il recupero dell'ID
+	 *
+	 * @throws SQLException Se si verifica un errore durante l'accesso al database
+	 *
+	 * @see AccountController#getIdAccountByEmail(String)
+	 */
 	private void ottieniIdAccount(String emailAgente) {
 		if (idCliente == null) {
 			final AccountController controller = new AccountController();
@@ -453,6 +616,26 @@ public class ViewDashboard extends JFrame {
 		}
 	}
 
+	/**
+	 * Esegue la ricerca degli immobili in base ai criteri selezionati.
+	 * Questo metodo raccoglie tutti i parametri di ricerca (testo, tipologia, filtri)
+	 * e popola la tabella dei risultati tramite il controller.
+	 *
+	 * <p>La ricerca include:
+	 * <ul>
+	 *   <li>Validazione del campo di testo (non può essere vuoto o placeholder)
+	 *   <li>Capitalizzazione delle parole per normalizzare l'input
+	 *   <li>Recupero dei filtri selezionati
+	 *   <li>Creazione del DTO di ricerca
+	 *   <li>Aggiornamento del conteggio risultati
+	 * </ul>
+	 *
+	 * @throws IllegalArgumentException Se il campo di ricerca è vuoto o contiene solo il placeholder
+	 *
+	 * @see InputUtils#capitalizzaParole(String)
+	 * @see ImmobileController#riempiTableRisultati(JTable, RicercaDTO)
+	 * @see RicercaDTO
+	 */
 	private void ricercaImmobili() {
 		final ImmobileController controller = new ImmobileController();
 		final String tipologiaAppartamento = (String) comboBoxAppartamento.getSelectedItem();
@@ -476,12 +659,18 @@ public class ViewDashboard extends JFrame {
 		ricercaDTO.setTipologiaImmobile(tipologiaAppartamento);
 		ricercaDTO.setFiltri(filtri);
 		ricercaDTO.setEmailUtente(emailCliente); // Email del cliente
-		ricercaDTO.setTipoRicerca(RicercaDTO.TipoRicerca.TUTTI_I_RISULTATI); // Sempre tutti i risultati per i clienti
+		/* La ricerca degli immobili di un cliente mostra
+		 * sempre tutti i risultati di ricerca */
+		ricercaDTO.setTipoRicerca(RicercaDTO.TipoRicerca.TUTTI_I_RISULTATI);
 
 		numeroRisultatiTrovati = controller.riempiTableRisultati(tableRisultati, ricercaDTO);
 		lblRisultati.setText("Immobili trovati: " + numeroRisultatiTrovati);
 	}
 
+	/**
+	 * Gestisce il comportamento del campo di testo quando riceve il focus.
+	 * Rimuove il placeholder text e cambia lo stile del font.
+	 */
 	private void setCampoDiTestoIn() {
 		campoPieno = campoRicerca.getText();
 		if (campoPieno.equals("Cerca scrivendo una via, una zona o una parola chiave")) {
@@ -490,6 +679,10 @@ public class ViewDashboard extends JFrame {
 		}
 	}
 
+	/**
+	 * Gestisce il comportamento del campo di testo quando perde il focus.
+	 * Ripristina il placeholder text se il campo è vuoto.
+	 */
 	private void setCampoDiTestoOut() {
 		campoPieno = campoRicerca.getText();
 		if (campoPieno.equals(campoVuoto)) {

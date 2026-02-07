@@ -26,6 +26,34 @@ import model.entity.Filtri;
 import util.GuiUtils;
 import util.InputUtils;
 
+/**
+ * Finestra per la gestione dei filtri di ricerca immobili in DietiEstates25.
+ * Permette agli utenti di definire criteri di ricerca avanzati per affinare
+ * i risultati della ricerca immobiliare in base alle proprie preferenze.
+ *
+ * <p>La finestra supporta diverse tipologie di filtri:
+ * <ul>
+ *   <li>Filtri numerici: prezzo minimo/massimo, superficie minima/massima</li>
+ *   <li>Filtri strutturali: numero locali, numero bagni, piano</li>
+ *   <li>Filtri di servizi: ascensore, portineria, climatizzazione</li>
+ * </ul>
+ *
+ * <p>Funzionalità avanzate:
+ * <ul>
+ *   <li>Persistenza delle preferenze tramite {@link Preferences} API</li>
+ *   <li>Reset completo dei filtri con conferma</li>
+ *   <li>Salvataggio automatico delle scelte</li>
+ *   <li>Opzione "Indifferente" per ogni filtro</li>
+ * </ul>
+ *
+ * <p>I filtri vengono adattati dinamicamente in base alla tipologia di appartamento
+ * (Vendita/Affitto) con range di prezzo appropriati.
+ *
+ * @author IngSW2425_055 Team
+ * @see Filtri
+ * @see Preferences
+ * @see InputUtils
+ */
 public class ViewFiltri extends JFrame {
 	private static final long serialVersionUID = 1L;
 	// Attributi della classe ViewFiltri
@@ -44,6 +72,22 @@ public class ViewFiltri extends JFrame {
 	private final JCheckBox chckbxPortineria;
 	private final JCheckBox chckbxClimatizzazione;
 
+	/**
+	 * Costruttore della finestra di gestione filtri.
+	 * Inizializza tutti i componenti grafici e carica le preferenze precedentemente
+	 * salvate per ogni filtro.
+	 *
+	 * <p>I filtri disponibili vengono adattati dinamicamente in base alla tipologia
+	 * di appartamento specificata, con particolare attenzione ai range di prezzo.
+	 *
+	 * @param tipologiaAppartamento Tipologia di immobile per cui applicare i filtri.
+	 *                              Determina i range di prezzo disponibili:
+	 *                              <ul>
+	 *                                <li>"Vendita": range da 50.000€ a 1.000.000€</li>
+	 *                                <li>"Affitto": range da 200€ a 4.000€</li>
+	 *                              </ul>
+	 * @throws IllegalArgumentException Se la tipologia non è "Vendita" o "Affitto"
+	 */
 	// Costruttore che crea il frame
 	public ViewFiltri(String tipologiaAppartamento) {
 		// Imposta l'icona di DietiEstates25 alla finestra in uso
@@ -53,13 +97,16 @@ public class ViewFiltri extends JFrame {
 
 		prefs = Preferences.userNodeForPackage(ViewFiltri.class);
 
+		/**
+		 * Listener per il click sul frame che resetta le preferenze.
+		 * Utilizzato principalmente per debug e testing.
+		 */
 		addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				try {
 					prefs.clear();
 				} catch (BackingStoreException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 			}
@@ -234,6 +281,10 @@ public class ViewFiltri extends JFrame {
 		final JButton btnSalvaFiltri = new JButton("Salva");
 
 		getRootPane().setDefaultButton(btnSalvaFiltri);
+		/**
+		 * Listener per il pulsante "Salva" che persiste le preferenze selezionate
+		 * e chiude la finestra.
+		 */
 		btnSalvaFiltri.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -248,6 +299,12 @@ public class ViewFiltri extends JFrame {
 				prefs.putBoolean("portineria", chckbxPortineria.isSelected());
 				prefs.putBoolean("climatizzazione", chckbxClimatizzazione.isSelected());
 				// chiama view dashboard con stringa di preferenze (?)
+
+				/**
+				 * Chiude la finestra dei filtri dopo aver salvato le preferenze.
+				 * Le preferenze verranno utilizzate per filtrare i risultati nella
+				 * schermata principale.
+				 */
 				ViewFiltri.this.dispose();
 			}
 		});
@@ -258,6 +315,9 @@ public class ViewFiltri extends JFrame {
 		btnSalvaFiltri.setBounds(494, 372, 185, 23);
 		panelTitolo.add(btnSalvaFiltri);
 
+		/**
+		 * Pulsante per annullare le modifiche e chiudere la finestra senza salvare.
+		 */
 		final JButton btnAnnulla = new JButton("Annulla");
 		btnAnnulla.addActionListener(new ActionListener() {
 			@Override
@@ -272,8 +332,26 @@ public class ViewFiltri extends JFrame {
 		btnAnnulla.setBounds(250, 372, 185, 23);
 		panelTitolo.add(btnAnnulla);
 
+		/**
+		 * Pulsante per resettare tutti i filtri ai valori predefiniti.
+		 * Richiede conferma all'utente prima di procedere con l'operazione.
+		 */
 		final JButton btnReset = new JButton("Reset filtri");
 		btnReset.addActionListener(new ActionListener() {
+			/**
+			 * Gestisce il reset completo di tutti i filtri.
+			 *
+			 * <p>Il metodo:
+			 * <ol>
+			 *   <li>Mostra una finestra di conferma con opzione "Sì/No"</li>
+			 *   <li>Se l'utente conferma, resetta tutte le preferenze a valori predefiniti</li>
+			 *   <li>Imposta tutti i filtri a "Indifferente" o "false"</li>
+			 *   <li>Mostra un messaggio di successo</li>
+			 *   <li>Chiude la finestra corrente</li>
+			 * </ol>
+			 *
+			 * @param e Evento dell'azione del pulsante
+			 */
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// Mostra una finestra di conferma
@@ -312,6 +390,16 @@ public class ViewFiltri extends JFrame {
 
 	}
 
+	/**
+	 * Crea un oggetto {@link Filtri} basato sui valori selezionati nell'interfaccia.
+	 *
+	 * <p>Il metodo converte tutti i valori delle comboBox e checkbox in un oggetto
+	 * Filtri pronto per essere utilizzato nelle query di ricerca. I valori "Indifferente"
+	 * vengono convertiti in {@code null}.
+	 *
+	 * @return Oggetto {@link Filtri} contenente tutti i criteri di ricerca selezionati
+	 * @see InputUtils#parseComboInteger(JComboBox)
+	 */
 	private Filtri creaFiltriDaInput() {
 		// Legge e converte i valori dalle combobox
 		final Integer prezzoMin = InputUtils.parseComboInteger(comboBoxPMin);
@@ -330,6 +418,16 @@ public class ViewFiltri extends JFrame {
 
 	}
 
+	/**
+	 * Restituisce l'oggetto {@link Filtri} contenente tutti i criteri di ricerca
+	 * selezionati dall'utente nell'interfaccia.
+	 *
+	 * <p>Questo metodo è il punto di accesso principale per recuperare i filtri
+	 * configurati dall'utente e utilizzarli nelle operazioni di ricerca.
+	 *
+	 * @return Oggetto {@link Filtri} con tutti i criteri di ricerca attivi
+	 * @see #creaFiltriDaInput()
+	 */
 	public Filtri getFiltriSelezionati() {
 		return creaFiltriDaInput();
 	}

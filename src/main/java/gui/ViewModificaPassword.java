@@ -25,38 +25,58 @@ import controller.AccountController;
 import util.GuiUtils;
 
 /**
- * Finestra grafica per la modifica della password dell'account.
- * 
- * Permette all'utente di inserire una nuova password e di confermarla,
- * delegando la validazione e l'aggiornamento al AccountController
+ * Finestra grafica per la modifica della password dell'account in DietiEstates25.
+ * Permette all'utente autenticato di cambiare la propria password rispettando
+ * i requisiti di sicurezza e di conferma.
+ *
+ * <p>La finestra implementa le seguenti funzionalità:
+ * <ul>
+ *   <li>Inserimento della nuova password con placeholder dinamico</li>
+ *   <li>Conferma della nuova password per evitare errori di digitazione</li>
+ *   <li>Validazione dei requisiti di sicurezza (lunghezza, caratteri)</li>
+ *   <li>Persistenza della nuova password tramite {@link AccountController}</li>
+ *   <li>Gestione intelligente del placeholder "******" che scompare all'interazione</li>
+ * </ul>
+ *
+ * <p>Requisiti per la password:
+ * <ul>
+ *   <li>Lunghezza minima: 6 caratteri</li>
+ *   <li>Deve contenere almeno un numero</li>
+ *   <li>Deve contenere almeno una lettera</li>
+ *   <li>Le due password inserite devono coincidere</li>
+ * </ul>
+ *
+ * @author IngSW2425_055 Team
+ * @see AccessController
+ * @see AccountController
+ * @see GuiUtils
  */
 public class ViewModificaPassword extends JFrame {
 
 	private static final long serialVersionUID = 1L;
-
-	/* =======================
-	 *  Componenti GUI
-	 * ======================= */
-
 	private JPanel contentPane;
 	private JPasswordField passwordField;
 	private JPasswordField confermaPasswordField;
-
-	/* =======================
-	 *  Variabili di supporto
-	 * ======================= */
-
 	private String campoPieno = "******";
 	private String campoVuoto = "";
 
-	/* =======================
-	 *  Costruttore
-	 * ======================= */
 
 	/**
-	 * Crea la finestra per la modifica della password.
+	 * Costruttore della finestra di modifica password.
+	 * Inizializza tutti i componenti grafici e configura i listener per la gestione
+	 * dell'inserimento e della validazione della nuova password.
 	 *
-	 * parametro emailAssociata dell'account di cui modificare la password
+	 * <p>La finestra include:
+	 * <ul>
+	 *   <li>Due campi password con placeholder intelligente</li>
+	 *   <li>Label con specifiche dei requisiti</li>
+	 *   <li>Pulsanti per confermare o annullare l'operazione</li>
+	 * </ul>
+	 *
+	 * @param emailAssociata Email dell'account di cui modificare la password.
+	 *                       Utilizzata per identificare l'utente nel sistema e
+	 *                       aggiornare la password corrispondente nel database.
+	 * @throws IllegalArgumentException Se l'email è null o vuota
 	 */
 	public ViewModificaPassword(String emailAssociata) {
 
@@ -79,9 +99,6 @@ public class ViewModificaPassword extends JFrame {
 		panel.setLayout(null);
 		contentPane.add(panel);
 
-		/* =======================
-		 *  Titolo e descrizione
-		 * ======================= */
 
 		JLabel lblModificaPassword = new JLabel("Digitare la nuova password");
 		lblModificaPassword.setFont(new Font("Tahoma", Font.BOLD, 18));
@@ -95,10 +112,12 @@ public class ViewModificaPassword extends JFrame {
 		lblSpecifiche.setBounds(57, 46, 431, 20);
 		panel.add(lblSpecifiche);
 
-		/* =======================
-		 *  Campo nuova password
-		 * ======================= */
-
+		/**
+		 * Campo per l'inserimento della nuova password con placeholder dinamico.
+		 * Il placeholder "******" scompare quando l'utente inizia a digitare
+		 * o clicca sul campo, e viene ripristinato se il campo rimane vuoto
+		 * e si clicca fuori da esso.
+		 */
 		passwordField = new JPasswordField();
 		passwordField.setVerifyInputWhenFocusTarget(false);
 		passwordField.setToolTipText("Inserire la password di accesso");
@@ -130,13 +149,12 @@ public class ViewModificaPassword extends JFrame {
 				}
 			}
 		});
-		
-		
 
-		/* =======================
-		 *  Campo conferma password
-		 * ======================= */
 
+		/**
+		 * Campo per la conferma della nuova password con le stesse caratteristiche
+		 * di placeholder dinamico del campo principale.
+		 */
 		confermaPasswordField = new JPasswordField();
 		confermaPasswordField.setVerifyInputWhenFocusTarget(false);
 		confermaPasswordField.setToolTipText("Inserire la password di accesso");
@@ -169,7 +187,11 @@ public class ViewModificaPassword extends JFrame {
 			}
 		});
 
-		// Ripristino placeholder quando si clicca fuori
+		/**
+		 * Listener per ripristinare i placeholder quando si clicca fuori dai campi.
+		 * Se un campo password è vuoto, viene ripristinato il placeholder "******"
+		 * per migliorare l'usabilità dell'interfaccia.
+		 */
 		panel.addMouseListener(new MouseAdapter() {
 			@SuppressWarnings("deprecation")
 			@Override
@@ -183,10 +205,6 @@ public class ViewModificaPassword extends JFrame {
 			}
 		});
 
-		/* =======================
-		 *  Label campi
-		 * ======================= */
-
 		JLabel lblPass = new JLabel("Nuova password:");
 		lblPass.setFont(new Font("Tahoma", Font.BOLD, 11));
 		lblPass.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -199,10 +217,10 @@ public class ViewModificaPassword extends JFrame {
 		lblConfermaPass.setBounds(80, 152, 177, 14);
 		panel.add(lblConfermaPass);
 
-		/* =======================
-		 *  Pulsanti
-		 * ======================= */
-
+		/**
+		 * Pulsante per annullare l'operazione di modifica password.
+		 * Chiude semplicemente la finestra senza salvare alcuna modifica.
+		 */
 		JButton btnAnnulla = new JButton("Annulla");
 		btnAnnulla.addMouseListener(new MouseAdapter() {
 			@Override
@@ -217,10 +235,32 @@ public class ViewModificaPassword extends JFrame {
 		btnAnnulla.setBounds(102, 237, 133, 23);
 		panel.add(btnAnnulla);
 
+		/**
+		 * Pulsante per confermare la modifica della password.
+		 * Esegue la validazione dei dati e, se superata, aggiorna la password
+		 * tramite il {@link AccountController}.
+		 */
 		JButton btnConferma = new JButton("Conferma");
 		getRootPane().setDefaultButton(btnConferma);
 
 		btnConferma.addMouseListener(new MouseAdapter() {
+			/**
+			 * Gestisce il processo di modifica della password quando viene premuto il pulsante "Conferma".
+			 *
+			 * <p>Il metodo:
+			 * <ol>
+			 *   <li>Recupera le password inserite nei due campi</li>
+			 *   <li>Valida i requisiti di sicurezza tramite {@link AccessController#isValidPassword(String, String)}</li>
+			 *   <li>Se la validazione fallisce, mostra un messaggio di errore descrittivo</li>
+			 *   <li>Se la validazione ha successo, aggiorna la password tramite {@link AccountController#updatePassword(String, String, String)}</li>
+			 *   <li>Mostra un messaggio di successo e chiude la finestra</li>
+			 *   <li>Gestisce eventuali eccezioni SQL durante l'aggiornamento</li>
+			 * </ol>
+			 *
+			 * @param e Evento del mouse che ha triggerato l'azione
+			 * @throws HeadlessException Se si verifica un errore nella visualizzazione dei dialog
+			 * @throws SQLException Se si verifica un errore durante l'aggiornamento nel database
+			 */
 			@SuppressWarnings("deprecation")
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -229,17 +269,17 @@ public class ViewModificaPassword extends JFrame {
 
 				AccessController con1 = new AccessController();
 				AccountController con = new AccountController();
-				
-				 if (!con1.isValidPassword(pass, confermaPass)) {
-			            JOptionPane.showMessageDialog(
-			                null,
-			                "La password deve avere almeno 6 caratteri, contenere un numero e coincidere con la conferma.",
-			                "Errore",
-			                JOptionPane.ERROR_MESSAGE
-			            );
-			            return; // blocca prima dell'update
-			        }
-				 
+
+				if (!con1.isValidPassword(pass, confermaPass)) {
+					JOptionPane.showMessageDialog(
+							null,
+							"La password deve avere almeno 6 caratteri, contenere un numero e coincidere con la conferma.",
+							"Errore",
+							JOptionPane.ERROR_MESSAGE
+							);
+					return;
+				}
+
 				try {
 					if (con.updatePassword(emailAssociata, pass, confermaPass)) {
 						JOptionPane.showMessageDialog(

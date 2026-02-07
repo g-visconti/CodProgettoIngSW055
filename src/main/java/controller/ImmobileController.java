@@ -18,12 +18,50 @@ import util.TableUtils;
 import util.TextAreaRenderer;
 import util.TextBoldRenderer;
 
+/**
+ * Controller per la gestione degli immobili nel sistema.
+ * Questa classe fornisce metodi per caricare, recuperare, visualizzare
+ * e validare gli immobili, sia in vendita che in affitto.
+ *
+ * <p>La classe gestisce:
+ * <ul>
+ *   <li>Caricamento di nuovi immobili nel database
+ *   <li>Recupero dettagli immobili tramite ID
+ *   <li>Popolamento di tabelle con risultati di ricerca
+ *   <li>Validazione dei dati immobili prima del caricamento
+ * </ul>
+ *
+ * @author IngSW2425_055 Team
+ * @see ImmobileDAO
+ * @see Immobile
+ * @see ImmobileInAffitto
+ * @see ImmobileInVendita
+ * @see RicercaDTO
+ */
 public class ImmobileController {
 
+	/**
+	 * Costruttore di default per l'ImmobileController.
+	 */
 	public ImmobileController() {
 	}
 
-	// Carica un immobile (Affitto o Vendita)
+	/**
+	 * Carica un immobile nel database, distinguendo tra affitto e vendita.
+	 *
+	 * <p>Il metodo determina la tipologia dell'immobile e chiama il metodo
+	 * appropriato del DAO per l'inserimento nel database corretto.
+	 *
+	 * @param imm L'immobile da caricare (deve essere di tipo ImmobileInAffitto o ImmobileInVendita)
+	 * @return true se il caricamento ha successo, false in caso di errore
+	 *
+	 * @throws ClassCastException Se l'immobile non è di un tipo valido per la sua tipologia
+	 * @throws IllegalArgumentException Se la tipologia dell'immobile non è supportata
+	 * @throws SQLException Se si verifica un errore durante l'accesso al database
+	 *
+	 * @see ImmobileDAO#caricaImmobileInAffitto(ImmobileInAffitto)
+	 * @see ImmobileDAO#caricaImmobileInVendita(ImmobileInVendita)
+	 */
 	public boolean caricaImmobile(Immobile imm) {
 		try {
 			final Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
@@ -45,7 +83,18 @@ public class ImmobileController {
 		}
 	}
 
-	// Recupera un immobile dal database tramite ID
+	/**
+	 * Recupera i dettagli completi di un immobile dal database tramite il suo ID.
+	 *
+	 * <p>Il metodo restituisce un oggetto Immobile contenente tutte le informazioni,
+	 * incluse immagini e caratteristiche dell'immobile.
+	 *
+	 * @param idImmobile ID univoco dell'immobile da recuperare
+	 * @return Oggetto Immobile con tutti i dettagli, o null se non trovato
+	 *
+	 * @throws SQLException Se si verifica un errore durante l'accesso al database
+	 * @see ImmobileDAO#getImmobileById(long)
+	 */
 	public Immobile recuperaDettagli(long idImmobile) {
 		try {
 			final Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
@@ -57,6 +106,32 @@ public class ImmobileController {
 		}
 	}
 
+	/**
+	 * Popola una JTable con i risultati della ricerca immobili.
+	 *
+	 * <p>Il metodo esegue una ricerca in base ai criteri specificati nel DTO
+	 * e popola la tabella con i risultati, applicando formattazione e renderer specifici.
+	 *
+	 * <p>La tabella include:
+	 * <ul>
+	 *   <li>Anteprima immagine (con renderer Base64)
+	 *   <li>Titolo dell'annuncio (in grassetto)
+	 *   <li>Descrizione (con TextArea per il wrapping)
+	 *   <li>Prezzo (formattato in base alla tipologia)
+	 * </ul>
+	 *
+	 * @param tableRisultati La JTable da popolare con i risultati
+	 * @param ricercaDTO DTO contenente i criteri di ricerca
+	 * @return Il numero di righe inserite nella tabella
+	 *
+	 * @throws SQLException Se si verifica un errore durante l'accesso al database
+	 * @see ImmobileDAO#getImmobiliAffitto(RicercaDTO)
+	 * @see ImmobileDAO#getImmobiliVendita(RicercaDTO)
+	 * @see TableUtils
+	 * @see Base64ImageRenderer
+	 * @see TextBoldRenderer
+	 * @see TextAreaRenderer
+	 */
 	public int riempiTableRisultati(JTable tableRisultati, RicercaDTO ricercaDTO) {
 		try {
 			final Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
@@ -129,6 +204,35 @@ public class ImmobileController {
 		return 0;
 	}
 
+	/**
+	 * Valida i dati di un immobile prima del caricamento nel sistema.
+	 *
+	 * <p>Il metodo verifica che tutti i campi obbligatori siano presenti
+	 * e contengano valori validi.
+	 *
+	 * <p>Vengono controllati:
+	 * <ul>
+	 *   <li>Titolo (non vuoto)
+	 *   <li>Indirizzo (non vuoto)
+	 *   <li>Località (non vuota)
+	 *   <li>Descrizione (non vuota)
+	 *   <li>Tipologia (valida, non "-")
+	 *   <li>Dimensione (positiva)
+	 *   <li>Prezzo (positivo)
+	 *   <li>Piano (>= -1, dove -1 indica "non specificato")
+	 * </ul>
+	 *
+	 * @param titolo Titolo dell'annuncio
+	 * @param indirizzo Indirizzo dell'immobile
+	 * @param localita Località dell'immobile
+	 * @param descrizione Descrizione dettagliata
+	 * @param tipologia Tipologia ("Affitto" o "Vendita")
+	 * @param dimensione Dimensione in mq
+	 * @param prezzo Prezzo (mensile per affitto, totale per vendita)
+	 * @param piano Piano dell'immobile (-1 se non specificato)
+	 *
+	 * @throws IllegalArgumentException Se uno dei parametri non supera la validazione
+	 */
 	public void validaImmobile(
 			String titolo,
 			String indirizzo,

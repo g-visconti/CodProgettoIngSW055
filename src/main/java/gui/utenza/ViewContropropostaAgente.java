@@ -18,15 +18,51 @@ import model.entity.RispostaOfferta;
 import util.GuiUtils;
 import util.TableUtils;
 
+/**
+ * Finestra per la visualizzazione di una controproposta inviata da un agente immobiliare.
+ * Questa interfaccia mostra i dettagli di una controproposta che un agente ha formulato
+ * in risposta a un'offerta iniziale fatta da un cliente per un immobile.
+ *
+ * <p>La finestra visualizza le seguenti informazioni:
+ * <ul>
+ *   <li>Nome e cognome dell'agente che ha formulato la controproposta
+ *   <li>Data di invio della controproposta
+ *   <li>Importo della controproposta formattato in euro
+ * </ul>
+ *
+ * <p>La finestra è di tipo pop-up e non è ridimensionabile, pensata per una rapida consultazione
+ * da parte del cliente per valutare la risposta dell'agente alla propria offerta.
+ *
+ * @author IngSW2425_055 Team
+ * @see OfferteController#getDettagliRispostaAttiva(Long)
+ * @see RispostaOfferta
+ * @see TableUtils#formattaData(String)
+ * @see TableUtils#formattaPrezzo(Double)
+ */
 public class ViewContropropostaAgente extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	private final JPanel contentPane;
 
 	/**
-	 * Realizzo la View relativa alla visualizzazione di una controproposta che un
-	 * agente propone in merito all'offerta fatta da un cliente, per un certo
-	 * immobile
+	 * Costruttore della finestra di visualizzazione controproposta agente.
+	 * Inizializza l'interfaccia grafica e recupera i dati della controproposta
+	 * dal database tramite il controller.
+	 *
+	 * <p>La finestra mostra:
+	 * <ul>
+	 *   <li>Intestazione con dati dell'agente e data della risposta
+	 *   <li>Importo della controproposta formattato in euro
+	 *   <li>Pulsante per tornare alla schermata precedente
+	 * </ul>
+	 *
+	 * @param idOfferta ID dell'offerta iniziale a cui si riferisce la controproposta
+	 * @param idCliente ID del cliente che ha fatto l'offerta iniziale
+	 *                  (utilizzato per verificare i permessi di visualizzazione)
+	 *
+	 * @throws IllegalArgumentException Se l'ID dell'offerta è null o non valido
+	 *
+	 * @see OfferteController#getDettagliRispostaAttiva(Long)
 	 */
 	public ViewContropropostaAgente(Long idOfferta, String idCliente) {
 		GuiUtils.setIconaFinestra(this);
@@ -94,6 +130,12 @@ public class ViewContropropostaAgente extends JFrame {
 		getRootPane().setDefaultButton(btnTornaIndietro);
 
 		btnTornaIndietro.addActionListener(new ActionListener() {
+			/**
+			 * Gestisce il click sul pulsante "Torna indietro".
+			 * Chiude la finestra corrente e ritorna alla schermata precedente.
+			 *
+			 * @param e L'evento dell'azione che ha triggerato la chiusura
+			 */
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				dispose();

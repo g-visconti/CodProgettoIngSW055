@@ -13,16 +13,50 @@ import model.entity.AgenteImmobiliare;
 import model.entity.AmministratoreDiSupporto;
 import model.entity.Cliente;
 
+/**
+ * Data Access Object per la gestione degli account nel sistema.
+ * Fornisce metodi per interagire con la tabella "Account" del database,
+ * inclusa la creazione, lettura, aggiornamento e verifica degli account.
+ *
+ * <p>Questa classe gestisce:
+ * <ul>
+ *   <li>Verifica esistenza email</li>
+ *   <li>Autenticazione utenti</li>
+ *   <li>Creazione nuovi account</li>
+ *   <li>Recupero informazioni profilo</li>
+ *   <li>Gestione password</li>
+ *   <li>Ricerca account per email o ID</li>
+ * </ul>
+ *
+ * @author IngSW2425_055 Team
+ * @see Account
+ * @see Connection
+ */
 public class AccountDAO {
 
 	private final Connection connection;
 
-	// costruttore per AccountDAO
+	/**
+	 * Costruttore per AccountDAO.
+	 * Inizializza il DAO con una connessione al database.
+	 *
+	 * @param connection Connessione al database da utilizzare per tutte le operazioni
+	 * @throws IllegalArgumentException Se la connessione è null
+	 */
 	public AccountDAO(Connection connection) {
 		this.connection = connection;
 	}
 
-	// controllo se l'email è presente nel database
+	/**
+	 * Verifica se un'email esiste già nel database.
+	 *
+	 * <p>Questo metodo controlla se esiste già un account con l'email specificata,
+	 * utile durante la registrazione per evitare duplicati.
+	 *
+	 * @param email Email da verificare
+	 * @return true se l'email esiste già, false altrimenti
+	 * @throws SQLException Se si verifica un errore durante l'accesso al database
+	 */
 	public boolean emailEsiste(String email) throws SQLException {
 		boolean result = false;
 		final String sql = "SELECT 1 FROM \"Account\" WHERE email = ?";
@@ -41,8 +75,18 @@ public class AccountDAO {
 		return result;
 	}
 
-	// controllo l'esistenza di una tupla con email e password passate come
-	// parametri
+	/**
+	 * Verifica le credenziali di accesso di un utente.
+	 *
+	 * <p>Controlla se esiste un account con l'email specificata e se la password
+	 * corrisponde a quella memorizzata (hashata con BCrypt).
+	 *
+	 * @param email Email dell'account
+	 * @param passwordInserita Password in chiaro inserita dall'utente
+	 * @return true se le credenziali sono valide, false altrimenti
+	 * @throws SQLException Se si verifica un errore durante l'accesso al database
+	 * @see BCrypt#checkpw(String, String)
+	 */
 	public boolean checkCredenziali(String email, String passwordInserita) throws SQLException {
 		final String query = "SELECT password FROM \"Account\" WHERE email = ?";
 		try (PreparedStatement stmt = connection.prepareStatement(query)) {
@@ -58,9 +102,18 @@ public class AccountDAO {
 		}
 	}
 
-	// creo un nuovo account
+	/**
+	 * Crea un nuovo account nel database.
+	 *
+	 * <p>Inserisce un nuovo record nella tabella "Account" con i dati forniti
+	 * e restituisce l'ID generato automaticamente dal database.
+	 *
+	 * @param account Oggetto Account contenente tutti i dati dell'utente
+	 * @return ID dell'account appena creato
+	 * @throws SQLException Se si verifica un errore durante l'inserimento nel database
+	 * @throws IllegalArgumentException Se l'account è null o contiene dati non validi
+	 */
 	public String insertAccount(Account account) throws SQLException {
-		System.out.println("DEBUG DAO insertAccount - cognome: '" + account.getCognome() + "'");
 
 		final String query = "INSERT INTO \"Account\" (\"email\", \"password\", \"nome\", \"cognome\", \"citta\", \"numeroTelefono\",\"cap\", \"indirizzo\", ruolo ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
@@ -90,6 +143,17 @@ public class AccountDAO {
 		}
 	}
 
+	/**
+	 * Crea un nuovo account per un cliente nel database.
+	 *
+	 * <p>Versione specializzata per oggetti Cliente che utilizza RETURNING
+	 * per ottenere immediatamente l'ID generato.
+	 *
+	 * @param cliente Oggetto Cliente da inserire nel database
+	 * @return ID dell'account appena creato
+	 * @throws SQLException Se si verifica un errore durante l'inserimento nel database
+	 * @throws IllegalArgumentException Se il cliente è null o contiene dati non validi
+	 */
 	public String insertAccount(Cliente cliente) throws SQLException {
 		// Lasciamo il DB generare idAccount, quindi non lo inseriamo
 		final String query = "INSERT INTO \"Account\" (\"email\", \"password\", \"nome\", \"cognome\", \"citta\", \"numeroTelefono\", \"cap\", \"indirizzo\", ruolo) "
@@ -116,6 +180,19 @@ public class AccountDAO {
 		}
 	}
 
+	/**
+	 * Recupera i dettagli completi di un account, inclusi i ruoli specializzati.
+	 *
+	 * <p>Questo metodo recupera non solo i dati base dell'account ma anche
+	 * informazioni specifiche per AgenteImmobiliare o AmministratoreDiSupporto
+	 * tramite JOIN con le rispettive tabelle.
+	 *
+	 * @param idAccount ID dell'account da recuperare
+	 * @return Oggetto Account (o sottoclasse) con tutti i dettagli, null se non trovato
+	 * @throws SQLException Se si verifica un errore durante l'accesso al database
+	 * @see AgenteImmobiliare
+	 * @see AmministratoreDiSupporto
+	 */
 	public Account getAccountDettagli(String idAccount) throws SQLException {
 		final String sql = "SELECT a.\"idAccount\", a.nome, a.cognome, a.email, a.\"numeroTelefono\", "
 				+ "       ag.agenzia, s.\"id\" AS supporto_id " + "FROM \"Account\" a "
@@ -131,7 +208,7 @@ public class AccountDAO {
 				final String nome = rs.getString("nome");
 				final String cognome = rs.getString("cognome");
 				final String email = rs.getString("email");
-				final String numeroTelefono = rs.getString("numeroTelefono"); // <-- nuovo campo
+				final String numeroTelefono = rs.getString("numeroTelefono");
 				final String agenzia = rs.getString("agenzia");
 				final String supportoId = rs.getString("supporto_id");
 
@@ -151,7 +228,7 @@ public class AccountDAO {
 							null, // indirizzo
 							"Supporto", // ruolo
 							agenzia // agenzia
-					);
+							);
 				} else if (agenzia != null) {
 					return new AgenteImmobiliare(id, email, null, nome, cognome, null, numeroTelefono, null, null,
 							"Agente", agenzia);
@@ -165,6 +242,17 @@ public class AccountDAO {
 		}
 	}
 
+	/**
+	 * Recupera il ruolo di un account basato sull'email.
+	 *
+	 * <p>Utile per determinare i permessi e le funzionalità disponibili
+	 * per un utente durante l'autenticazione e la navigazione nel sistema.
+	 *
+	 * @param email Email dell'account
+	 * @return Ruolo dell'account (es. "Cliente", "Agente", "Supporto")
+	 * @throws SQLException Se si verifica un errore durante l'accesso al database
+	 * @throws SQLException Se nessun account viene trovato con l'email specificata
+	 */
 	public String getRuoloByEmail(String email) throws SQLException {
 		final String sql = "SELECT ruolo FROM \"Account\" WHERE email = ?";
 		try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -179,6 +267,16 @@ public class AccountDAO {
 		}
 	}
 
+	/**
+	 * Recupera l'ID di un account basato sull'email.
+	 *
+	 * <p>Restituisce solo i primi 3 caratteri dell'ID dell'account.
+	 * Se l'account non viene trovato, restituisce "undef".
+	 *
+	 * @param email Email dell'account
+	 * @return ID abbreviato dell'account (primi 3 caratteri) o "undef" se non trovato
+	 * @throws SQLException Se si verifica un errore durante l'accesso al database
+	 */
 	public String getId(String email) throws SQLException {
 		String result = "undef";
 		final String query = "SELECT SUBSTRING(\"idAccount\", 1, 3) AS \"idAccount\" FROM \"Account\" WHERE email = ?";
@@ -191,7 +289,7 @@ public class AccountDAO {
 				result = rs.getString("idAccount");
 			}
 
-			rs.close(); // opzionale ma consigliato
+			rs.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -199,6 +297,19 @@ public class AccountDAO {
 		return result;
 	}
 
+	/**
+	 * Cambia la password di un account.
+	 *
+	 * <p>Aggiorna la password nel database per l'account specificato.
+	 * Si presume che la validazione della nuova password sia stata effettuata
+	 * prima della chiamata a questo metodo.
+	 *
+	 * @param emailAssociata Email dell'account di cui cambiare la password
+	 * @param pass Nuova password (già hashata)
+	 * @param confermaPass Conferma della nuova password (non utilizzata in questo metodo)
+	 * @return true se l'aggiornamento è avvenuto con successo, false altrimenti
+	 * @throws SQLException Se si verifica un errore durante l'aggiornamento del database
+	 */
 	public boolean cambiaPassword(String emailAssociata, String pass, String confermaPass) {
 		boolean result = false;
 		final String query = "UPDATE \"Account\" SET \"password\" = ? WHERE email = ?";
@@ -206,10 +317,10 @@ public class AccountDAO {
 			stmt.setString(1, pass);
 			stmt.setString(2, emailAssociata);
 
-			final int rowsUpdated = stmt.executeUpdate(); // <-- usa executeUpdate
+			final int rowsUpdated = stmt.executeUpdate();
 
 			if (rowsUpdated > 0) {
-				result = true; // almeno una riga è stata aggiornata
+				result = true;
 			}
 
 		} catch (SQLException e) {
@@ -219,11 +330,15 @@ public class AccountDAO {
 	}
 
 	/**
-	 * Metodo per il recupero delle info del profilo
-	 * 
-	 * @param emailUtente
-	 * @return
-	 * @throws SQLException
+	 * Recupera le informazioni del profilo di un utente.
+	 *
+	 * <p>Restituisce un DTO contenente tutte le informazioni di base
+	 * dell'account necessarie per visualizzare il profilo utente.
+	 *
+	 * @param emailUtente Email dell'utente di cui recuperare le informazioni
+	 * @return AccountInfoDTO con i dati del profilo, null se l'utente non viene trovato
+	 * @throws SQLException Se si verifica un errore durante l'accesso al database
+	 * @see AccountInfoDTO
 	 */
 	public AccountInfoDTO getInfoProfiloDAO(String emailUtente) throws SQLException {
 		final String query = "SELECT \"idAccount\", email, nome, cognome, \"numeroTelefono\", "
@@ -246,6 +361,16 @@ public class AccountDAO {
 		}
 	}
 
+	/**
+	 * Recupera l'ID completo di un account basato sull'email.
+	 *
+	 * <p>Restituisce l'ID intero dell'account. Se l'account non viene trovato,
+	 * restituisce "undef".
+	 *
+	 * @param email Email dell'account
+	 * @return ID completo dell'account o "undef" se non trovato
+	 * @throws SQLException Se si verifica un errore durante l'accesso al database
+	 */
 	public String getIdAccountByEmail(String email) throws SQLException {
 		String idAccount = "undef";
 		final String query = "SELECT \"idAccount\" FROM \"Account\" WHERE email = ?";
@@ -266,6 +391,16 @@ public class AccountDAO {
 		return idAccount;
 	}
 
+	/**
+	 * Recupera l'agente associato a un immobile specifico.
+	 *
+	 * <p>Utile per determinare quale agente è responsabile di un determinato immobile,
+	 * ad esempio per visualizzare le informazioni di contatto o per la gestione delle prenotazioni.
+	 *
+	 * @param idImmobile ID dell'immobile
+	 * @return ID dell'agente associato o "inesistente" se non trovato
+	 * @throws SQLException Se si verifica un errore durante l'accesso al database
+	 */
 	public String getAgenteAssociato(long idImmobile) {
 		String agenteAssociato = "inesistente";
 		final String query = "SELECT \"agenteAssociato\" FROM \"Immobile\" WHERE \"idImmobile\" = ?";
@@ -286,6 +421,16 @@ public class AccountDAO {
 		return agenteAssociato;
 	}
 
+	/**
+	 * Recupera un account completo basato sull'email.
+	 *
+	 * <p>Restituisce un oggetto Account con tutti i campi popolati.
+	 * Utile quando sono necessarie tutte le informazioni dell'account.
+	 *
+	 * @param email Email dell'account da recuperare
+	 * @return Oggetto Account completo, null se non trovato
+	 * @throws SQLException Se si verifica un errore durante l'accesso al database
+	 */
 	public Account getAccountByEmail(String email) throws SQLException {
 		final String query = "SELECT * FROM \"Account\" WHERE \"email\" = ?";
 
@@ -310,8 +455,16 @@ public class AccountDAO {
 		return null;
 	}
 
-	// Se non hai già un AccountDAO con un metodo getAccountById, aggiungilo:
-
+	/**
+	 * Recupera un account completo basato sull'ID.
+	 *
+	 * <p>Restituisce un oggetto Account con tutti i campi popolati, inclusa la password.
+	 * Utile per operazioni amministrative o di recupero dati completi.
+	 *
+	 * @param idAccount ID dell'account da recuperare
+	 * @return Oggetto Account completo, null se non trovato
+	 * @throws SQLException Se si verifica un errore durante l'accesso al database
+	 */
 	public Account getAccountById(String idAccount) throws SQLException {
 		final String query = "SELECT * FROM \"Account\" WHERE \"idAccount\" = ?";
 
@@ -320,7 +473,6 @@ public class AccountDAO {
 			final ResultSet rs = stmt.executeQuery();
 
 			if (rs.next()) {
-				// Usa il costruttore con tutti i parametri o i setter
 				final Account account = new Account();
 				account.setIdAccount(rs.getString("idAccount"));
 				account.setEmail(rs.getString("email"));
@@ -331,12 +483,11 @@ public class AccountDAO {
 				account.setCap(rs.getString("cap"));
 				account.setIndirizzo(rs.getString("indirizzo"));
 				account.setRuolo(rs.getString("ruolo"));
-				account.setPassword(rs.getString("password")); // se necessario
+				account.setPassword(rs.getString("password"));
 
 				return account;
 			}
 		}
 		return null;
 	}
-
 }

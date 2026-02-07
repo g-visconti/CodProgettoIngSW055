@@ -28,24 +28,47 @@ import controller.AccessController;
 import gui.utenza.ViewDashboard;
 import util.GuiUtils;
 
+/**
+ * Finestra per la registrazione di un nuovo amministratore di supporto nel sistema.
+ * Questa interfaccia permette agli amministratori con privilegi elevati di inserire
+ * tutti i dati necessari per creare un nuovo account amministratore di supporto.
+ *
+ * <p>La finestra è strutturalmente simile a {@link ViewRegistraAgente} ma con alcune differenze:
+ * <ul>
+ *   <li>Titolo e descrizioni specifiche per amministratori di supporto</li>
+ *   <li>Ruolo predefinito impostato a "Supporto" invece di "Agente"</li>
+ *   <li>Chiamata al metodo specifico per la registrazione supporto</li>
+ * </ul>
+ *
+ * <p>La validazione include:
+ * <ul>
+ *   <li>Controllo formato campi testuali con espressioni regolari</li>
+ *   <li>Validazione numerica per telefono e CAP</li>
+ *   <li>Registrazione su AWS Cognito per l'autenticazione</li>
+ *   <li>Salvataggio nel database di AWS tramite AccessController</li>
+ * </ul>
+ *
+ * @author IngSW2425_055 Team
+ * @see ViewRegistraAgente
+ * @see CognitoAuthService
+ * @see AccessController
+ * @see ViewDashboard
+ */
 public class ViewRegistraSupporto extends JFrame {
 
-	/**
-	 *
-	 */
 	private static final long serialVersionUID = 1L;
 	private final CognitoAuthService authService;
 	private final JPanel contentPane;
-	private final JTextField Nome_Utente;
-	private final JTextField Cognome_Utente;
-	private final JTextField Telefono_Utente;
-	private final JTextField Citta_Utente;
-	private final JTextField Indirizzo_Utente;
-	private final JPasswordField Conferma_Utente;
-	private final JPasswordField Password_Utente;
+	private final JTextField txtNome;
+	private final JTextField txtCognome;
+	private final JTextField txtTelefono;
+	private final JTextField txtCitta;
+	private final JTextField txtIndirizzo;
+	private final JPasswordField txtConfirmPass;
+	private final JPasswordField txtPass;
 	private final JPanel panel;
-	private final JLabel lblNewLabel_1;
-	private final JTextField Cap_Utente;
+	private final JLabel lblNuovoAmmDiSupporto;
+	private final JTextField txtCap;
 	private final JLabel lblCognomeError;
 	private final JLabel lblCittaError;
 	private final JLabel lblTelefonoError;
@@ -53,11 +76,31 @@ public class ViewRegistraSupporto extends JFrame {
 	private final JLabel lblIndirizzoError;
 	private final String ruolo = "Supporto";
 
-	/**
-	 * Create the frame.
-	 */
 
-	public ViewRegistraSupporto(String Email_Utente, String agenzia) {
+	/**
+	 * Costruttore della finestra di registrazione amministratore di supporto.
+	 * Inizializza tutti i componenti grafici e configura i listener per la validazione
+	 * in tempo reale dei dati inseriti.
+	 *
+	 * <p>Questa interfaccia è accessibile solo agli amministratori principali
+	 * e consente di creare nuovi account con privilegi di supporto, che potranno
+	 * a loro volta aggiungere agenti immobiliari ma non altri amministratori.
+	 *
+	 * <p>Il processo di registrazione combina:
+	 * <ul>
+	 *   <li>Autenticazione tramite AWS Cognito</li>
+	 *   <li>Salvataggio dati anagrafici nel database</li>
+	 *   <li>Associazione automatica all'agenzia dell'amministratore creatore</li>
+	 * </ul>
+	 *
+	 * @param emailSupporto Email di lavoro del nuovo amministratore di supporto
+	 * @param agenzia Nome dell'agenzia a cui associare il nuovo amministratore
+	 *
+	 * @see CognitoAuthServiceImpl#registerUser(String, String, String)
+	 * @see AccessController#registraNuovoSupporto(String, String, String, String, String, String, String, String, String, String)
+	 * @see GuiUtils#setIconaFinestra(JFrame)
+	 */
+	public ViewRegistraSupporto(String emailSupporto, String agenzia) {
 		authService = new CognitoAuthServiceImpl();
 
 		setTitle("DietiEstates25 - Registra un nuovo amministratore di supporto");
@@ -75,62 +118,62 @@ public class ViewRegistraSupporto extends JFrame {
 
 		panel = new JPanel();
 		panel.setBackground(SystemColor.menu);
-		panel.setBounds(0, 0, 457, 593);
+		panel.setBounds(0, 0, 443, 579);
 		contentPane.add(panel);
 		panel.setLayout(null);
 		SwingUtilities.invokeLater(() -> requestFocusInWindow());
 
-		Citta_Utente = new JTextField();
-		Citta_Utente.setFont(new Font("Tahoma", Font.BOLD, 11));
-		Citta_Utente.setBounds(225, 142, 133, 25);
-		panel.add(Citta_Utente);
-		Citta_Utente.setText("Citt\u00E0");
-		Citta_Utente.setColumns(10);
-		labelClicked(Citta_Utente, "Città");
+		txtCitta = new JTextField();
+		txtCitta.setFont(new Font("Tahoma", Font.BOLD, 11));
+		txtCitta.setBounds(225, 142, 133, 25);
+		panel.add(txtCitta);
+		txtCitta.setText("Citt\u00E0");
+		txtCitta.setColumns(10);
+		labelClicked(txtCitta, "Città");
 
-		Password_Utente = new JPasswordField();
-		Password_Utente.setFont(new Font("Tahoma", Font.BOLD, 11));
-		Password_Utente.setBounds(69, 245, 133, 25);
-		panel.add(Password_Utente);
-		Password_Utente.addMouseListener(new MouseAdapter() {
+		txtPass = new JPasswordField();
+		txtPass.setFont(new Font("Tahoma", Font.BOLD, 11));
+		txtPass.setBounds(69, 245, 133, 25);
+		panel.add(txtPass);
+		txtPass.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				Password_Utente.setText("");
+				txtPass.setText("");
 			}
 		});
-		Password_Utente.setVerifyInputWhenFocusTarget(false);
-		Password_Utente.setToolTipText("");
-		Password_Utente.setText("*****");
+		txtPass.setVerifyInputWhenFocusTarget(false);
+		txtPass.setToolTipText("");
+		txtPass.setText("*****");
 
-		Conferma_Utente = new JPasswordField();
-		Conferma_Utente.setFont(new Font("Tahoma", Font.BOLD, 11));
-		Conferma_Utente.setBounds(225, 245, 133, 25);
-		panel.add(Conferma_Utente);
-		Conferma_Utente.setText("*****");
-		Conferma_Utente.setVerifyInputWhenFocusTarget(false);
-		Conferma_Utente.addMouseListener(new MouseAdapter() {
+		txtConfirmPass = new JPasswordField();
+		txtConfirmPass.setFont(new Font("Tahoma", Font.BOLD, 11));
+		txtConfirmPass.setBounds(225, 245, 133, 25);
+		panel.add(txtConfirmPass);
+		txtConfirmPass.setText("*****");
+		txtConfirmPass.setVerifyInputWhenFocusTarget(false);
+		txtConfirmPass.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				Conferma_Utente.setText("");
+				txtConfirmPass.setText("");
 			}
 		});
-		Conferma_Utente.setToolTipText("");
+		txtConfirmPass.setToolTipText("");
 
-		Indirizzo_Utente = new JTextField();
-		Indirizzo_Utente.setFont(new Font("Tahoma", Font.BOLD, 11));
-		Indirizzo_Utente.setBounds(69, 194, 133, 25);
-		panel.add(Indirizzo_Utente);
-		Indirizzo_Utente.setText("Indirizzo");
-		Indirizzo_Utente.setColumns(10);
-		labelClicked(Indirizzo_Utente, "Indirizzo");
+		txtIndirizzo = new JTextField();
+		txtIndirizzo.setFont(new Font("Tahoma", Font.BOLD, 11));
+		txtIndirizzo.setBounds(69, 194, 133, 25);
+		panel.add(txtIndirizzo);
+		txtIndirizzo.setText("Indirizzo");
+		txtIndirizzo.setColumns(10);
+		labelClicked(txtIndirizzo, "Indirizzo");
 
-		Cognome_Utente = new JTextField();
-		Cognome_Utente.setFont(new Font("Tahoma", Font.BOLD, 11));
-		Cognome_Utente.setBounds(225, 85, 133, 25);
-		panel.add(Cognome_Utente);
-		Cognome_Utente.setText("Cognome");
-		Cognome_Utente.setColumns(10);
-		labelClicked(Cognome_Utente, "Cognome");
+		txtCognome = new JTextField();
+		txtCognome.setFont(new Font("Tahoma", Font.BOLD, 11));
+		txtCognome.setBounds(225, 85, 133, 25);
+		panel.add(txtCognome);
+		txtCognome.setText("Cognome");
+		txtCognome.setColumns(10);
+		labelClicked(txtCognome, "Cognome");
 
 		final JLabel lblPassDimError = new JLabel("Inserire una password di almeno 6 caratteri.");
 		lblPassDimError.setFont(new Font("Tahoma", Font.BOLD, 11));
@@ -150,35 +193,36 @@ public class ViewRegistraSupporto extends JFrame {
 		lblPassConfError.setBounds(69, 343, 133, 20);
 		panel.add(lblPassConfError);
 
-		Nome_Utente = new JTextField();
-		Nome_Utente.setCaretColor(new Color(0, 0, 51));
-		Nome_Utente.setFont(new Font("Tahoma", Font.BOLD, 11));
-		Nome_Utente.setBounds(69, 85, 133, 25);
-		panel.add(Nome_Utente);
-		Nome_Utente.setText("Nome");
-		Nome_Utente.setColumns(10);
-		labelClicked(Nome_Utente, "Nome");
+		txtNome = new JTextField();
+		txtNome.setCaretColor(new Color(0, 0, 51));
+		txtNome.setFont(new Font("Tahoma", Font.BOLD, 11));
+		txtNome.setBounds(69, 85, 133, 25);
+		panel.add(txtNome);
+		txtNome.setText("Nome");
+		txtNome.setColumns(10);
+		labelClicked(txtNome, "Nome");
 
-		Telefono_Utente = new JTextField();
-		Telefono_Utente.setFont(new Font("Tahoma", Font.BOLD, 11));
-		Telefono_Utente.setBounds(69, 142, 133, 25);
-		panel.add(Telefono_Utente);
-		Telefono_Utente.setText("Telefono");
-		Telefono_Utente.setColumns(10);
-		labelClicked(Telefono_Utente, "Telefono");
+		txtTelefono = new JTextField();
+		txtTelefono.setFont(new Font("Tahoma", Font.BOLD, 11));
+		txtTelefono.setBounds(69, 142, 133, 25);
+		panel.add(txtTelefono);
+		txtTelefono.setText("Telefono");
+		txtTelefono.setColumns(10);
+		labelClicked(txtTelefono, "Telefono");
 
-		lblNewLabel_1 = new JLabel("Inserire i dati dell'agente:");
-		lblNewLabel_1.setFont(new Font("Tahoma", Font.BOLD, 13));
-		lblNewLabel_1.setBounds(69, 22, 224, 41);
-		panel.add(lblNewLabel_1);
+		lblNuovoAmmDiSupporto = new JLabel("Inserire i dati del nuovo amministratore di supporto:");
+		lblNuovoAmmDiSupporto.setHorizontalAlignment(SwingConstants.CENTER);
+		lblNuovoAmmDiSupporto.setFont(new Font("Tahoma", Font.BOLD, 13));
+		lblNuovoAmmDiSupporto.setBounds(45, 22, 353, 41);
+		panel.add(lblNuovoAmmDiSupporto);
 
-		Cap_Utente = new JTextField();
-		Cap_Utente.setFont(new Font("Tahoma", Font.BOLD, 11));
-		Cap_Utente.setText("CAP");
-		Cap_Utente.setBounds(225, 194, 68, 25);
-		panel.add(Cap_Utente);
-		Cap_Utente.setColumns(10);
-		labelClicked(Cap_Utente, "CAP");
+		txtCap = new JTextField();
+		txtCap.setFont(new Font("Tahoma", Font.BOLD, 11));
+		txtCap.setText("CAP");
+		txtCap.setBounds(225, 194, 68, 25);
+		panel.add(txtCap);
+		txtCap.setColumns(10);
+		labelClicked(txtCap, "CAP");
 
 		final JLabel lblNameError = new JLabel("Nome non valido");
 		lblNameError.setForeground(new Color(255, 0, 0));
@@ -222,71 +266,98 @@ public class ViewRegistraSupporto extends JFrame {
 		lblIndirizzoError.setBounds(68, 217, 134, 14);
 		panel.add(lblIndirizzoError);
 
-		final JButton btnNewButton = new JButton("Registra supporto");
-		btnNewButton.addActionListener(new ActionListener() {
+		final JButton btnRegistraSupporto = new JButton("Registra supporto");
+		btnRegistraSupporto.addActionListener(new ActionListener() {
+			/**
+			 * Gestisce il click sul pulsante di registrazione.
+			 * Esegue la validazione di tutti i campi, registra l'utente su AWS Cognito,
+			 * salva i dati nel database locale e reindirizza alla dashboard.
+			 *
+			 * <p>Processo di validazione dettagliato:
+			 * <ul>
+			 *   <li><b>Nome e cognome</b>: Solo caratteri alfabetici, spazi e caratteri speciali consentiti (espressione: [a-zA-Z�-�\\s]+)</li>
+			 *   <li><b>Telefono</b>: Solo cifre numeriche, massimo 15 caratteri (espressione: \\d{1,15})</li>
+			 *   <li><b>Città e indirizzo</b>: Solo caratteri alfabetici e spazi</li>
+			 *   <li><b>CAP</b>: Solo cifre numeriche, massimo 5 caratteri (espressione: \\d{1,5})</li>
+			 * </ul>
+			 *
+			 * <p>In caso di successo della registrazione su AWS Cognito:
+			 * <ol>
+			 *   <li>Chiama {@code AccessController.registraNuovoSupporto()} per salvare i dati localmente</li>
+			 *   <li>Chiude la finestra corrente</li>
+			 *   <li>Apre la dashboard dell'utente appena registrato</li>
+			 * </ol>
+			 *
+			 * <p>In caso di fallimento mostra un messaggio di errore appropriato.
+			 *
+			 * @param e Evento di azione generato dal click sul pulsante
+			 *
+			 * @see CognitoAuthService#registerUser(String, String, String)
+			 * @see AccessController#registraNuovoSupporto(String, String, String, String, String, String, String, String, String, String)
+			 */
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
-				final String nome = Nome_Utente.getText();
+				final String nome = txtNome.getText();
 				if (!nome.matches("[a-zA-Z�-�\\s]+")) {
 					lblNameError.setVisible(true);
-					Nome_Utente.setText("Nome");
+					txtNome.setText("Nome");
 				} else {
 					lblNameError.setVisible(false);
 				}
 
-				final String cognome = Cognome_Utente.getText();
+				final String cognome = txtCognome.getText();
 				if (!cognome.matches("[a-zA-Z�-�\\s]+")) {
 					lblCognomeError.setVisible(true);
-					Cognome_Utente.setText("Cognome");
+					txtCognome.setText("Cognome");
 				} else {
 					lblCognomeError.setVisible(false);
 				}
 
-				final String citta = Citta_Utente.getText();
+				final String citta = txtCitta.getText();
 				if (!citta.matches("[a-zA-Z�-�\\s]+")) {
 					lblCittaError.setVisible(true);
-					Citta_Utente.setText("Citt�");
+					txtCitta.setText("Citt�");
 				} else {
 					lblCittaError.setVisible(false);
 				}
 
-				final String telefono = Telefono_Utente.getText().trim();
+				final String telefono = txtTelefono.getText().trim();
 
 				if (!telefono.matches("\\d{1,15}")) {
 
 					lblTelefonoError.setVisible(true);
-					Telefono_Utente.setText("Telefono");
+					txtTelefono.setText("Telefono");
 				} else {
 					lblTelefonoError.setVisible(false);
 				}
 
-				final String cap = Cap_Utente.getText().trim();
+				final String cap = txtCap.getText().trim();
 
 				if (!cap.matches("\\d{1,5}")) {
 
 					lblCapError.setVisible(true);
-					Cap_Utente.setText("CAP");
+					txtCap.setText("CAP");
 				} else {
 					lblCapError.setVisible(false);
 				}
 
-				final String indirizzo = Indirizzo_Utente.getText();
+				final String indirizzo = txtIndirizzo.getText();
 				if (!indirizzo.matches("[a-zA-Z�-�\\s]+")) {
 					lblIndirizzoError.setVisible(true);
-					Indirizzo_Utente.setText("Indirizzo");
+					txtIndirizzo.setText("Indirizzo");
 				} else {
 					lblIndirizzoError.setVisible(false);
 				}
 
-				final char[] passwordChar = Password_Utente.getPassword();
+				final char[] passwordChar = txtPass.getPassword();
 				final String passwordUtente = new String(passwordChar);
 
-				final boolean success = authService.registerUser(Email_Utente, passwordUtente, Email_Utente);
+				final boolean success = authService.registerUser(emailSupporto, passwordUtente, emailSupporto);
 
 				if (success) {
 					final AccessController cont1 = new AccessController();
-					cont1.registraNuovoSupporto(Email_Utente, passwordUtente, nome, cognome, citta, telefono, cap,
+					cont1.registraNuovoSupporto(emailSupporto, passwordUtente, nome, cognome, citta, telefono, cap,
 							indirizzo, ruolo, agenzia);
 
 					dispose();
@@ -295,19 +366,39 @@ public class ViewRegistraSupporto extends JFrame {
 							"Errore nella registrazione", JOptionPane.ERROR_MESSAGE);
 				}
 
-				final ViewDashboard schermata = new ViewDashboard(Email_Utente);
+				final ViewDashboard schermata = new ViewDashboard(emailSupporto);
 				schermata.setVisible(true);
 
 			}
 		});
-		btnNewButton.setFocusable(false);
-		btnNewButton.setForeground(Color.WHITE);
-		btnNewButton.setBackground(SystemColor.textHighlight);
-		btnNewButton.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 13));
-		btnNewButton.setBounds(128, 435, 200, 25);
-		panel.add(btnNewButton);
+		btnRegistraSupporto.setFocusable(false);
+		btnRegistraSupporto.setForeground(Color.WHITE);
+		btnRegistraSupporto.setBackground(SystemColor.textHighlight);
+		btnRegistraSupporto.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 13));
+		btnRegistraSupporto.setBounds(121, 435, 200, 25);
+		panel.add(btnRegistraSupporto);
 	}
 
+	/**
+	 * Configura un campo di testo con comportamento da placeholder intelligente.
+	 * Implementa il pattern "hint text" che fornisce un'esperienza utente migliorata:
+	 * il testo di esempio scompare quando l'utente inizia a digitare e riappare
+	 * se il campo viene lasciato vuoto.
+	 *
+	 * <p>Caratteristiche:
+	 * <ul>
+	 *   <li>Testo di guida visibile quando il campo è vuoto e senza focus</li>
+	 *   <li>Rimozione automatica del testo di guida al focus</li>
+	 *   <li>Ripristino automatico se il campo viene abbandonato vuoto</li>
+	 *   <li>Compatibile con tutti i campi di testo dell'interfaccia</li>
+	 * </ul>
+	 *
+	 * @param field Campo di testo da configurare
+	 * @param text Testo placeholder/guida da visualizzare
+	 *
+	 * @see FocusAdapter
+	 * @see JTextField
+	 */
 	public void labelClicked(JTextField field, String text) {
 		field.setText(text);
 
@@ -327,5 +418,4 @@ public class ViewRegistraSupporto extends JFrame {
 			}
 		});
 	}
-
 }

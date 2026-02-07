@@ -14,23 +14,70 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+/**
+ * Implementazione del servizio di autenticazione tramite Amazon Cognito.
+ * Questa classe fornisce metodi per interagire con il servizio Cognito di AWS,
+ * inclusi l'ottenimento di token di accesso, la registrazione di utenti e
+ * l'autenticazione tramite provider esterni come Facebook e Google.
+ *
+ * <p>La classe gestisce:
+ * <ul>
+ *   <li>Autenticazione client per ottenere token di accesso
+ *   <li>Registrazione di nuovi utenti nel pool utenti Cognito
+ *   <li>Autenticazione federata tramite Facebook e Google
+ * </ul>
+ *
+ * @author IngSW2425_055 Team
+ * @see CognitoAuthService
+ * @see AuthConfig
+ */
 public class CognitoAuthServiceImpl implements CognitoAuthService {
 
 	private final AuthConfig config;
 	private final OkHttpClient httpClient;
 
+	/**
+	 * Costruttore di default che inizializza la configurazione di autenticazione
+	 * e il client HTTP con timeout predefiniti.
+	 *
+	 * <p>Utilizza una nuova istanza di {@link AuthConfig} caricata con i valori
+	 * di default dalle variabili d'ambiente o file di configurazione.
+	 *
+	 * @see AuthConfig
+	 */
 	public CognitoAuthServiceImpl() {
 		config = new AuthConfig();
 		httpClient = new OkHttpClient.Builder().connectTimeout(30, TimeUnit.SECONDS).readTimeout(30, TimeUnit.SECONDS)
 				.build();
 	}
 
+	/**
+	 * Costruttore che permette di fornire una configurazione personalizzata.
+	 * Utile per testing o scenari dove la configurazione deve essere dinamica.
+	 *
+	 * @param config Configurazione di autenticazione personalizzata
+	 * @throws IllegalArgumentException Se la configurazione fornita è null
+	 * @see AuthConfig
+	 */
 	public CognitoAuthServiceImpl(AuthConfig config) {
 		this.config = config;
 		httpClient = new OkHttpClient.Builder().connectTimeout(30, TimeUnit.SECONDS).readTimeout(30, TimeUnit.SECONDS)
 				.build();
 	}
 
+	/**
+	 * Ottiene un token di accesso dal servizio Cognito utilizzando le credenziali client.
+	 * Il token viene richiesto utilizzando il flusso OAuth2 "client_credentials".
+	 *
+	 * <p>Il metodo verifica prima la validità della configurazione e del client secret.
+	 * Se la richiesta ha successo, restituisce il token di accesso; altrimenti restituisce null.
+	 *
+	 * @return Token di accesso come stringa, o null in caso di errore
+	 *
+	 * @throws IllegalStateException Se la configurazione Cognito non è valida
+	 * @see AuthConfig#isValid()
+	 * @see AuthConfig#getClientSecret()
+	 */
 	@Override
 	public String getAccessToken() {
 		if (!config.isValid()) {
@@ -71,6 +118,22 @@ public class CognitoAuthServiceImpl implements CognitoAuthService {
 		}
 	}
 
+	/**
+	 * Registra un nuovo utente nel pool utenti Cognito.
+	 * Crea un account con username, password e email forniti.
+	 *
+	 * <p>Il metodo invia una richiesta di SignUp all'endpoint Cognito Identity Provider.
+	 * L'email viene aggiunta come attributo utente.
+	 *
+	 * @param username Nome utente per la registrazione
+	 * @param password Password per l'account
+	 * @param email Indirizzo email dell'utente
+	 * @return true se la registrazione ha successo, false altrimenti
+	 *
+	 * @throws IllegalArgumentException Se username, password o email sono null o vuoti
+	 * @see AuthConfig#getClientId()
+	 * @see AuthConfig#getRegion()
+	 */
 	@Override
 	public boolean registerUser(String username, String password, String email) {
 		final JsonObject jsonRequest = new JsonObject();
@@ -110,6 +173,19 @@ public class CognitoAuthServiceImpl implements CognitoAuthService {
 		}
 	}
 
+	/**
+	 * Autentica un utente utilizzando un token di accesso di Facebook.
+	 * Questo metodo implementa l'autenticazione federata tramite Facebook Login.
+	 *
+	 * <p>Il metodo invia il token Facebook a Cognito Identity per ottenere
+	 * un'identità federata all'interno del pool identità configurato.
+	 *
+	 * @param facebookAccessToken Token di accesso ottenuto da Facebook Login
+	 * @return true se l'autenticazione ha successo, false altrimenti
+	 *
+	 * @throws IllegalArgumentException Se il token Facebook è null o vuoto
+	 * @see AuthConfig#getIdentityPoolId()
+	 */
 	@Override
 	public boolean authenticateWithFacebook(String facebookAccessToken) {
 		final JsonObject jsonRequest = new JsonObject();
@@ -140,6 +216,19 @@ public class CognitoAuthServiceImpl implements CognitoAuthService {
 		}
 	}
 
+	/**
+	 * Autentica un utente utilizzando un token di accesso di Google.
+	 * Questo metodo implementa l'autenticazione federata tramite Google Sign-In.
+	 *
+	 * <p>Il metodo invia il token Google a Cognito Identity per ottenere
+	 * un'identità federata all'interno del pool identità configurato.
+	 *
+	 * @param googleAccessToken Token di accesso ottenuto da Google Sign-In
+	 * @return true se l'autenticazione ha successo, false altrimenti
+	 *
+	 * @throws IllegalArgumentException Se il token Google è null o vuoto
+	 * @see AuthConfig#getIdentityPoolId()
+	 */
 	@Override
 	public boolean authenticateWithGoogle(String googleAccessToken) {
 		final JsonObject jsonRequest = new JsonObject();
@@ -169,63 +258,4 @@ public class CognitoAuthServiceImpl implements CognitoAuthService {
 			return false;
 		}
 	}
-
-	/**
-	 * Autenticazione con GitHub oscurata a causa di imperfezioni lasciata per
-	 * mostrare il lavoro precedentemente fatto
-	 */
-
-	/*
-	 * @Override public boolean authenticateWithGitHub(String githubAccessToken) {
-	 * JsonObject jsonRequest = new JsonObject();
-	 * jsonRequest.addProperty("IdentityPoolId", config.getIdentityPoolId());
-	 * jsonRequest.addProperty("Logins", "github.com:" + githubAccessToken);
-	 * 
-	 * RequestBody body = RequestBody.create( jsonRequest.toString(),
-	 * MediaType.parse("application/json") );
-	 * 
-	 * Request request = new Request.Builder()
-	 * .url("https://cognito-identity.eu-west-1.amazonaws.com/") .post(body)
-	 * .addHeader("Content-Type", "application/json") .addHeader("X-Amz-Target",
-	 * "AWSCognitoIdentityService.GetId") .build();
-	 * 
-	 * try (Response response = httpClient.newCall(request).execute()) { if
-	 * (response.isSuccessful()) { if (response.body() != null) {
-	 * response.body().string(); }
-	 * System.out.println("Autenticazione GitHub avvenuta con successo"); return
-	 * true; } else {
-	 * System.err.println("Errore durante l'autenticazione con GitHub: " +
-	 * response.code()); return false; } } catch (Exception e) {
-	 * System.err.println("Errore durante l'autenticazione GitHub: " +
-	 * e.getMessage()); e.printStackTrace(); return false; } }
-	 * 
-	 * @Override public boolean exchangeGitHubCode(String code) { HttpUrl tokenUrl =
-	 * HttpUrl.parse("https://github.com/login/oauth/access_token").newBuilder()
-	 * .addQueryParameter("client_id", "Ov23liiPkBEnvPNXer7V")
-	 * .addQueryParameter("client_secret",
-	 * "c1b38f9cd22ebec732466ac6c6cd4737c81c07f1") .addQueryParameter("code", code)
-	 * .addQueryParameter("redirect_uri",
-	 * "https://g-visconti.github.io/callback-github/githubcallback") .build();
-	 * 
-	 * Request tokenRequest = new Request.Builder() .url(tokenUrl) .header("Accept",
-	 * "application/json") .post(RequestBody.create("", null)) .build();
-	 * 
-	 * try (Response tokenResponse = httpClient.newCall(tokenRequest).execute()) {
-	 * if (!tokenResponse.isSuccessful() || tokenResponse.body() == null) {
-	 * System.err.println("Errore scambio code/token GitHub: " +
-	 * tokenResponse.code()); return false; }
-	 * 
-	 * String json = tokenResponse.body().string(); JsonObject obj =
-	 * JsonParser.parseString(json).getAsJsonObject();
-	 * 
-	 * if (obj.has("access_token")) { String accessToken =
-	 * obj.get("access_token").getAsString(); return
-	 * authenticateWithGitHub(accessToken); } else {
-	 * System.err.println("Access token non trovato nella risposta GitHub"); return
-	 * false; }
-	 * 
-	 * } catch (Exception e) {
-	 * System.err.println("Errore durante lo scambio code GitHub: " +
-	 * e.getMessage()); e.printStackTrace(); return false; } }
-	 */
 }

@@ -20,22 +20,46 @@ import controller.OfferteController;
 import model.entity.OffertaIniziale;
 import util.GuiUtils;
 
+/**
+ * Finestra per la gestione delle risposte alle offerte immobiliari.
+ * Questa interfaccia permette all'agente immobiliare di rispondere alle offerte
+ * dei clienti con tre diverse opzioni: accettazione, rifiuto o controproposta.
+ *
+ * <p>La finestra si adatta dinamicamente in base allo stato dell'offerta:
+ * <ul>
+ *   <li>Per offerte "In attesa": mostra tutte e tre le opzioni (Accetta, Rifiuta, Controproposta)
+ *   <li>Per offerte già valutate: mostra solo l'opzione di controproposta per nuove negoziazioni
+ * </ul>
+ *
+ * @author IngSW2425_055 Team
+ * @see OfferteController
+ * @see OffertaIniziale
+ */
 public class ViewRispostaOfferte extends JFrame {
-
 	private static final long serialVersionUID = 1L;
 	private final JPanel contentPane;
-	private final JTextField txtControproposta; // Cambia da lblOfferta
+	private final JTextField txtControproposta;
 
 	/**
-	 * Launch the application.
+	 * Costruttore della finestra di risposta alle offerte.
+	 * Inizializza l'interfaccia grafica e configura i componenti in base allo stato dell'offerta.
+	 *
+	 * <p>La finestra mostra:
+	 * <ul>
+	 *   <li>Bottoni per accettare o rifiutare l'offerta (solo se in stato "In attesa")
+	 *   <li>Campo di testo per inserire una controproposta
+	 *   <li>Validazione dell'importo della controproposta
+	 * </ul>
+	 *
+	 * @param idOfferta ID univoco dell'offerta a cui rispondere
+	 * @param idAgente ID dell'agente immobiliare che sta rispondendo all'offerta
+	 *
+	 * @throws IllegalArgumentException Se l'offerta non esiste o non è recuperabile
+	 *
+	 * @see OfferteController#getOffertaById(long)
+	 * @see OfferteController#inserisciRispostaOfferta(long, String, String, Double)
 	 */
-
 	public ViewRispostaOfferte(long idOfferta, String idAgente) {
-		System.out.println("=== DEBUG ViewRispostaOfferte ===");
-		System.out.println("Costruttore - idOfferta: " + idOfferta);
-		System.out.println("Costruttore - idAgente: " + idAgente);
-		System.out.println("=== FINE DEBUG ViewRispostaOfferte ===");
-
 		// Imposta l'icona di DietiEstates25 alla finestra in uso
 		GuiUtils.setIconaFinestra(this);
 		setTitle("DietiEstates25 - Rispondi alla proposta del cliente");
@@ -90,7 +114,6 @@ public class ViewRispostaOfferte extends JFrame {
 		btnControproposta.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 11));
 		btnControproposta.setBackground(SystemColor.textHighlight);
 
-		// **RECUPERA LO STATO DELL'OFFERTA PER SAPIRE SE È GIÀ VALUTATA**
 		final OfferteController controller = new OfferteController();
 		final OffertaIniziale offerta = controller.getOffertaById(idOfferta);
 
@@ -98,11 +121,9 @@ public class ViewRispostaOfferte extends JFrame {
 		if (offerta != null) {
 			final String stato = offerta.getStato();
 			isOffertaGiàValutata = stato != null && !stato.trim().equalsIgnoreCase("In attesa");
-			System.out.println("DEBUG - Stato offerta: '" + stato + "'");
-			System.out.println("DEBUG - Offerta già valutata: " + isOffertaGiàValutata);
 		}
 
-		// **MODIFICA LA GUI IN BASE ALLO STATO**
+		// aggiorna la gui in base allo stato
 		if (isOffertaGiàValutata) {
 			// Offerta già valutata: mostra solo la controproposta
 			lblDescrizione.setText("Fai una nuova proposta al cliente");
@@ -122,11 +143,23 @@ public class ViewRispostaOfferte extends JFrame {
 			btnControproposta.setText("Invia proposta");
 		}
 
-		System.out.println("=== FINE DEBUG ViewRispostaOfferte ===");
-
 		// L'agente accetta la proposta del cliente
-
 		btnAccetta.addMouseListener(new MouseAdapter() {
+			/**
+			 * Gestisce il click sul pulsante "Accetta".
+			 * Mostra una finestra di conferma e, in caso positivo,
+			 * invia la risposta di accettazione al sistema.
+			 *
+			 * <p>Dopo l'operazione:
+			 * <ul>
+			 *   <li>Mostra un messaggio di successo o errore
+			 *   <li>Chiude la finestra in caso di successo
+			 * </ul>
+			 *
+			 * @param e L'evento del mouse che ha triggerato l'azione
+			 *
+			 * @see OfferteController#inserisciRispostaOfferta(long, String, String, Double)
+			 */
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				final int conferma = JOptionPane.showConfirmDialog(null,
@@ -152,8 +185,22 @@ public class ViewRispostaOfferte extends JFrame {
 		contentPane.add(btnAccetta);
 
 		// L'agente rifiuta l'offerta proposta dal cliente
-
 		btnRifiuta.addMouseListener(new MouseAdapter() {
+			/**
+			 * Gestisce il click sul pulsante "Rifiuta".
+			 * Mostra una finestra di conferma e, in caso positivo,
+			 * invia la risposta di rifiuto al sistema.
+			 *
+			 * <p>Dopo l'operazione:
+			 * <ul>
+			 *   <li>Mostra un messaggio di successo o errore
+			 *   <li>Chiude la finestra in caso di successo
+			 * </ul>
+			 *
+			 * @param e L'evento del mouse che ha triggerato l'azione
+			 *
+			 * @see OfferteController#inserisciRispostaOfferta(long, String, String, Double)
+			 */
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				final int conferma = JOptionPane.showConfirmDialog(null,
@@ -178,8 +225,26 @@ public class ViewRispostaOfferte extends JFrame {
 		contentPane.add(btnRifiuta);
 
 		// Controproposta dell'agente
-
 		btnControproposta.addMouseListener(new MouseAdapter() {
+			/**
+			 * Gestisce il click sul pulsante "Controproposta".
+			 * Valida l'importo inserito e, se valido, invia una controproposta al sistema.
+			 *
+			 * <p>Il metodo esegue le seguenti operazioni:
+			 * <ol>
+			 *   <li>Converte il testo in numero double
+			 *   <li>Recupera l'importo dell'offerta iniziale
+			 *   <li>Valida che la controproposta sia positiva e superiore all'offerta iniziale
+			 *   <li>Invia la controproposta al sistema
+			 * </ol>
+			 *
+			 * @param e L'evento del mouse che ha triggerato l'azione
+			 *
+			 * @throws NumberFormatException Se il valore inserito non è un numero valido
+			 *
+			 * @see OfferteController#isValidControproposta(double, double)
+			 * @see OfferteController#inserisciRispostaOfferta(long, String, String, Double)
+			 */
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				try {
