@@ -30,24 +30,27 @@ import util.GuiUtils;
 
 /**
  * Finestra per la registrazione di un nuovo agente immobiliare nel sistema.
- * Questa interfaccia permette agli amministratori di inserire tutti i dati necessari
- * per creare un nuovo account agente, con validazione in tempo reale dei campi.
+ * Questa interfaccia permette agli amministratori di inserire tutti i dati
+ * necessari per creare un nuovo account agente, con validazione in tempo reale
+ * dei campi.
  *
- * <p>La finestra include campi per:
+ * <p>
+ * La finestra include campi per:
  * <ul>
- *   <li>Dati anagrafici (nome, cognome)</li>
- *   <li>Dati di contatto (telefono, email preimpostata)</li>
- *   <li>Indirizzo di residenza (città, indirizzo, CAP)</li>
- *   <li>Creazione password con validazione</li>
- *   <li>Associazione all'agenzia di provenienza</li>
+ * <li>Dati anagrafici (nome, cognome)</li>
+ * <li>Dati di contatto (telefono, email preimpostata)</li>
+ * <li>Indirizzo di residenza (città, indirizzo, CAP)</li>
+ * <li>Creazione password con validazione</li>
+ * <li>Associazione all'agenzia di provenienza</li>
  * </ul>
  *
- * <p>La validazione include:
+ * <p>
+ * La validazione include:
  * <ul>
- *   <li>Controllo formato campi testuali</li>
- *   <li>Validazione numerica per telefono e CAP</li>
- *   <li>Registrazione su servizio di autenticazione AWS Cognito</li>
- *   <li>Salvataggio nel database postgresdb di AWS</li>
+ * <li>Controllo formato campi testuali</li>
+ * <li>Validazione numerica per telefono e CAP</li>
+ * <li>Registrazione su servizio di autenticazione AWS Cognito</li>
+ * <li>Salvataggio nel database postgresdb di AWS</li>
  * </ul>
  *
  * @author IngSW2425_055 Team
@@ -77,28 +80,30 @@ public class ViewRegistraAgente extends JFrame {
 	private final JLabel lblIndirizzoError;
 	private final String ruolo = "Agente";
 
-
 	// costruttore
 
 	/**
-	 * Costruttore della finestra di registrazione agente.
-	 * Inizializza tutti i componenti grafici e configura i listener per la validazione
-	 * in tempo reale dei dati inseriti.
+	 * Costruttore della finestra di registrazione agente. Inizializza tutti i
+	 * componenti grafici e configura i listener per la validazione in tempo reale
+	 * dei dati inseriti.
 	 *
-	 * <p>La finestra prevede:
+	 * <p>
+	 * La finestra prevede:
 	 * <ul>
-	 *   <li>Campo email precompilato (non modificabile)</li>
-	 *   <li>Validazione con espressioni regolari per tutti i campi</li>
-	 *   <li>Messaggi di errore contestuali sotto ogni campo</li>
-	 *   <li>Integrazione con AWS Cognito per l'autenticazione</li>
-	 *   <li>Registrazione nel database tramite AccessController</li>
+	 * <li>Campo email precompilato (non modificabile)</li>
+	 * <li>Validazione con espressioni regolari per tutti i campi</li>
+	 * <li>Messaggi di errore contestuali sotto ogni campo</li>
+	 * <li>Integrazione con AWS Cognito per l'autenticazione</li>
+	 * <li>Registrazione nel database tramite AccessController</li>
 	 * </ul>
 	 *
-	 * @param emailAgente Email di lavoro del nuovo agente (già inserita nella fase precedente)
-	 * @param agenzia Nome dell'agenzia a cui associare il nuovo agente
+	 * @param emailAgente Email di lavoro del nuovo agente (già inserita nella fase
+	 *                    precedente)
+	 * @param agenzia     Nome dell'agenzia a cui associare il nuovo agente
 	 *
 	 * @see CognitoAuthServiceImpl#registerUser(String, String, String)
-	 * @see AccessController#registraNuovoAgente(String, String, String, String, String, String, String, String, String, String)
+	 * @see AccessController#registraNuovoAgente(String, String, String, String,
+	 *      String, String, String, String, String, String)
 	 * @see GuiUtils#setIconaFinestra(JFrame)
 	 */
 	public ViewRegistraAgente(String emailAgente, String agenzia) {
@@ -181,18 +186,21 @@ public class ViewRegistraAgente extends JFrame {
 		lblPassDimError.setBounds(69, 281, 371, 20);
 		panel.add(lblPassDimError);
 		lblPassDimError.setHorizontalAlignment(SwingConstants.LEFT);
+		lblPassDimError.setVisible(false);
 
 		final JLabel lblPassNumError = new JLabel("La password deve contenere almeno un numero.");
 		lblPassNumError.setFont(new Font("Tahoma", Font.BOLD, 11));
 		lblPassNumError.setBounds(69, 312, 371, 20);
 		panel.add(lblPassNumError);
 		lblPassNumError.setHorizontalAlignment(SwingConstants.LEFT);
+		lblPassNumError.setVisible(false);
 
 		final JLabel lblPassConfError = new JLabel("Conferma la password.");
 		lblPassConfError.setFont(new Font("Tahoma", Font.BOLD, 11));
 		lblPassConfError.setHorizontalAlignment(SwingConstants.LEFT);
 		lblPassConfError.setBounds(69, 343, 133, 20);
 		panel.add(lblPassConfError);
+		lblPassConfError.setVisible(false);
 
 		txtNome = new JTextField();
 		txtNome.setCaretColor(new Color(0, 0, 51));
@@ -267,107 +275,167 @@ public class ViewRegistraAgente extends JFrame {
 		panel.add(lblIndirizzoError);
 
 		final JButton btnRegistraAgente = new JButton("Registra agente");
+		getRootPane().setDefaultButton(btnRegistraAgente);
 		btnRegistraAgente.addActionListener(new ActionListener() {
 			/**
-			 * Gestisce il click sul pulsante di registrazione.
-			 * Esegue la validazione di tutti i campi, registra l'utente su AWS Cognito,
-			 * salva i dati nel database locale e reindirizza alla dashboard.
+			 * Gestisce il click sul pulsante di registrazione. Esegue la validazione di
+			 * tutti i campi, registra l'utente su AWS Cognito, salva i dati nel database
+			 * locale e reindirizza alla dashboard.
 			 *
-			 * <p>Processo di validazione:
+			 * <p>
+			 * Processo di validazione:
 			 * <ul>
-			 *   <li>Nome e cognome: solo lettere e spazi</li>
-			 *   <li>Telefono: solo numeri (max 15 cifre)</li>
-			 *   <li>Città e indirizzo: solo lettere e spazi</li>
-			 *   <li>CAP: solo numeri (max 5 cifre)</li>
+			 * <li>Nome e cognome: solo lettere e spazi</li>
+			 * <li>Telefono: solo numeri (max 15 cifre)</li>
+			 * <li>Città e indirizzo: solo lettere e spazi</li>
+			 * <li>CAP: solo numeri (max 5 cifre)</li>
 			 * </ul>
 			 *
-			 * <p>In caso di successo:
+			 * <p>
+			 * In caso di successo:
 			 * <ol>
-			 *   <li>Registra l'utente su AWS Cognito</li>
-			 *   <li>Salva i dati nel database locale</li>
-			 *   <li>Chiude la finestra corrente</li>
-			 *   <li>Apre la dashboard dell'utente</li>
+			 * <li>Registra l'utente su AWS Cognito</li>
+			 * <li>Salva i dati nel database locale</li>
+			 * <li>Chiude la finestra corrente</li>
+			 * <li>Apre la dashboard dell'utente</li>
 			 * </ol>
 			 *
 			 * @param e Evento di azione generato dal click sul pulsante
 			 *
 			 * @see CognitoAuthService#registerUser(String, String, String)
-			 * @see AccessController#registraNuovoAgente(String, String, String, String, String, String, String, String, String, String)
+			 * @see AccessController#registraNuovoAgente(String, String, String, String,
+			 *      String, String, String, String, String, String)
 			 */
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				boolean valid = true;
 
+				// Validazione nome
 				final String nome = txtNome.getText();
-				if (!nome.matches("[a-zA-Z�-�\\s]+")) {
+				if (!nome.matches("[a-zA-ZÀ-ÿ\\s]+") || nome.equals("Nome")) {
 					lblNameError.setVisible(true);
 					txtNome.setText("Nome");
+					valid = false;
 				} else {
 					lblNameError.setVisible(false);
 				}
 
+				// Validazione cognome
 				final String cognome = txtCognome.getText();
-				if (!cognome.matches("[a-zA-Z�-�\\s]+")) {
+				if (!cognome.matches("[a-zA-ZÀ-ÿ\\s]+") || cognome.equals("Cognome")) {
 					lblCognomeError.setVisible(true);
 					txtCognome.setText("Cognome");
+					valid = false;
 				} else {
 					lblCognomeError.setVisible(false);
 				}
 
+				// Validazione città
 				final String citta = txtCitta.getText();
-				if (!citta.matches("[a-zA-Z�-�\\s]+")) {
+				if (!citta.matches("[a-zA-ZÀ-ÿ\\s]+") || citta.equals("Città")) {
 					lblCittaError.setVisible(true);
-					txtCitta.setText("Citt�");
+					txtCitta.setText("Città");
+					valid = false;
 				} else {
 					lblCittaError.setVisible(false);
 				}
 
+				// Validazione telefono
 				final String telefono = txtTelefono.getText().trim();
 
-				if (!telefono.matches("\\d{1,15}")) {
-
+				// Permette numeri con o senza spazi: es. 3203407898 o 320 340 7898
+				if (!telefono.matches("[\\d\\s]{1,20}") || telefono.equals("Telefono")) {
 					lblTelefonoError.setVisible(true);
 					txtTelefono.setText("Telefono");
+					valid = false;
 				} else {
-					lblTelefonoError.setVisible(false);
+					// Verifica che ci siano almeno 8-15 cifre numeriche
+					String soloNumeri = telefono.replaceAll("\\D", ""); // Rimuove tutto tranne i numeri
+					if (soloNumeri.length() < 8 || soloNumeri.length() > 15) {
+						lblTelefonoError.setVisible(true);
+						txtTelefono.setText("Telefono");
+						valid = false;
+					} else {
+						lblTelefonoError.setVisible(false);
+					}
 				}
 
+				// Validazione CAP
 				final String cap = txtCap.getText().trim();
-
-				if (!cap.matches("\\d{1,5}")) {
-
+				// CAP italiano: esattamente 5 cifre, prima cifra 0-9
+				if (!cap.matches("\\d{5}") || cap.equals("CAP")) {
 					lblCapError.setVisible(true);
 					txtCap.setText("CAP");
+					valid = false;
 				} else {
 					lblCapError.setVisible(false);
 				}
 
+				// Validazione indirizzo
 				final String indirizzo = txtIndirizzo.getText();
-				if (!indirizzo.matches("[a-zA-Z�-�\\s]+")) {
+				if (!indirizzo.matches("[a-zA-ZÀ-ÿ\\s\\d]+") || indirizzo.equals("Indirizzo")) {
 					lblIndirizzoError.setVisible(true);
 					txtIndirizzo.setText("Indirizzo");
+					valid = false;
 				} else {
 					lblIndirizzoError.setVisible(false);
 				}
 
+				// Validazione password
 				final char[] passwordChar = txtPass.getPassword();
 				final String passwordUtente = new String(passwordChar);
+				final char[] confirmPasswordChar = txtConfirmPass.getPassword();
+				final String confirmPassword = new String(confirmPasswordChar);
 
-				final boolean success = authService.registerUser(emailAgente, passwordUtente, emailAgente);
+				// Nascondi tutti i messaggi di errore password prima di ricontrollare
+				lblPassDimError.setVisible(false);
+				lblPassNumError.setVisible(false);
+				lblPassConfError.setVisible(false);
 
-				if (success) {
-					final AccessController cont1 = new AccessController();
-					cont1.registraNuovoAgente(emailAgente, passwordUtente, nome, cognome, citta, telefono, cap,
-							indirizzo, ruolo, agenzia);
-
-					dispose();
-				} else {
-					JOptionPane.showMessageDialog(null, "La registrazione � fallita. Riprova con i dati corretti.",
-							"Errore nella registrazione", JOptionPane.ERROR_MESSAGE);
+				// Controlla lunghezza password
+				if (passwordUtente.length() < 6) {
+					lblPassDimError.setVisible(true);
+					valid = false;
 				}
 
-				final ViewDashboard schermata = new ViewDashboard(emailAgente);
-				schermata.setVisible(true);
+				// Controlla se password contiene almeno un numero
+				if (!passwordUtente.matches(".*\\d.*")) {
+					lblPassNumError.setVisible(true);
+					valid = false;
+				}
 
+				// Controlla se le password corrispondono
+				if (!passwordUtente.equals(confirmPassword)) {
+					lblPassConfError.setVisible(true);
+					valid = false;
+				}
+
+				// Controlla se la password non è quella di default
+				if (passwordUtente.equals("******")) {
+					lblPassDimError.setVisible(true);
+					valid = false;
+				}
+
+				// Se tutti i campi sono validi, procedi con la registrazione
+				if (valid) {
+					final boolean success = authService.registerUser(emailAgente, passwordUtente, emailAgente);
+
+					if (success) {
+						final AccessController controller = new AccessController();
+						controller.registraNuovoAgente(emailAgente, passwordUtente, nome, cognome, citta, telefono, cap,
+								indirizzo, ruolo, agenzia);
+						JOptionPane.showMessageDialog(null,
+								"La registrazione del nuovo agente è avvenuta con successo!");
+						dispose();
+					} else {
+						JOptionPane.showMessageDialog(null, "Qualcosa è andato storto, registrazione fallita.",
+								"Errore nella registrazione", JOptionPane.ERROR_MESSAGE);
+					}
+				} else {
+					// Non chiudere la finestra se ci sono errori
+					JOptionPane.showMessageDialog(null, "Correggi gli errori nei campi prima di procedere.",
+							"Errore di validazione", JOptionPane.WARNING_MESSAGE);
+				}
 			}
 		});
 		btnRegistraAgente.setFocusable(false);
@@ -376,24 +444,35 @@ public class ViewRegistraAgente extends JFrame {
 		btnRegistraAgente.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 13));
 		btnRegistraAgente.setBounds(121, 420, 200, 25);
 		panel.add(btnRegistraAgente);
+
+		txtPass.addFocusListener(new FocusAdapter() {
+			@Override
+			public void focusLost(FocusEvent e) {
+				if (txtPass.getPassword().length == 0 || new String(txtPass.getPassword()).equals("******")) {
+					lblPassDimError.setVisible(false); // Nascondi quando non c'è input
+					lblPassNumError.setVisible(false);
+				}
+			}
+		});
 	}
 
 	// metodi
 
 	/**
 	 * Configura un campo di testo con comportamento da placeholder intelligente.
-	 * Quando il campo riceve il focus, il testo placeholder viene rimosso.
-	 * Quando perde il focus ed è vuoto, il testo placeholder viene ripristinato.
+	 * Quando il campo riceve il focus, il testo placeholder viene rimosso. Quando
+	 * perde il focus ed è vuoto, il testo placeholder viene ripristinato.
 	 *
-	 * <p>Questo metodo migliora l'usabilità dell'interfaccia fornendo:
+	 * <p>
+	 * Questo metodo migliora l'usabilità dell'interfaccia fornendo:
 	 * <ul>
-	 *   <li>Testo di esempio quando il campo è vuoto</li>
-	 *   <li>Rimozione automatica del placeholder all'inizio della digitazione</li>
-	 *   <li>Ripristino del placeholder se l'utente non inserisce nulla</li>
+	 * <li>Testo di esempio quando il campo è vuoto</li>
+	 * <li>Rimozione automatica del placeholder all'inizio della digitazione</li>
+	 * <li>Ripristino del placeholder se l'utente non inserisce nulla</li>
 	 * </ul>
 	 *
 	 * @param field Campo di testo da configurare
-	 * @param text Testo placeholder da visualizzare
+	 * @param text  Testo placeholder da visualizzare
 	 *
 	 * @see FocusAdapter
 	 * @see JTextField

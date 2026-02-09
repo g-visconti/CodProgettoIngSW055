@@ -25,34 +25,37 @@ import javax.swing.border.EmptyBorder;
 import auth.CognitoAuthService;
 import auth.CognitoAuthServiceImpl;
 import controller.AccessController;
-import gui.utenza.ViewDashboard;
 import util.GuiUtils;
 
 /**
- * Finestra per la registrazione di un nuovo amministratore di supporto nel sistema.
- * Questa interfaccia permette agli amministratori con privilegi elevati di inserire
- * tutti i dati necessari per creare un nuovo account amministratore di supporto.
+ * Finestra per la registrazione di un nuovo amministratore di supporto nel
+ * sistema. Questa interfaccia permette agli amministratori con privilegi
+ * elevati di inserire tutti i dati necessari per creare un nuovo account
+ * amministratore di supporto.
  *
- * <p>La finestra è strutturalmente simile a {@link ViewRegistraAgente} ma con alcune differenze:
+ * <p>
+ * La finestra è strutturalmente simile a {@link ViewRegistraAgente} ma con
+ * alcune differenze:
  * <ul>
- *   <li>Titolo e descrizioni specifiche per amministratori di supporto</li>
- *   <li>Ruolo predefinito impostato a "Supporto" invece di "Agente"</li>
- *   <li>Chiamata al metodo specifico per la registrazione supporto</li>
+ * <li>Titolo e descrizioni specifiche per amministratori di supporto</li>
+ * <li>Ruolo predefinito impostato a "Supporto" invece di "Agente"</li>
+ * <li>Chiamata al metodo specifico per la registrazione supporto</li>
  * </ul>
  *
- * <p>La validazione include:
+ * <p>
+ * La validazione include:
  * <ul>
- *   <li>Controllo formato campi testuali con espressioni regolari</li>
- *   <li>Validazione numerica per telefono e CAP</li>
- *   <li>Registrazione su AWS Cognito per l'autenticazione</li>
- *   <li>Salvataggio nel database di AWS tramite AccessController</li>
+ * <li>Controllo formato campi testuali con espressioni regolari</li>
+ * <li>Validazione numerica per telefono e CAP</li>
+ * <li>Validazione password con controlli avanzati</li>
+ * <li>Registrazione su AWS Cognito per l'autenticazione</li>
+ * <li>Salvataggio nel database di AWS tramite AccessController</li>
  * </ul>
  *
  * @author IngSW2425_055 Team
  * @see ViewRegistraAgente
  * @see CognitoAuthService
  * @see AccessController
- * @see ViewDashboard
  */
 public class ViewRegistraSupporto extends JFrame {
 
@@ -74,30 +77,34 @@ public class ViewRegistraSupporto extends JFrame {
 	private final JLabel lblTelefonoError;
 	private final JLabel lblCapError;
 	private final JLabel lblIndirizzoError;
+	private final JLabel lblEmail;
 	private final String ruolo = "Supporto";
-
 
 	/**
 	 * Costruttore della finestra di registrazione amministratore di supporto.
-	 * Inizializza tutti i componenti grafici e configura i listener per la validazione
-	 * in tempo reale dei dati inseriti.
+	 * Inizializza tutti i componenti grafici e configura i listener per la
+	 * validazione in tempo reale dei dati inseriti.
 	 *
-	 * <p>Questa interfaccia è accessibile solo agli amministratori principali
-	 * e consente di creare nuovi account con privilegi di supporto, che potranno
-	 * a loro volta aggiungere agenti immobiliari ma non altri amministratori.
+	 * <p>
+	 * Questa interfaccia è accessibile solo agli amministratori principali e
+	 * consente di creare nuovi account con privilegi di supporto, che potranno a
+	 * loro volta aggiungere agenti immobiliari ma non altri amministratori.
 	 *
-	 * <p>Il processo di registrazione combina:
+	 * <p>
+	 * Il processo di registrazione combina:
 	 * <ul>
-	 *   <li>Autenticazione tramite AWS Cognito</li>
-	 *   <li>Salvataggio dati anagrafici nel database</li>
-	 *   <li>Associazione automatica all'agenzia dell'amministratore creatore</li>
+	 * <li>Autenticazione tramite AWS Cognito</li>
+	 * <li>Salvataggio dati anagrafici nel database</li>
+	 * <li>Associazione automatica all'agenzia dell'amministratore creatore</li>
 	 * </ul>
 	 *
 	 * @param emailSupporto Email di lavoro del nuovo amministratore di supporto
-	 * @param agenzia Nome dell'agenzia a cui associare il nuovo amministratore
+	 * @param agenzia       Nome dell'agenzia a cui associare il nuovo
+	 *                      amministratore
 	 *
 	 * @see CognitoAuthServiceImpl#registerUser(String, String, String)
-	 * @see AccessController#registraNuovoSupporto(String, String, String, String, String, String, String, String, String, String)
+	 * @see AccessController#registraNuovoSupporto(String, String, String, String,
+	 *      String, String, String, String, String, String)
 	 * @see GuiUtils#setIconaFinestra(JFrame)
 	 */
 	public ViewRegistraSupporto(String emailSupporto, String agenzia) {
@@ -138,23 +145,27 @@ public class ViewRegistraSupporto extends JFrame {
 		txtPass.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				txtPass.setText("");
+				if (new String(txtPass.getPassword()).equals("******")) {
+					txtPass.setText("");
+				}
 			}
 		});
 		txtPass.setVerifyInputWhenFocusTarget(false);
 		txtPass.setToolTipText("");
-		txtPass.setText("*****");
+		txtPass.setText("******");
 
 		txtConfirmPass = new JPasswordField();
 		txtConfirmPass.setFont(new Font("Tahoma", Font.BOLD, 11));
 		txtConfirmPass.setBounds(225, 245, 133, 25);
 		panel.add(txtConfirmPass);
-		txtConfirmPass.setText("*****");
+		txtConfirmPass.setText("******");
 		txtConfirmPass.setVerifyInputWhenFocusTarget(false);
 		txtConfirmPass.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				txtConfirmPass.setText("");
+				if (new String(txtConfirmPass.getPassword()).equals("******")) {
+					txtConfirmPass.setText("");
+				}
 			}
 		});
 		txtConfirmPass.setToolTipText("");
@@ -180,18 +191,21 @@ public class ViewRegistraSupporto extends JFrame {
 		lblPassDimError.setBounds(69, 281, 371, 20);
 		panel.add(lblPassDimError);
 		lblPassDimError.setHorizontalAlignment(SwingConstants.LEFT);
+		lblPassDimError.setVisible(false);
 
 		final JLabel lblPassNumError = new JLabel("La password deve contenere almeno un numero.");
 		lblPassNumError.setFont(new Font("Tahoma", Font.BOLD, 11));
 		lblPassNumError.setBounds(69, 312, 371, 20);
 		panel.add(lblPassNumError);
 		lblPassNumError.setHorizontalAlignment(SwingConstants.LEFT);
+		lblPassNumError.setVisible(false);
 
 		final JLabel lblPassConfError = new JLabel("Conferma la password.");
 		lblPassConfError.setFont(new Font("Tahoma", Font.BOLD, 11));
 		lblPassConfError.setHorizontalAlignment(SwingConstants.LEFT);
 		lblPassConfError.setBounds(69, 343, 133, 20);
 		panel.add(lblPassConfError);
+		lblPassConfError.setVisible(false);
 
 		txtNome = new JTextField();
 		txtNome.setCaretColor(new Color(0, 0, 51));
@@ -266,135 +280,215 @@ public class ViewRegistraSupporto extends JFrame {
 		lblIndirizzoError.setBounds(68, 217, 134, 14);
 		panel.add(lblIndirizzoError);
 
+		// Aggiunta del campo email
+		lblEmail = new JLabel("Email: " + emailSupporto);
+		lblEmail.setFont(new Font("Tahoma", Font.BOLD, 12));
+		lblEmail.setBounds(69, 50, 371, 25);
+		panel.add(lblEmail);
+
 		final JButton btnRegistraSupporto = new JButton("Registra supporto");
+		getRootPane().setDefaultButton(btnRegistraSupporto);
 		btnRegistraSupporto.addActionListener(new ActionListener() {
 			/**
-			 * Gestisce il click sul pulsante di registrazione.
-			 * Esegue la validazione di tutti i campi, registra l'utente su AWS Cognito,
-			 * salva i dati nel database locale e reindirizza alla dashboard.
+			 * Gestisce il click sul pulsante di registrazione. Esegue la validazione di
+			 * tutti i campi, registra l'utente su AWS Cognito, salva i dati nel database
+			 * locale e reindirizza alla dashboard.
 			 *
-			 * <p>Processo di validazione dettagliato:
+			 * <p>
+			 * Processo di validazione dettagliato:
 			 * <ul>
-			 *   <li><b>Nome e cognome</b>: Solo caratteri alfabetici, spazi e caratteri speciali consentiti (espressione: [a-zA-Z�-�\\s]+)</li>
-			 *   <li><b>Telefono</b>: Solo cifre numeriche, massimo 15 caratteri (espressione: \\d{1,15})</li>
-			 *   <li><b>Città e indirizzo</b>: Solo caratteri alfabetici e spazi</li>
-			 *   <li><b>CAP</b>: Solo cifre numeriche, massimo 5 caratteri (espressione: \\d{1,5})</li>
+			 * <li><b>Nome e cognome</b>: Solo caratteri alfabetici, spazi e caratteri
+			 * speciali consentiti (espressione: [a-zA-Z�-�\\s]+)</li>
+			 * <li><b>Telefono</b>: Solo cifre numeriche, massimo 15 caratteri</li>
+			 * <li><b>Città e indirizzo</b>: Solo caratteri alfabetici e spazi</li>
+			 * <li><b>CAP</b>: Solo cifre numeriche, esattamente 5 caratteri</li>
+			 * <li><b>Password</b>: Almeno 6 caratteri con almeno un numero</li>
 			 * </ul>
 			 *
-			 * <p>In caso di successo della registrazione su AWS Cognito:
+			 * <p>
+			 * In caso di successo della registrazione su AWS Cognito:
 			 * <ol>
-			 *   <li>Chiama {@code AccessController.registraNuovoSupporto()} per salvare i dati localmente</li>
-			 *   <li>Chiude la finestra corrente</li>
-			 *   <li>Apre la dashboard dell'utente appena registrato</li>
+			 * <li>Chiama {@code AccessController.registraNuovoSupporto()} per salvare i
+			 * dati localmente</li>
+			 * <li>Chiude la finestra corrente</li>
 			 * </ol>
 			 *
-			 * <p>In caso di fallimento mostra un messaggio di errore appropriato.
+			 * <p>
+			 * In caso di fallimento mostra un messaggio di errore appropriato.
 			 *
 			 * @param e Evento di azione generato dal click sul pulsante
 			 *
 			 * @see CognitoAuthService#registerUser(String, String, String)
-			 * @see AccessController#registraNuovoSupporto(String, String, String, String, String, String, String, String, String, String)
+			 * @see AccessController#registraNuovoSupporto(String, String, String, String,
+			 *      String, String, String, String, String, String)
 			 */
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				boolean valid = true;
 
+				// Validazione nome
 				final String nome = txtNome.getText();
-				if (!nome.matches("[a-zA-Z�-�\\s]+")) {
+				if (!nome.matches("[a-zA-ZÀ-ÿ\\s]+") || nome.equals("Nome")) {
 					lblNameError.setVisible(true);
 					txtNome.setText("Nome");
+					valid = false;
 				} else {
 					lblNameError.setVisible(false);
 				}
 
+				// Validazione cognome
 				final String cognome = txtCognome.getText();
-				if (!cognome.matches("[a-zA-Z�-�\\s]+")) {
+				if (!cognome.matches("[a-zA-ZÀ-ÿ\\s]+") || cognome.equals("Cognome")) {
 					lblCognomeError.setVisible(true);
 					txtCognome.setText("Cognome");
+					valid = false;
 				} else {
 					lblCognomeError.setVisible(false);
 				}
 
+				// Validazione città
 				final String citta = txtCitta.getText();
-				if (!citta.matches("[a-zA-Z�-�\\s]+")) {
+				if (!citta.matches("[a-zA-ZÀ-ÿ\\s]+") || citta.equals("Città")) {
 					lblCittaError.setVisible(true);
-					txtCitta.setText("Citt�");
+					txtCitta.setText("Città");
+					valid = false;
 				} else {
 					lblCittaError.setVisible(false);
 				}
 
+				// Validazione telefono
 				final String telefono = txtTelefono.getText().trim();
 
-				if (!telefono.matches("\\d{1,15}")) {
-
+				// Permette numeri con o senza spazi: es. 3203407898 o 320 340 7898
+				if (!telefono.matches("[\\d\\s]{1,20}") || telefono.equals("Telefono")) {
 					lblTelefonoError.setVisible(true);
 					txtTelefono.setText("Telefono");
+					valid = false;
 				} else {
-					lblTelefonoError.setVisible(false);
+					// Verifica che ci siano almeno 8-15 cifre numeriche
+					String soloNumeri = telefono.replaceAll("\\D", ""); // Rimuove tutto tranne i numeri
+					if (soloNumeri.length() < 8 || soloNumeri.length() > 15) {
+						lblTelefonoError.setVisible(true);
+						txtTelefono.setText("Telefono");
+						valid = false;
+					} else {
+						lblTelefonoError.setVisible(false);
+					}
 				}
 
+				// Validazione CAP
 				final String cap = txtCap.getText().trim();
-
-				if (!cap.matches("\\d{1,5}")) {
-
+				// CAP italiano: esattamente 5 cifre, prima cifra 0-9
+				if (!cap.matches("\\d{5}") || cap.equals("CAP")) {
 					lblCapError.setVisible(true);
 					txtCap.setText("CAP");
+					valid = false;
 				} else {
 					lblCapError.setVisible(false);
 				}
 
+				// Validazione indirizzo
 				final String indirizzo = txtIndirizzo.getText();
-				if (!indirizzo.matches("[a-zA-Z�-�\\s]+")) {
+				if (!indirizzo.matches("[a-zA-ZÀ-ÿ\\s\\d]+") || indirizzo.equals("Indirizzo")) {
 					lblIndirizzoError.setVisible(true);
 					txtIndirizzo.setText("Indirizzo");
+					valid = false;
 				} else {
 					lblIndirizzoError.setVisible(false);
 				}
 
+				// Validazione password
 				final char[] passwordChar = txtPass.getPassword();
 				final String passwordUtente = new String(passwordChar);
+				final char[] confirmPasswordChar = txtConfirmPass.getPassword();
+				final String confirmPassword = new String(confirmPasswordChar);
 
-				final boolean success = authService.registerUser(emailSupporto, passwordUtente, emailSupporto);
+				// Nascondi tutti i messaggi di errore password prima di ricontrollare
+				lblPassDimError.setVisible(false);
+				lblPassNumError.setVisible(false);
+				lblPassConfError.setVisible(false);
 
-				if (success) {
-					final AccessController cont1 = new AccessController();
-					cont1.registraNuovoSupporto(emailSupporto, passwordUtente, nome, cognome, citta, telefono, cap,
-							indirizzo, ruolo, agenzia);
-
-					dispose();
-				} else {
-					JOptionPane.showMessageDialog(null, "La registrazione � fallita. Riprova con i dati corretti.",
-							"Errore nella registrazione", JOptionPane.ERROR_MESSAGE);
+				// Controlla lunghezza password
+				if (passwordUtente.length() < 6) {
+					lblPassDimError.setVisible(true);
+					valid = false;
 				}
 
-				final ViewDashboard schermata = new ViewDashboard(emailSupporto);
-				schermata.setVisible(true);
+				// Controlla se password contiene almeno un numero
+				if (!passwordUtente.matches(".*\\d.*")) {
+					lblPassNumError.setVisible(true);
+					valid = false;
+				}
 
+				// Controlla se le password corrispondono
+				if (!passwordUtente.equals(confirmPassword)) {
+					lblPassConfError.setVisible(true);
+					valid = false;
+				}
+
+				// Controlla se la password non è quella di default
+				if (passwordUtente.equals("******")) {
+					lblPassDimError.setVisible(true);
+					valid = false;
+				}
+
+				// Se tutti i campi sono validi, procedi con la registrazione
+				if (valid) {
+					final boolean success = authService.registerUser(emailSupporto, passwordUtente, emailSupporto);
+
+					if (success) {
+						final AccessController controller = new AccessController();
+						controller.registraNuovoSupporto(emailSupporto, passwordUtente, nome, cognome, citta, telefono,
+								cap, indirizzo, ruolo, agenzia);
+						JOptionPane.showMessageDialog(null,
+								"La registrazione del nuovo amministratore di supporto è avvenuta con successo!");
+						dispose();
+					} else {
+						JOptionPane.showMessageDialog(null, "Qualcosa è andato storto, registrazione fallita.",
+								"Errore nella registrazione", JOptionPane.ERROR_MESSAGE);
+					}
+				} else {
+					// Non chiudere la finestra se ci sono errori
+					JOptionPane.showMessageDialog(null, "Correggi gli errori nei campi prima di procedere.",
+							"Errore di validazione", JOptionPane.WARNING_MESSAGE);
+				}
 			}
 		});
 		btnRegistraSupporto.setFocusable(false);
 		btnRegistraSupporto.setForeground(Color.WHITE);
 		btnRegistraSupporto.setBackground(SystemColor.textHighlight);
 		btnRegistraSupporto.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 13));
-		btnRegistraSupporto.setBounds(121, 435, 200, 25);
+		btnRegistraSupporto.setBounds(121, 420, 200, 25);
 		panel.add(btnRegistraSupporto);
+
+		txtPass.addFocusListener(new FocusAdapter() {
+			@Override
+			public void focusLost(FocusEvent e) {
+				if (txtPass.getPassword().length == 0 || new String(txtPass.getPassword()).equals("******")) {
+					lblPassDimError.setVisible(false); // Nascondi quando non c'è input
+					lblPassNumError.setVisible(false);
+				}
+			}
+		});
 	}
 
 	/**
 	 * Configura un campo di testo con comportamento da placeholder intelligente.
-	 * Implementa il pattern "hint text" che fornisce un'esperienza utente migliorata:
-	 * il testo di esempio scompare quando l'utente inizia a digitare e riappare
-	 * se il campo viene lasciato vuoto.
+	 * Implementa il pattern "hint text" che fornisce un'esperienza utente
+	 * migliorata: il testo di esempio scompare quando l'utente inizia a digitare e
+	 * riappare se il campo viene lasciato vuoto.
 	 *
-	 * <p>Caratteristiche:
+	 * <p>
+	 * Caratteristiche:
 	 * <ul>
-	 *   <li>Testo di guida visibile quando il campo è vuoto e senza focus</li>
-	 *   <li>Rimozione automatica del testo di guida al focus</li>
-	 *   <li>Ripristino automatico se il campo viene abbandonato vuoto</li>
-	 *   <li>Compatibile con tutti i campi di testo dell'interfaccia</li>
+	 * <li>Testo di guida visibile quando il campo è vuoto e senza focus</li>
+	 * <li>Rimozione automatica del testo di guida al focus</li>
+	 * <li>Ripristino automatico se il campo viene abbandonato vuoto</li>
+	 * <li>Compatibile con tutti i campi di testo dell'interfaccia</li>
 	 * </ul>
 	 *
 	 * @param field Campo di testo da configurare
-	 * @param text Testo placeholder/guida da visualizzare
+	 * @param text  Testo placeholder/guida da visualizzare
 	 *
 	 * @see FocusAdapter
 	 * @see JTextField

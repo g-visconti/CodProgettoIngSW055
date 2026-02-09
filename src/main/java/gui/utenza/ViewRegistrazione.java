@@ -31,29 +31,32 @@ import gui.ViewAccesso;
 import util.GuiUtils;
 
 /**
- * Finestra per la registrazione di un nuovo utente cliente nel sistema.
- * Questa interfaccia permette di completare il processo di registrazione
- * inserendo i dati personali dopo aver validato l'email tramite codice OTP.
+ * Finestra per la registrazione di un nuovo utente cliente nel sistema. Questa
+ * interfaccia permette di completare il processo di registrazione inserendo i
+ * dati personali dopo aver validato l'email tramite codice OTP.
  *
- * <p>La finestra è divisa in due aree:
+ * <p>
+ * La finestra è divisa in due aree:
  * <ul>
- *   <li>Area sinistra: logo e nome dell'applicazione
- *   <li>Area destra: form di registrazione con validazione in tempo reale
+ * <li>Area sinistra: logo e nome dell'applicazione
+ * <li>Area destra: form di registrazione con validazione in tempo reale
  * </ul>
  *
- * <p>Validazioni incluse:
+ * <p>
+ * Validazioni incluse:
  * <ul>
- *   <li>Nome e cognome: solo lettere e spazi
- *   <li>Telefono: solo numeri (massimo 15 cifre)
- *   <li>Città e indirizzo: solo lettere e spazi
- *   <li>CAP: solo numeri (massimo 5 cifre)
- *   <li>Password: minimo 6 caratteri, almeno un numero, conferma corrispondente
+ * <li>Nome e cognome: solo lettere e spazi
+ * <li>Telefono: solo numeri (massimo 15 cifre)
+ * <li>Città e indirizzo: solo lettere e spazi
+ * <li>CAP: solo numeri (massimo 5 cifre)
+ * <li>Password: minimo 6 caratteri, almeno un numero, conferma corrispondente
  * </ul>
  *
  * @author IngSW2425_055 Team
  * @see CognitoAuthService
  * @see CognitoAuthServiceImpl#registerUser(String, String, String)
- * @see AccessController#registraNuovoCliente(String, String, String, String, String, String, String, String, String)
+ * @see AccessController#registraNuovoCliente(String, String, String, String,
+ *      String, String, String, String, String)
  * @see AccessController#isValidPassword(String, String)
  * @see ViewAccesso
  * @see ViewDashboard
@@ -82,26 +85,28 @@ public class ViewRegistrazione extends JFrame {
 	private String ruolo = "Cliente";
 
 	/**
-	 * Costruttore della finestra di registrazione.
-	 * Inizializza l'interfaccia grafica per la registrazione di un nuovo cliente
-	 * con l'email già validata tramite OTP.
+	 * Costruttore della finestra di registrazione. Inizializza l'interfaccia
+	 * grafica per la registrazione di un nuovo cliente con l'email già validata
+	 * tramite OTP.
 	 *
-	 * <p>La finestra include:
+	 * <p>
+	 * La finestra include:
 	 * <ul>
-	 *   <li>Form per l'inserimento dei dati personali
-	 *   <li>Validazione in tempo reale dei campi
-	 *   <li>Controlli di validità della password
-	 *   <li>Integrazione con AWS Cognito per la registrazione
-	 *   <li>Pulsanti per registrarsi o tornare alla schermata di accesso
+	 * <li>Form per l'inserimento dei dati personali
+	 * <li>Validazione in tempo reale dei campi
+	 * <li>Controlli di validità della password
+	 * <li>Integrazione con AWS Cognito per la registrazione
+	 * <li>Pulsanti per registrarsi o tornare alla schermata di accesso
 	 * </ul>
 	 *
-	 * @param emailUtente Email dell'utente già validata tramite OTP
-	 *                    Viene utilizzata come username per la registrazione in Cognito
+	 * @param emailUtente Email dell'utente già validata tramite OTP Viene
+	 *                    utilizzata come username per la registrazione in Cognito
 	 *
 	 * @throws IllegalArgumentException Se l'email è null o vuota
 	 *
 	 * @see CognitoAuthServiceImpl#registerUser(String, String, String)
-	 * @see AccessController#registraNuovoCliente(String, String, String, String, String, String, String, String, String)
+	 * @see AccessController#registraNuovoCliente(String, String, String, String,
+	 *      String, String, String, String, String)
 	 */
 	public ViewRegistrazione(String emailUtente) {
 		authService = new CognitoAuthServiceImpl();
@@ -141,8 +146,8 @@ public class ViewRegistrazione extends JFrame {
 		panelRegistrazione.add(txtPass);
 		txtPass.addMouseListener(new MouseAdapter() {
 			/**
-			 * Gestisce il click sul campo password per svuotarlo
-			 * quando contiene il placeholder.
+			 * Gestisce il click sul campo password per svuotarlo quando contiene il
+			 * placeholder.
 			 *
 			 * @param e L'evento del mouse che ha triggerato lo svuotamento
 			 */
@@ -163,8 +168,8 @@ public class ViewRegistrazione extends JFrame {
 		txtConfirmPass.setVerifyInputWhenFocusTarget(false);
 		txtConfirmPass.addMouseListener(new MouseAdapter() {
 			/**
-			 * Gestisce il click sul campo conferma password per svuotarlo
-			 * quando contiene il placeholder.
+			 * Gestisce il click sul campo conferma password per svuotarlo quando contiene
+			 * il placeholder.
 			 *
 			 * @param e L'evento del mouse che ha triggerato lo svuotamento
 			 */
@@ -284,35 +289,37 @@ public class ViewRegistrazione extends JFrame {
 		JButton btnRegistrati = new JButton("Registrati");
 		btnRegistrati.addActionListener(new ActionListener() {
 			/**
-			 * Gestisce il click sul pulsante "Registrati".
-			 * Valida tutti i campi del form e, se validi, procede con:
+			 * Gestisce il click sul pulsante "Registrati". Valida tutti i campi del form e,
+			 * se validi, procede con:
 			 * <ol>
-			 *   <li>Registrazione utente in AWS Cognito
-			 *   <li>Salvataggio dati cliente nel database locale
-			 *   <li>Apertura della dashboard cliente
+			 * <li>Registrazione utente in AWS Cognito
+			 * <li>Salvataggio dati cliente nel database locale
+			 * <li>Apertura della dashboard cliente
 			 * </ol>
 			 *
-			 * <p>Validazioni eseguite:
+			 * <p>
+			 * Validazioni eseguite:
 			 * <ul>
-			 *   <li>Nome e cognome: solo lettere e spazi
-			 *   <li>Telefono: solo numeri (max 15 cifre)
-			 *   <li>Città: solo lettere e spazi
-			 *   <li>Indirizzo: solo lettere e spazi
-			 *   <li>CAP: solo numeri (max 5 cifre)
-			 *   <li>Password: minimo 6 caratteri, almeno un numero, conferma corrispondente
+			 * <li>Nome e cognome: solo lettere e spazi
+			 * <li>Telefono: solo numeri (max 15 cifre)
+			 * <li>Città: solo lettere e spazi
+			 * <li>Indirizzo: solo lettere e spazi
+			 * <li>CAP: solo numeri (max 5 cifre)
+			 * <li>Password: minimo 6 caratteri, almeno un numero, conferma corrispondente
 			 * </ul>
 			 *
 			 * @param e L'evento dell'azione che ha triggerato la registrazione
 			 *
 			 * @see CognitoAuthServiceImpl#registerUser(String, String, String)
-			 * @see AccessController#registraNuovoCliente(String, String, String, String, String, String, String, String, String)
+			 * @see AccessController#registraNuovoCliente(String, String, String, String,
+			 *      String, String, String, String, String)
 			 * @see AccessController#isValidPassword(String, String)
 			 */
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
 				String nome = txtNome.getText();
-				if (!nome.matches("[a-zA-Z�-�\\s]+")) {
+				if (!nome.matches("[a-zA-ZÀ-ÿ\\s]+")) {
 					lblNameError.setVisible(true);
 					txtNome.setText("Nome");
 				} else {
@@ -320,7 +327,7 @@ public class ViewRegistrazione extends JFrame {
 				}
 
 				String cognome = txtCognome.getText();
-				if (!cognome.matches("[a-zA-Z�-�\\s]+")) {
+				if (!cognome.matches("[a-zA-ZÀ-ÿ\\s]+")) {
 					lblCognomeError.setVisible(true);
 					txtCognome.setText("Cognome");
 				} else {
@@ -328,7 +335,7 @@ public class ViewRegistrazione extends JFrame {
 				}
 
 				String citta = txtCitta.getText();
-				if (!citta.matches("[a-zA-Z�-�\\s]+")) {
+				if (!citta.matches("[a-zA-ZÀ-ÿ\\s]+")) {
 					lblCittaError.setVisible(true);
 					txtCitta.setText("Citt�");
 				} else {
@@ -356,7 +363,7 @@ public class ViewRegistrazione extends JFrame {
 				}
 
 				String indirizzo = txtIndirizzo.getText();
-				if (!indirizzo.matches("[a-zA-Z�-�\\s]+")) {
+				if (!indirizzo.matches("[a-zA-ZÀ-ÿ\\s\\d]+")) {
 					lblIndirizzoError.setVisible(true);
 					txtIndirizzo.setText("Indirizzo");
 				} else {
@@ -372,12 +379,9 @@ public class ViewRegistrazione extends JFrame {
 				AccessController controller = new AccessController();
 
 				if (!controller.isValidPassword(passwordUtente, confermaPassword)) {
-					JOptionPane.showMessageDialog(
-							null,
+					JOptionPane.showMessageDialog(null,
 							"Password non valida:\n- minimo 6 caratteri\n- almeno un numero\n- le password devono coincidere",
-							"Errore password",
-							JOptionPane.ERROR_MESSAGE
-							);
+							"Errore password", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
 
@@ -417,8 +421,8 @@ public class ViewRegistrazione extends JFrame {
 
 		btnTornaIndietro.addMouseListener(new MouseAdapter() {
 			/**
-			 * Gestisce il click sul pulsante "Torna indietro".
-			 * Chiude la finestra di registrazione e ritorna alla schermata di accesso.
+			 * Gestisce il click sul pulsante "Torna indietro". Chiude la finestra di
+			 * registrazione e ritorna alla schermata di accesso.
 			 *
 			 * @param e L'evento del mouse che ha triggerato il ritorno
 			 *
@@ -453,12 +457,12 @@ public class ViewRegistrazione extends JFrame {
 	}
 
 	/**
-	 * Configura il comportamento di placeholder per un campo di testo.
-	 * Il testo viene mostrato quando il campo è vuoto e scompare quando
-	 * il campo riceve il focus.
+	 * Configura il comportamento di placeholder per un campo di testo. Il testo
+	 * viene mostrato quando il campo è vuoto e scompare quando il campo riceve il
+	 * focus.
 	 *
 	 * @param field Il campo di testo da configurare
-	 * @param text Il testo del placeholder da mostrare
+	 * @param text  Il testo del placeholder da mostrare
 	 *
 	 * @see FocusAdapter
 	 */
@@ -467,8 +471,8 @@ public class ViewRegistrazione extends JFrame {
 
 		field.addFocusListener(new FocusAdapter() {
 			/**
-			 * Gestisce l'evento di focus guadagnato.
-			 * Se il campo contiene il testo del placeholder, lo svuota.
+			 * Gestisce l'evento di focus guadagnato. Se il campo contiene il testo del
+			 * placeholder, lo svuota.
 			 *
 			 * @param e L'evento di focus che indica che il campo ha ricevuto il focus
 			 */
@@ -480,8 +484,8 @@ public class ViewRegistrazione extends JFrame {
 			}
 
 			/**
-			 * Gestisce l'evento di focus perso.
-			 * Se il campo è vuoto, ripristina il testo del placeholder.
+			 * Gestisce l'evento di focus perso. Se il campo è vuoto, ripristina il testo
+			 * del placeholder.
 			 *
 			 * @param e L'evento di focus che indica che il campo ha perso il focus
 			 */
