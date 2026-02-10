@@ -19,8 +19,11 @@ import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
-
+import java.util.logging.Logger;
+import java.util.logging.Level;
 import controller.OfferteController;
+
+
 import util.GuiUtils;
 
 /**
@@ -46,7 +49,7 @@ import util.GuiUtils;
  * @see ViewOffertaProposta
  */
 public class ViewStoricoAgente extends JFrame {
-
+	private static final Logger LOGGER = Logger.getLogger(ViewStoricoAgente.class.getName());
 	private static final long serialVersionUID = 1L;
 	private final JTable tableStoricoOfferte;
 	private final JPanel contentPane;
@@ -244,7 +247,7 @@ public class ViewStoricoAgente extends JFrame {
 							}
 						}
 					} catch (Exception ex) {
-						ex.printStackTrace();
+						LOGGER.log(Level.SEVERE, "Errore", ex);
 					}
 
 					if (idOfferta == null || idOfferta == 0) {

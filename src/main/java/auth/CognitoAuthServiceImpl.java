@@ -1,6 +1,8 @@
 package auth;
 
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -32,6 +34,14 @@ import okhttp3.Response;
  * @see AuthConfig
  */
 public class CognitoAuthServiceImpl implements CognitoAuthService {
+
+    private static final Logger logger = Logger.getLogger(CognitoAuthServiceImpl.class.getName());
+    
+    private static final String HEADER_X_AMZ_TARGET = "X-Amz-Target";
+    private static final String HEADER_CONTENT_TYPE = "Content-Type";
+    private static final String CONTENT_TYPE_JSON = "application/json";
+    private static final String CONTENT_TYPE_FORM = "application/x-www-form-urlencoded";
+
 
 	private final AuthConfig config;
 	private final OkHttpClient httpClient;
@@ -80,43 +90,52 @@ public class CognitoAuthServiceImpl implements CognitoAuthService {
 	 */
 	@Override
 	public String getAccessToken() {
-		if (!config.isValid()) {
-			System.err.println("Configurazione Cognito non valida");
-			return null;
-		}
+	    if (!config.isValid()) {
+	        logger.severe("Configurazione Cognito non valida");
+	        return null;
+	    }
 
-		final String clientSecret = config.getClientSecret();
-		if (clientSecret == null || clientSecret.isEmpty()) {
-			System.err.println("Client secret non configurato. Imposta COGNITO_CLIENT_SECRET");
-			return null;
-		}
+	    final String clientSecret = config.getClientSecret();
+	    if (clientSecret == null || clientSecret.isEmpty()) {
+	        logger.severe("Client secret non configurato. Imposta COGNITO_CLIENT_SECRET");
+	        return null;
+	    }
 
-		final RequestBody formBody = new FormBody.Builder().add("client_id", config.getClientId())
-				.add("client_secret", clientSecret).add("scope", config.getScope())
-				.add("grant_type", "client_credentials").build();
+	    final RequestBody formBody = new FormBody.Builder()
+	            .add("client_id", config.getClientId())
+	            .add("client_secret", clientSecret)
+	            .add("scope", config.getScope())
+	            .add("grant_type", "client_credentials")
+	            .build();
 
-		final Request request = new Request.Builder()
-				.url("https://eu-west-1xrobh5glh.auth.eu-west-1.amazoncognito.com/oauth2/token").post(formBody)
-				.header("Content-Type", "application/x-www-form-urlencoded").build();
+	    final Request request = new Request.Builder()
+	            .url("https://eu-west-1.xrobh5glh.auth.eu-west-1.amazoncognito.com/oauth2/token") 
+	            .post(formBody)
+	            .header(HEADER_CONTENT_TYPE, CONTENT_TYPE_FORM)
+	            .build();
 
-		try (Response response = httpClient.newCall(request).execute()) {
-			if (response.isSuccessful() && response.body() != null) {
-				final String responseBody = response.body().string();
-				final JsonObject jsonObject = JsonParser.parseString(responseBody).getAsJsonObject();
-				return jsonObject.get("access_token").getAsString();
-			} else {
-				System.err.println("Errore nella richiesta del token: " + response.code());
-				if (response.body() != null) {
-					System.err.println("Response body: " + response.body().string());
-				}
-				return null;
-			}
-		} catch (Exception e) {
-			System.err.println("Errore durante la richiesta del token: " + e.getMessage());
-			e.printStackTrace();
-			return null;
-		}
+	    try (Response response = httpClient.newCall(request).execute()) {
+	        String responseBody = null;
+	        if (response.body() != null) {
+	            responseBody = response.body().string(); // leggi una volta sola
+	        }
+
+	        if (response.isSuccessful() && responseBody != null) {
+	            final JsonObject jsonObject = JsonParser.parseString(responseBody).getAsJsonObject();
+	            return jsonObject.get("access_token").getAsString();
+	        } else {
+	            logger.severe("Errore nella richiesta del token: " + response.code());
+	            if (responseBody != null) {
+	                logger.log(Level.SEVERE, "Response body: {0}", responseBody);
+	            }
+	            return null;
+	        }
+	    } catch (Exception e) {
+	        logger.log(Level.SEVERE, "Errore durante la richiesta del token", e);
+	        return null;
+	    }
 	}
+
 
 	/**
 	 * Registra un nuovo utente nel pool utenti Cognito.
@@ -149,26 +168,31 @@ public class CognitoAuthServiceImpl implements CognitoAuthService {
 
 		jsonRequest.add("UserAttributes", userAttributes);
 
-		final RequestBody body = RequestBody.create(jsonRequest.toString(), MediaType.parse("application/json"));
+		final RequestBody body = RequestBody.create(jsonRequest.toString(), MediaType.parse(CONTENT_TYPE_JSON));
 
 		final Request request = new Request.Builder()
 				.url("https://cognito-idp." + config.getRegion() + ".amazonaws.com/").post(body)
-				.header("Content-Type", "application/json")
-				.header("X-Amz-Target", "AWSCognitoIdentityProviderService.SignUp")
+				.header(HEADER_CONTENT_TYPE, CONTENT_TYPE_JSON)
+				.header(HEADER_X_AMZ_TARGET, "AWSCognitoIdentityProviderService.SignUp")
 				.header("X-Amz-Region", config.getRegion()).build();
 
 		try (Response response = httpClient.newCall(request).execute()) {
 			if (response.isSuccessful()) {
-				System.out.println("Registrazione avvenuta con successo");
-				return true;
+			    logger.info("Registrazione avvenuta con successo");
+			    return true;
 			} else {
-				final String errorBody = response.body() != null ? response.body().string() : "Nessun body";
-				System.err.println("Errore durante la registrazione: " + response.code() + " - " + errorBody);
-				return false;
+			    
+			    final String errorBody = response.body() != null ? response.body().string() : "Nessun body";
+			    
+			    
+			    logger.log(Level.SEVERE,
+			            "Errore durante la registrazione: {0} - {1}",
+			            new Object[]{response.code(), errorBody});
+			    return false;
 			}
+
 		} catch (Exception e) {
-			System.err.println("Errore durante la registrazione: " + e.getMessage());
-			e.printStackTrace();
+			logger.log(Level.SEVERE, "Errore durante la registrazione", e);
 			return false;
 		}
 	}
@@ -192,26 +216,25 @@ public class CognitoAuthServiceImpl implements CognitoAuthService {
 		jsonRequest.addProperty("IdentityPoolId", config.getIdentityPoolId());
 		jsonRequest.addProperty("Logins", "graph.facebook.com:" + facebookAccessToken);
 
-		final RequestBody body = RequestBody.create(jsonRequest.toString(), MediaType.parse("application/json"));
+		final RequestBody body = RequestBody.create(jsonRequest.toString(), MediaType.parse(CONTENT_TYPE_JSON));
 
 		final Request request = new Request.Builder().url("https://cognito-identity.eu-west-1.amazonaws.com/")
-				.post(body).addHeader("Content-Type", "application/json")
-				.addHeader("X-Amz-Target", "AWSCognitoIdentityService.GetId").build();
+				.post(body).addHeader(HEADER_CONTENT_TYPE, CONTENT_TYPE_JSON)
+				.addHeader(HEADER_X_AMZ_TARGET, "AWSCognitoIdentityService.GetId").build();
 
 		try (Response response = httpClient.newCall(request).execute()) {
 			if (response.isSuccessful()) {
 				if (response.body() != null) {
 					response.body().string();
 				}
-				System.out.println("Autenticazione Facebook avvenuta con successo");
+				logger.info("Autenticazione Facebook avvenuta con successo");
 				return true;
 			} else {
-				System.err.println("Errore durante l'autenticazione con Facebook: " + response.code());
+				logger.severe("Errore durante l'autenticazione con Facebook: " + response.code());
 				return false;
 			}
 		} catch (Exception e) {
-			System.err.println("Errore durante l'autenticazione Facebook: " + e.getMessage());
-			e.printStackTrace();
+			logger.log(Level.SEVERE, "Errore durante l'autenticazione Facebook", e);
 			return false;
 		}
 	}
@@ -235,26 +258,25 @@ public class CognitoAuthServiceImpl implements CognitoAuthService {
 		jsonRequest.addProperty("IdentityPoolId", config.getIdentityPoolId());
 		jsonRequest.addProperty("Logins", "accounts.google.com:" + googleAccessToken);
 
-		final RequestBody body = RequestBody.create(jsonRequest.toString(), MediaType.parse("application/json"));
+		final RequestBody body = RequestBody.create(jsonRequest.toString(), MediaType.parse(CONTENT_TYPE_JSON));
 
 		final Request request = new Request.Builder().url("https://cognito-identity.eu-west-1.amazonaws.com/")
-				.post(body).addHeader("Content-Type", "application/json")
-				.addHeader("X-Amz-Target", "AWSCognitoIdentityService.GetId").build();
+				.post(body).addHeader(HEADER_CONTENT_TYPE, CONTENT_TYPE_JSON)
+				.addHeader(HEADER_X_AMZ_TARGET, "AWSCognitoIdentityService.GetId").build();
 
 		try (Response response = httpClient.newCall(request).execute()) {
 			if (response.isSuccessful()) {
 				if (response.body() != null) {
 					response.body().string();
 				}
-				System.out.println("Autenticazione Google avvenuta con successo");
+				logger.info("Autenticazione Google avvenuta con successo");
 				return true;
 			} else {
-				System.err.println("Errore durante l'autenticazione con Google: " + response.code());
+				logger.severe("Errore durante l'autenticazione con Google: " + response.code());
 				return false;
 			}
 		} catch (Exception e) {
-			System.err.println("Errore durante l'autenticazione Google: " + e.getMessage());
-			e.printStackTrace();
+			logger.log(Level.SEVERE, "Errore durante l'autenticazione Google", e);
 			return false;
 		}
 	}

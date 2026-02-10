@@ -31,6 +31,13 @@ import model.entity.OffertaIniziale;
  * @see Connection
  */
 public class OffertaInizialeDAO {
+	
+	private static final String ID_OFFERTA = "idOfferta";
+	private static final String IMPORTO_OFFERTA = "importoProposto";
+	private static final String DATA_OFFERTA = "dataOfferta";
+	private static final String STATO_OFFERTA = "importoProposto";
+	private static final String IMMOBILE_ASSOCIATO = "immobileAssociato";
+	private static final String CLIENTE_ASSOCIATO = "clienteAssociato";
 	private final Connection connection;
 
 	/**
@@ -92,11 +99,11 @@ public class OffertaInizialeDAO {
 			final ResultSet rs = stmt.executeQuery();
 
 			while (rs.next()) {
-				final OffertaIniziale offerta = new OffertaIniziale(rs.getDouble("importoProposto"),
-						rs.getString("clienteAssociato"), rs.getLong("immobileAssociato"));
-				offerta.setIdOfferta(rs.getLong("idOfferta"));
-				offerta.setDataOfferta(rs.getTimestamp("dataOfferta").toLocalDateTime());
-				offerta.setStato(rs.getString("stato"));
+				final OffertaIniziale offerta = new OffertaIniziale(rs.getDouble(IMPORTO_OFFERTA),
+						rs.getString(CLIENTE_ASSOCIATO), rs.getLong(IMMOBILE_ASSOCIATO));
+				offerta.setIdOfferta(rs.getLong(ID_OFFERTA));
+				offerta.setDataOfferta(rs.getTimestamp(DATA_OFFERTA).toLocalDateTime());
+				offerta.setStato(rs.getString(STATO_OFFERTA));
 				offerte.add(offerta);
 			}
 		}
@@ -123,11 +130,11 @@ public class OffertaInizialeDAO {
 			final ResultSet rs = stmt.executeQuery();
 
 			while (rs.next()) {
-				final OffertaIniziale offerta = new OffertaIniziale(rs.getDouble("importoProposto"),
-						rs.getString("clienteAssociato"), rs.getLong("immobileAssociato"));
-				offerta.setIdOfferta(rs.getLong("idOfferta"));
-				offerta.setDataOfferta(rs.getTimestamp("dataOfferta").toLocalDateTime());
-				offerta.setStato(rs.getString("stato"));
+				final OffertaIniziale offerta = new OffertaIniziale(rs.getDouble(IMPORTO_OFFERTA),
+						rs.getString(CLIENTE_ASSOCIATO), rs.getLong(IMMOBILE_ASSOCIATO));
+				offerta.setIdOfferta(rs.getLong(ID_OFFERTA));
+				offerta.setDataOfferta(rs.getTimestamp(DATA_OFFERTA).toLocalDateTime());
+				offerta.setStato(rs.getString(STATO_OFFERTA));
 				offerte.add(offerta);
 			}
 		}
@@ -176,11 +183,11 @@ public class OffertaInizialeDAO {
 			final ResultSet rs = stmt.executeQuery();
 
 			if (rs.next()) {
-				final OffertaIniziale offerta = new OffertaIniziale(rs.getDouble("importoProposto"),
-						rs.getString("clienteAssociato"), rs.getLong("immobileAssociato"));
-				offerta.setIdOfferta(rs.getLong("idOfferta"));
-				offerta.setDataOfferta(rs.getTimestamp("dataOfferta").toLocalDateTime());
-				offerta.setStato(rs.getString("stato"));
+				final OffertaIniziale offerta = new OffertaIniziale(rs.getDouble(IMPORTO_OFFERTA),
+						rs.getString(CLIENTE_ASSOCIATO), rs.getLong(IMMOBILE_ASSOCIATO));
+				offerta.setIdOfferta(rs.getLong(ID_OFFERTA));
+				offerta.setDataOfferta(rs.getTimestamp(DATA_OFFERTA).toLocalDateTime());
+				offerta.setStato(rs.getString(STATO_OFFERTA));
 				return offerta;
 			}
 		}
@@ -205,7 +212,7 @@ public class OffertaInizialeDAO {
 			final ResultSet rs = stmt.executeQuery();
 
 			if (rs.next()) {
-				return rs.getString("clienteAssociato");
+				return rs.getString(CLIENTE_ASSOCIATO);
 			}
 		}
 		return null;

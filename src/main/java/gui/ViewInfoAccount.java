@@ -17,6 +17,9 @@ import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 
 import controller.AccountController;
+import java.util.logging.Logger;
+import java.util.logging.Level;
+
 import model.dto.AccountInfoDTO;
 import util.GuiUtils;
 
@@ -41,7 +44,7 @@ import util.GuiUtils;
  * @see GuiUtils
  */
 public class ViewInfoAccount extends JFrame {
-
+	private static final Logger LOGGER = Logger.getLogger(ViewInfoAccount.class.getName());
 	private static final long serialVersionUID = 1L;
 	private final JPanel contentPane;
 
@@ -160,8 +163,8 @@ public class ViewInfoAccount extends JFrame {
 		try {
 			infoProfilo = controller.getInfoProfilo(emailUtente);
 		} catch (SQLException e) {
-			System.out.println("Non sono riuscito a recuperare le info per il profilo: " + emailUtente);
-			e.printStackTrace();
+			
+			LOGGER.log(Level.SEVERE, "Errore", e);
 		}
 		if (infoProfilo != null) {
 			lblNomeUtenteRes.setText(infoProfilo.getNomeCompleto());

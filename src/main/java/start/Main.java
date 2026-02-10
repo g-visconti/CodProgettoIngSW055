@@ -1,5 +1,8 @@
 package start;
 
+import dao.AccountDAO;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 import gui.ViewAccesso;
 import gui.amministrazione.ViewDashboardDietiEstates;
 import gui.utenza.ViewDashboard;
@@ -29,7 +32,7 @@ import gui.utenza.ViewDashboard;
  * @see ViewDashboardDietiEstates
  */
 public class Main {
-
+	private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
 	/**
 	 * Metodo principale di avvio dell'applicazione DietiEstates25.
 	 * Gestisce l'inizializzazione dell'interfaccia grafica in base alla modalità
@@ -94,7 +97,7 @@ public class Main {
 			}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOGGER.log(Level.SEVERE, "Errore", e);
 		}
 	}
 

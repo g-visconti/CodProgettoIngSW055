@@ -9,8 +9,10 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+
 import java.net.URL;
 import java.sql.SQLException;
+
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -26,6 +28,10 @@ import javax.swing.border.EmptyBorder;
 
 import controller.AccessController;
 import controller.AccountController;
+import java.util.logging.Logger;
+import java.util.logging.Level;
+
+
 import gui.amministrazione.ViewDashboardDietiEstates;
 import gui.utenza.ViewDashboard;
 import util.GuiUtils;
@@ -62,12 +68,15 @@ import util.GuiUtils;
  * @see ViewDashboardDietiEstates
  */
 public class ViewAccessoConPassword extends JFrame {
-
+	
+	private static final Logger LOGGER = Logger.getLogger(ViewAccessoConPassword.class.getName());
 	private static final long serialVersionUID = 1L;
 	private final JPanel contentPane;
 	private final JTextField txtAccediORegistrati;
 	private String campoPieno = "******";
-	private final String campoVuoto = "";
+	private static final String CAMPO_PULITO = "******";
+	private static final String FONT_TAHOMA = "Tahoma";
+	private static final String campoVuoto = "";
 	private final JPasswordField passwordField;
 
 	/**
@@ -116,7 +125,7 @@ public class ViewAccessoConPassword extends JFrame {
 		panelLogo.add(lblDieti);
 		lblDieti.setHorizontalAlignment(SwingConstants.CENTER);
 		lblDieti.setForeground(new Color(27, 99, 142));
-		lblDieti.setFont(new Font("Tahoma", Font.BOLD, 30));
+		lblDieti.setFont(new Font(FONT_TAHOMA, Font.BOLD, 30));
 
 		final JPanel panelAccesso = new JPanel();
 
@@ -130,7 +139,7 @@ public class ViewAccessoConPassword extends JFrame {
 		txtAccediORegistrati.setFocusable(false);
 		txtAccediORegistrati.setEditable(false);
 		txtAccediORegistrati.setForeground(new Color(0, 0, 51));
-		txtAccediORegistrati.setFont(new Font("Tahoma", Font.BOLD, 18));
+		txtAccediORegistrati.setFont(new Font(FONT_TAHOMA, Font.BOLD, 18));
 		txtAccediORegistrati.setBorder(new EmptyBorder(0, 0, 0, 0));
 		txtAccediORegistrati.setHorizontalAlignment(SwingConstants.CENTER);
 		txtAccediORegistrati.setText("Accedi con email");
@@ -150,15 +159,15 @@ public class ViewAccessoConPassword extends JFrame {
 			@Override
 			public void keyTyped(KeyEvent e) {
 				campoPieno = passwordField.getText();
-				if (campoPieno.equals("******")) {
+				if (campoPieno.equals(CAMPO_PULITO)) {
 					passwordField.setText(campoVuoto);
 				}
 			}
 		});
 		passwordField.setVerifyInputWhenFocusTarget(false);
 		passwordField.setToolTipText("Inserire la password di accesso");
-		passwordField.setText("******");
-		passwordField.setFont(new Font("Tahoma", Font.BOLD, 11));
+		passwordField.setText(CAMPO_PULITO);
+		passwordField.setFont(new Font(FONT_TAHOMA, Font.BOLD, 11));
 		passwordField.setBounds(81, 255, 205, 20);
 		panelAccesso.add(passwordField);
 
@@ -168,7 +177,7 @@ public class ViewAccessoConPassword extends JFrame {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				campoPieno = passwordField.getText();
-				if (campoPieno.equals("******")) {
+				if (campoPieno.equals(CAMPO_PULITO)) {
 					passwordField.setText(campoVuoto);
 				}
 			}
@@ -181,20 +190,20 @@ public class ViewAccessoConPassword extends JFrame {
 			public void mouseClicked(MouseEvent e) {
 				campoPieno = passwordField.getText();
 				if (campoPieno.equals(campoVuoto)) {
-					passwordField.setText("******");
+					passwordField.setText(CAMPO_PULITO);
 				}
 			}
 		});
 
 		final JLabel lblInserireLaPassword = new JLabel("Inserire la password di accesso");
 		lblInserireLaPassword.setHorizontalAlignment(SwingConstants.CENTER);
-		lblInserireLaPassword.setFont(new Font("Tahoma", Font.BOLD, 11));
+		lblInserireLaPassword.setFont(new Font(FONT_TAHOMA, Font.BOLD, 11));
 		lblInserireLaPassword.setBounds(44, 224, 278, 20);
 		panelAccesso.add(lblInserireLaPassword);
 
 		final JLabel lblEmail = new JLabel("Email inserita:");
 		lblEmail.setHorizontalAlignment(SwingConstants.CENTER);
-		lblEmail.setFont(new Font("Tahoma", Font.BOLD, 11));
+		lblEmail.setFont(new Font(FONT_TAHOMA, Font.BOLD, 11));
 		lblEmail.setBounds(44, 88, 99, 20);
 		panelAccesso.add(lblEmail);
 
@@ -203,7 +212,7 @@ public class ViewAccessoConPassword extends JFrame {
 			lblEmailAttuale.setText(emailInserita);
 		}
 		lblEmailAttuale.setHorizontalAlignment(SwingConstants.CENTER);
-		lblEmailAttuale.setFont(new Font("Tahoma", Font.BOLD, 11));
+		lblEmailAttuale.setFont(new Font(FONT_TAHOMA, Font.BOLD, 11));
 		lblEmailAttuale.setBounds(144, 88, 178, 20);
 		panelAccesso.add(lblEmailAttuale);
 
@@ -289,7 +298,7 @@ public class ViewAccessoConPassword extends JFrame {
 								"Errore inserimento dei dati", JOptionPane.INFORMATION_MESSAGE);
 					}
 				} catch (SQLException e1) {
-					e1.printStackTrace();
+					LOGGER.log(Level.SEVERE, "Errore", e1);
 				}
 
 			}

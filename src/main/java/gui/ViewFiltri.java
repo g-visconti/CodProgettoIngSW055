@@ -21,6 +21,8 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 import model.entity.Filtri;
 import util.GuiUtils;
@@ -55,9 +57,26 @@ import util.InputUtils;
  * @see InputUtils
  */
 public class ViewFiltri extends JFrame {
+	
+	private static final String INDIFFERENTE_FILTRO = "Indifferente";
+	private static final String PREZZO_MIN = "prezzoMin";
+	private static final String PREZZO_MAX = "prezzoMax";
+	private static final String SUP_MIN = "supMin";
+	private static final String SUP_MAX = "supMax";
+	private static final String NUM_LOCALI = "numLocali";
+	private static final String PIANO = "piano";
+	private static final String NUM_BAGNI = "numBagni";
+	private static final String ASCENSORE = "ascensore";
+	private static final String PORTINERIA = "portineria";
+	private static final String CLIMATIZZAZIONE = "climatizzazione";
+	private static final String TAHOMA_FONT = "Tahoma";
+	private static final String GOTHIC_FONT = "Yu Gothic UI Semibold";
+	
+	
+	private static final Logger LOGGER = Logger.getLogger(ViewFiltri.class.getName());
 	private static final long serialVersionUID = 1L;
 	// Attributi della classe ViewFiltri
-	private final Preferences prefs;
+	private final transient Preferences prefs;
 	private final JPanel contentPane;
 	// attributi che serviranno per settare gli input ricevuti all'interno della
 	// classe Filtri
@@ -107,7 +126,7 @@ public class ViewFiltri extends JFrame {
 				try {
 					prefs.clear();
 				} catch (BackingStoreException e1) {
-					e1.printStackTrace();
+					LOGGER.log(Level.SEVERE, "Errore", e1);
 				}
 			}
 		});
@@ -117,24 +136,24 @@ public class ViewFiltri extends JFrame {
 		String[] opPrezzoMax = null;
 		switch (tipologiaAppartamento) {
 		case "Vendita" -> {
-			opPrezzoMin = new String[] { "Indifferente", "50000", "60000", "70000", "80000", "90000", "100000",
+			opPrezzoMin = new String[] { INDIFFERENTE_FILTRO, "50000", "60000", "70000", "80000", "90000", "100000",
 					"150000", "200000", "300000", "500000", "1000000" };
 			opPrezzoMax = new String[] { "Indifferente", "50000", "60000", "70000", "80000", "90000", "100000",
 					"150000", "200000", "300000", "500000", "1000000" };
 		}
 		case "Affitto" -> {
-			opPrezzoMin = new String[] { "Indifferente", "200", "300", "400", "500", "600", "700", "800", "900", "1000",
+			opPrezzoMin = new String[] { INDIFFERENTE_FILTRO, "200", "300", "400", "500", "600", "700", "800", "900", "1000",
 					"1500", "2000", "2500", "3000", "3500", "4000" };
-			opPrezzoMax = new String[] { "Indifferente", "200", "300", "400", "500", "600", "700", "800", "900", "1000",
+			opPrezzoMax = new String[] { INDIFFERENTE_FILTRO, "200", "300", "400", "500", "600", "700", "800", "900", "1000",
 					"1500", "2000", "2500", "3000", "3500", "4000" };
 		}
 		}
 
-		final String[] opSupMin = { "Indifferente", "40", "60", "80", "100", "120", "150", "180", "200", "300", "500" };
-		final String[] opSupMax = { "Indifferente", "40", "60", "80", "100", "120", "150", "180", "200", "300", "500" };
-		final String[] opNumLocali = { "Indifferente", "1", "2", "3", "4", "5" };
-		final String[] opNumBagni = { "Indifferente", "1", "2", "3", "4" };
-		final String[] opPiano = { "Indifferente", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" };
+		final String[] opSupMin = { INDIFFERENTE_FILTRO, "40", "60", "80", "100", "120", "150", "180", "200", "300", "500" };
+		final String[] opSupMax = {INDIFFERENTE_FILTRO, "40", "60", "80", "100", "120", "150", "180", "200", "300", "500" };
+		final String[] opNumLocali = { INDIFFERENTE_FILTRO, "1", "2", "3", "4", "5" };
+		final String[] opNumBagni = { INDIFFERENTE_FILTRO, "1", "2", "3", "4" };
+		final String[] opPiano = { INDIFFERENTE_FILTRO, "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" };
 
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		this.setBounds(100, 100, 937, 454);
@@ -160,122 +179,122 @@ public class ViewFiltri extends JFrame {
 
 		final JLabel lblPrezzoMinimo = new JLabel("Prezzo minimo (€)");
 		lblPrezzoMinimo.setHorizontalAlignment(SwingConstants.CENTER);
-		lblPrezzoMinimo.setFont(new Font("Tahoma", Font.BOLD, 11));
+		lblPrezzoMinimo.setFont(new Font(TAHOMA_FONT, Font.BOLD, 11));
 		lblPrezzoMinimo.setBounds(145, 92, 122, 14);
 		panelTitolo.add(lblPrezzoMinimo);
 
 		comboBoxPMin = new JComboBox<>(opPrezzoMin);
 		comboBoxPMin.setToolTipText("Seleziona il prezzo di partenza");
 		comboBoxPMin.setMaximumRowCount(12);
-		comboBoxPMin.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 11));
+		comboBoxPMin.setFont(new Font(GOTHIC_FONT, Font.PLAIN, 11));
 		comboBoxPMin.setBackground(Color.WHITE);
 		comboBoxPMin.setBounds(155, 117, 103, 29);
 		panelTitolo.add(comboBoxPMin);
-		comboBoxPMin.setSelectedItem(prefs.get("prezzoMin", "Indifferente"));
+		comboBoxPMin.setSelectedItem(prefs.get(PREZZO_MIN, INDIFFERENTE_FILTRO));
 
 		final JLabel lblPrezzoMassimo = new JLabel("Prezzo massimo (€)");
 		lblPrezzoMassimo.setHorizontalAlignment(SwingConstants.CENTER);
-		lblPrezzoMassimo.setFont(new Font("Tahoma", Font.BOLD, 11));
+		lblPrezzoMassimo.setFont(new Font(TAHOMA_FONT, Font.BOLD, 11));
 		lblPrezzoMassimo.setBounds(313, 92, 122, 14);
 		panelTitolo.add(lblPrezzoMassimo);
 
 		comboBoxPMax = new JComboBox<>(opPrezzoMax);
 		comboBoxPMax.setToolTipText("Seleziona il prezzo limite");
 		comboBoxPMax.setMaximumRowCount(12);
-		comboBoxPMax.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 11));
+		comboBoxPMax.setFont(new Font(GOTHIC_FONT, Font.PLAIN, 11));
 		comboBoxPMax.setBackground(Color.WHITE);
 		comboBoxPMax.setBounds(322, 117, 103, 29);
 		panelTitolo.add(comboBoxPMax);
-		comboBoxPMax.setSelectedItem(prefs.get("prezzoMax", "Indifferente"));
+		comboBoxPMax.setSelectedItem(prefs.get(PREZZO_MAX, INDIFFERENTE_FILTRO));
 
 		final JLabel lblSuperficieMinima = new JLabel("Superficie minima (mq)");
 		lblSuperficieMinima.setHorizontalAlignment(SwingConstants.CENTER);
-		lblSuperficieMinima.setFont(new Font("Tahoma", Font.BOLD, 11));
+		lblSuperficieMinima.setFont(new Font(TAHOMA_FONT, Font.BOLD, 11));
 		lblSuperficieMinima.setBounds(478, 92, 141, 14);
 		panelTitolo.add(lblSuperficieMinima);
 
 		comboBoxSMin = new JComboBox<>(opSupMin);
 		comboBoxSMin.setToolTipText("Seleziona la superficie di partenza");
 		comboBoxSMin.setMaximumRowCount(12);
-		comboBoxSMin.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 11));
+		comboBoxSMin.setFont(new Font(GOTHIC_FONT, Font.PLAIN, 11));
 		comboBoxSMin.setBackground(Color.WHITE);
 		comboBoxSMin.setBounds(494, 117, 103, 29);
 		panelTitolo.add(comboBoxSMin);
-		comboBoxSMin.setSelectedItem(prefs.get("supMin", "Indifferente"));
+		comboBoxSMin.setSelectedItem(prefs.get(SUP_MIN, INDIFFERENTE_FILTRO));
 
 		final JLabel lblSuperficieMassima = new JLabel("Superficie massima (mq)");
 		lblSuperficieMassima.setHorizontalAlignment(SwingConstants.CENTER);
-		lblSuperficieMassima.setFont(new Font("Tahoma", Font.BOLD, 11));
+		lblSuperficieMassima.setFont(new Font(TAHOMA_FONT, Font.BOLD, 11));
 		lblSuperficieMassima.setBounds(638, 92, 148, 14);
 		panelTitolo.add(lblSuperficieMassima);
 
 		comboBoxSMax = new JComboBox<>(opSupMax);
 		comboBoxSMax.setToolTipText("Seleziona la superficie limite");
 		comboBoxSMax.setMaximumRowCount(12);
-		comboBoxSMax.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 11));
+		comboBoxSMax.setFont(new Font(GOTHIC_FONT, Font.PLAIN, 11));
 		comboBoxSMax.setBackground(Color.WHITE);
 		comboBoxSMax.setBounds(661, 117, 103, 29);
 		panelTitolo.add(comboBoxSMax);
-		comboBoxSMax.setSelectedItem(prefs.get("supMax", "Indifferente"));
+		comboBoxSMax.setSelectedItem(prefs.get(SUP_MAX, INDIFFERENTE_FILTRO));
 
 		final JLabel lblNumeroLocali = new JLabel("Numero locali");
 		lblNumeroLocali.setHorizontalAlignment(SwingConstants.RIGHT);
-		lblNumeroLocali.setFont(new Font("Tahoma", Font.BOLD, 11));
+		lblNumeroLocali.setFont(new Font(TAHOMA_FONT, Font.BOLD, 11));
 		lblNumeroLocali.setBounds(170, 219, 97, 14);
 		panelTitolo.add(lblNumeroLocali);
 
 		comboBoxNumLocali = new JComboBox<>(opNumLocali);
-		comboBoxNumLocali.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 11));
+		comboBoxNumLocali.setFont(new Font(GOTHIC_FONT, Font.PLAIN, 11));
 		comboBoxNumLocali.setBackground(new Color(255, 255, 255));
 		comboBoxNumLocali.setBounds(277, 215, 115, 22);
 		panelTitolo.add(comboBoxNumLocali);
-		comboBoxNumLocali.setSelectedItem(prefs.get("numLocali", "Indifferente"));
+		comboBoxNumLocali.setSelectedItem(prefs.get(NUM_LOCALI, INDIFFERENTE_FILTRO));
 
 		final JLabel lblPiano = new JLabel("Piano");
 		lblPiano.setHorizontalAlignment(SwingConstants.RIGHT);
-		lblPiano.setFont(new Font("Tahoma", Font.BOLD, 11));
+		lblPiano.setFont(new Font(TAHOMA_FONT, Font.BOLD, 11));
 		lblPiano.setBounds(170, 300, 97, 14);
 		panelTitolo.add(lblPiano);
 
 		comboBoxPiano = new JComboBox<>(opPiano);
-		comboBoxPiano.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 11));
+		comboBoxPiano.setFont(new Font(GOTHIC_FONT, Font.PLAIN, 11));
 		comboBoxPiano.setBackground(new Color(255, 255, 255));
 		comboBoxPiano.setBounds(277, 296, 115, 22);
 		panelTitolo.add(comboBoxPiano);
-		comboBoxPiano.setSelectedItem(prefs.get("piano", "Indifferente"));
+		comboBoxPiano.setSelectedItem(prefs.get(PIANO, INDIFFERENTE_FILTRO));
 
 		final JLabel lblNumeroBagni = new JLabel("Numero bagni");
 		lblNumeroBagni.setHorizontalAlignment(SwingConstants.RIGHT);
-		lblNumeroBagni.setFont(new Font("Tahoma", Font.BOLD, 11));
+		lblNumeroBagni.setFont(new Font(TAHOMA_FONT, Font.BOLD, 11));
 		lblNumeroBagni.setBounds(170, 259, 97, 14);
 		panelTitolo.add(lblNumeroBagni);
 
 		comboBoxNumBagni = new JComboBox<>(opNumBagni);
-		comboBoxNumBagni.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 11));
+		comboBoxNumBagni.setFont(new Font(GOTHIC_FONT, Font.PLAIN, 11));
 		comboBoxNumBagni.setBackground(new Color(255, 255, 255));
 		comboBoxNumBagni.setBounds(277, 255, 115, 22);
 		panelTitolo.add(comboBoxNumBagni);
-		comboBoxNumBagni.setSelectedItem(prefs.get("numBagni", "Indifferente"));
+		comboBoxNumBagni.setSelectedItem(prefs.get(NUM_BAGNI, INDIFFERENTE_FILTRO));
 
 		// Elenco di checkbox sulle possibili preferenze
 		chckbxAscensore = new JCheckBox("Ascensore");
-		chckbxAscensore.setFont(new Font("Tahoma", Font.BOLD, 11));
+		chckbxAscensore.setFont(new Font(TAHOMA_FONT, Font.BOLD, 11));
 		chckbxAscensore.setBounds(523, 215, 97, 23);
 		panelTitolo.add(chckbxAscensore);
 		// chckbxAscensore.setSelected(false);
-		chckbxAscensore.setSelected(prefs.getBoolean("ascensore", false));
+		chckbxAscensore.setSelected(prefs.getBoolean(ASCENSORE, false));
 
 		chckbxPortineria = new JCheckBox("Portineria");
-		chckbxPortineria.setFont(new Font("Tahoma", Font.BOLD, 11));
+		chckbxPortineria.setFont(new Font(TAHOMA_FONT, Font.BOLD, 11));
 		chckbxPortineria.setBounds(648, 215, 97, 23);
 		panelTitolo.add(chckbxPortineria);
-		chckbxPortineria.setSelected(prefs.getBoolean("portineria", false));
+		chckbxPortineria.setSelected(prefs.getBoolean(PORTINERIA, false));
 
 		chckbxClimatizzazione = new JCheckBox("Climatizzazione");
-		chckbxClimatizzazione.setFont(new Font("Tahoma", Font.BOLD, 11));
+		chckbxClimatizzazione.setFont(new Font(TAHOMA_FONT, Font.BOLD, 11));
 		chckbxClimatizzazione.setBounds(523, 255, 115, 23);
 		panelTitolo.add(chckbxClimatizzazione);
-		chckbxClimatizzazione.setSelected(prefs.getBoolean("climatizzazione", false));
+		chckbxClimatizzazione.setSelected(prefs.getBoolean(CLIMATIZZAZIONE, false));
 
 		// Bottoni di gestione della finestra
 		final JButton btnSalvaFiltri = new JButton("Salva");
@@ -309,7 +328,7 @@ public class ViewFiltri extends JFrame {
 			}
 		});
 		btnSalvaFiltri.setForeground(Color.WHITE);
-		btnSalvaFiltri.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 11));
+		btnSalvaFiltri.setFont(new Font(GOTHIC_FONT, Font.PLAIN, 11));
 		btnSalvaFiltri.setFocusable(false);
 		btnSalvaFiltri.setBackground(SystemColor.textHighlight);
 		btnSalvaFiltri.setBounds(494, 372, 185, 23);
@@ -326,7 +345,7 @@ public class ViewFiltri extends JFrame {
 			}
 		});
 		btnAnnulla.setForeground(Color.WHITE);
-		btnAnnulla.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 11));
+		btnAnnulla.setFont(new Font(GOTHIC_FONT, Font.PLAIN, 11));
 		btnAnnulla.setFocusable(false);
 		btnAnnulla.setBackground(new Color(255, 74, 74));
 		btnAnnulla.setBounds(250, 372, 185, 23);
@@ -360,17 +379,17 @@ public class ViewFiltri extends JFrame {
 
 				// Se l'utente ha cliccato "Sì", esegue il reset
 				if (scelta == JOptionPane.YES_OPTION) {
-					prefs.put("prezzoMin", "Indifferente");
-					prefs.put("prezzoMax", "Indifferente");
-					prefs.put("supMin", "Indifferente");
-					prefs.put("supMax", "Indifferente");
-					prefs.put("numLocali", "Indifferente");
-					prefs.put("piano", "Indifferente");
-					prefs.put("numBagni", "Indifferente");
-					prefs.putBoolean("ascensore", false);
+					prefs.put(PREZZO_MIN, INDIFFERENTE_FILTRO);
+					prefs.put(PREZZO_MAX, INDIFFERENTE_FILTRO);
+					prefs.put(SUP_MIN, INDIFFERENTE_FILTRO);
+					prefs.put(SUP_MAX, INDIFFERENTE_FILTRO);
+					prefs.put(NUM_LOCALI, INDIFFERENTE_FILTRO);
+					prefs.put(PIANO, INDIFFERENTE_FILTRO);
+					prefs.put(NUM_BAGNI, INDIFFERENTE_FILTRO);
+					prefs.putBoolean(ASCENSORE, false);
 					prefs.putBoolean("postoAuto", false);
-					prefs.putBoolean("portineria", false);
-					prefs.putBoolean("climatizzazione", false);
+					prefs.putBoolean(PORTINERIA, false);
+					prefs.putBoolean(CLIMATIZZAZIONE, false);
 
 					JOptionPane.showMessageDialog(null, "Reset avvenuto con successo!", "Reset",
 							JOptionPane.INFORMATION_MESSAGE);
@@ -382,7 +401,7 @@ public class ViewFiltri extends JFrame {
 		});
 
 		btnReset.setForeground(Color.WHITE);
-		btnReset.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 11));
+		btnReset.setFont(new Font(GOTHIC_FONT, Font.PLAIN, 11));
 		btnReset.setFocusable(false);
 		btnReset.setBackground(SystemColor.textHighlight);
 		btnReset.setBounds(705, 23, 185, 23);
