@@ -13,6 +13,9 @@ import database.ConnessioneDatabase;
 import model.dto.AccountInfoDTO;
 import model.entity.Account;
 import model.entity.RispostaOfferta;
+import java.util.logging.Logger;
+import java.util.logging.Level;
+
 
 /**
  * Controller per la gestione degli account utente e operazioni correlate.
@@ -35,10 +38,18 @@ import model.entity.RispostaOfferta;
  */
 public class AccountController {
 
-	/**
-	 * Costruttore di default per l'AccountController.
-	 */
+	
+	private static final Logger logger = Logger.getLogger(AccountController.class.getName());
+
+	
+	
+	
+	
 	public AccountController() {
+		
+		/**
+		 * Costruttore di default per l'AccountController.
+		 */
 	}
 
 	/**
@@ -128,8 +139,9 @@ public class AccountController {
 			final AccountDAO accountDAO = new AccountDAO(connAWS);
 			return accountDAO.getAccountDettagli(idAccount);
 		} catch (SQLException e) {
-			e.printStackTrace();
-			return null;
+		    if (logger.isLoggable(Level.SEVERE))
+		        logger.log(Level.SEVERE, String.format("Errore nel recupero dei dettagli dell'agente con id %s", idAccount), e);
+		    return null;
 		}
 	}
 
@@ -164,16 +176,21 @@ public class AccountController {
 	 * @see AmministratoreDAO#getAgenziaByEmail(String)
 	 */
 	public String getAgenzia(String email) {
-		String agenzia = null;
-		try {
-			final Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
-			final AmministratoreDAO adminDAO = new AmministratoreDAO(connAWS);
-			agenzia = adminDAO.getAgenziaByEmail(email);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return agenzia;
+	    String agenzia = null;
+	    try {
+	        final Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
+	        final AmministratoreDAO adminDAO = new AmministratoreDAO(connAWS);
+	        agenzia = adminDAO.getAgenziaByEmail(email);
+	    } catch (SQLException e) {
+	        logger.log(Level.SEVERE,
+	                "Errore nel recupero dell'agenzia per email: {0}",
+	                new Object[]{email, e});
+	        return null;
+	    }
+
+	    return agenzia;
 	}
+
 
 	/**
 	 * Inserisce una risposta a un'offerta immobiliare da parte di un agente.
@@ -197,40 +214,46 @@ public class AccountController {
 	 * @see OffertaInizialeDAO
 	 */
 	public boolean inserisciRispostaOfferta(long idOfferta, String idAgente, String tipoRisposta,
-			Double importoControproposta) {
-		try {
-			final Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
-			final RispostaOffertaDAO rispostaDAO = new RispostaOffertaDAO(connAWS);
+            Double importoControproposta) {
+			try {
+				final Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
+				final RispostaOffertaDAO rispostaDAO = new RispostaOffertaDAO(connAWS);
 
-			// Recupera nome e cognome dell'agente
-			final AccountDAO accountDAO = new AccountDAO(connAWS);
-			final Account agente = accountDAO.getAccountById(idAgente);
+				// Recupera nome e cognome dell'agente
+				final AccountDAO accountDAO = new AccountDAO(connAWS);
+				final Account agente = accountDAO.getAccountById(idAgente);
 
-			if (agente == null) {
-				JOptionPane.showMessageDialog(null, "Agente non trovato!");
-				return false;
+				if (agente == null) {
+					JOptionPane.showMessageDialog(null, "Agente non trovato!");
+					return false;
+				}
+
+				// Disattiva risposte precedenti
+				rispostaDAO.disattivaRispostePrecedenti(idOfferta);
+
+				// Crea e inserisci nuova risposta
+				final RispostaOfferta risposta = new RispostaOfferta(idOfferta, idAgente, agente.getNome(),
+						agente.getCognome(),
+						tipoRisposta, importoControproposta);
+
+				final boolean successo = rispostaDAO.inserisciRispostaOfferta(risposta);
+
+				// Se l'inserimento è riuscito, aggiorna lo stato dell'offerta
+				if (successo) {
+					final OffertaInizialeDAO offertaDAO = new OffertaInizialeDAO(connAWS);
+					offertaDAO.aggiornaStatoOfferta(idOfferta, tipoRisposta);
+				}
+
+				return successo;
+			} catch (SQLException e) {
+			    if (logger.isLoggable(Level.SEVERE))
+			        logger.log(Level.SEVERE,
+			            String.format("Errore durante l'inserimento della risposta all'offerta %s per agente %s", idOfferta, idAgente),
+			            e
+			        );
+			    return false;
 			}
 
-			// Disattiva risposte precedenti
-			rispostaDAO.disattivaRispostePrecedenti(idOfferta);
+}
 
-			// Crea e inserisci nuova risposta
-			final RispostaOfferta risposta = new RispostaOfferta(idOfferta, idAgente, agente.getNome(),
-					agente.getCognome(),
-					tipoRisposta, importoControproposta);
-
-			final boolean successo = rispostaDAO.inserisciRispostaOfferta(risposta);
-
-			// Se l'inserimento è riuscito, aggiorna lo stato dell'offerta
-			if (successo) {
-				final OffertaInizialeDAO offertaDAO = new OffertaInizialeDAO(connAWS);
-				offertaDAO.aggiornaStatoOfferta(idOfferta, tipoRisposta);
-			}
-
-			return successo;
-		} catch (SQLException e) {
-			e.printStackTrace();
-			return false;
-		}
-	}
 }

@@ -7,6 +7,8 @@ import com.google.gson.JsonParser;
 
 import auth.CognitoAuthService;
 import auth.CognitoAuthServiceImpl;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 import model.entity.Account;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -43,6 +45,7 @@ import okhttp3.Response;
  * @see OkHttpClient
  */
 public class OAuthService {
+	private static final Logger LOGGER = Logger.getLogger(OAuthService.class.getName());
 
 	private final CognitoAuthService cognitoAuthService;
 	private final OkHttpClient httpClient;
@@ -208,7 +211,7 @@ public class OAuthService {
 				return account;
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			LOGGER.log(Level.SEVERE, "Errore", e);
 		}
 		return null;
 	}
@@ -255,7 +258,7 @@ public class OAuthService {
 				return account;
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			LOGGER.log(Level.SEVERE, "Errore", e);
 		}
 		return null;
 	}

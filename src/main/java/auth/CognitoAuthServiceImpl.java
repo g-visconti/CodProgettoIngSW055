@@ -1,6 +1,8 @@
 package auth;
 
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -15,17 +17,16 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 /**
- * Implementazione del servizio di autenticazione tramite Amazon Cognito. Questa
- * classe fornisce metodi per interagire con il servizio Cognito di AWS, inclusi
- * l'ottenimento di token di accesso, la registrazione di utenti e
+ * Implementazione del servizio di autenticazione tramite Amazon Cognito.
+ * Questa classe fornisce metodi per interagire con il servizio Cognito di AWS,
+ * inclusi l'ottenimento di token di accesso, la registrazione di utenti e
  * l'autenticazione tramite provider esterni come Facebook e Google.
  *
- * <p>
- * La classe gestisce:
+ * <p>La classe gestisce:
  * <ul>
- * <li>Autenticazione client per ottenere token di accesso
- * <li>Registrazione di nuovi utenti nel pool utenti Cognito
- * <li>Autenticazione federata tramite Facebook e Google
+ *   <li>Autenticazione client per ottenere token di accesso
+ *   <li>Registrazione di nuovi utenti nel pool utenti Cognito
+ *   <li>Autenticazione federata tramite Facebook e Google
  * </ul>
  *
  * @author IngSW2425_055 Team
@@ -34,16 +35,23 @@ import okhttp3.Response;
  */
 public class CognitoAuthServiceImpl implements CognitoAuthService {
 
+    private static final Logger logger = Logger.getLogger(CognitoAuthServiceImpl.class.getName());
+    
+    private static final String HEADER_X_AMZ_TARGET = "X-Amz-Target";
+    private static final String HEADER_CONTENT_TYPE = "Content-Type";
+    private static final String CONTENT_TYPE_JSON = "application/json";
+    private static final String CONTENT_TYPE_FORM = "application/x-www-form-urlencoded";
+
+
 	private final AuthConfig config;
 	private final OkHttpClient httpClient;
 
 	/**
-	 * Costruttore di default che inizializza la configurazione di autenticazione e
-	 * il client HTTP con timeout predefiniti.
+	 * Costruttore di default che inizializza la configurazione di autenticazione
+	 * e il client HTTP con timeout predefiniti.
 	 *
-	 * <p>
-	 * Utilizza una nuova istanza di {@link AuthConfig} caricata con i valori di
-	 * default dalle variabili d'ambiente o file di configurazione.
+	 * <p>Utilizza una nuova istanza di {@link AuthConfig} caricata con i valori
+	 * di default dalle variabili d'ambiente o file di configurazione.
 	 *
 	 * @see AuthConfig
 	 */
@@ -54,8 +62,8 @@ public class CognitoAuthServiceImpl implements CognitoAuthService {
 	}
 
 	/**
-	 * Costruttore che permette di fornire una configurazione personalizzata. Utile
-	 * per testing o scenari dove la configurazione deve essere dinamica.
+	 * Costruttore che permette di fornire una configurazione personalizzata.
+	 * Utile per testing o scenari dove la configurazione deve essere dinamica.
 	 *
 	 * @param config Configurazione di autenticazione personalizzata
 	 * @throws IllegalArgumentException Se la configurazione fornita è null
@@ -68,100 +76,11 @@ public class CognitoAuthServiceImpl implements CognitoAuthService {
 	}
 
 	/**
-	 * Autentica un utente utilizzando un token di accesso di Facebook. Questo
-	 * metodo implementa l'autenticazione federata tramite Facebook Login.
+	 * Ottiene un token di accesso dal servizio Cognito utilizzando le credenziali client.
+	 * Il token viene richiesto utilizzando il flusso OAuth2 "client_credentials".
 	 *
-	 * <p>
-	 * Il metodo invia il token Facebook a Cognito Identity per ottenere un'identità
-	 * federata all'interno del pool identità configurato.
-	 *
-	 * @param facebookAccessToken Token di accesso ottenuto da Facebook Login
-	 * @return true se l'autenticazione ha successo, false altrimenti
-	 *
-	 * @throws IllegalArgumentException Se il token Facebook è null o vuoto
-	 * @see AuthConfig#getIdentityPoolId()
-	 */
-	@Override
-	public boolean authenticateWithFacebook(String facebookAccessToken) {
-		final JsonObject jsonRequest = new JsonObject();
-		jsonRequest.addProperty("IdentityPoolId", config.getIdentityPoolId());
-		jsonRequest.addProperty("Logins", "graph.facebook.com:" + facebookAccessToken);
-
-		final RequestBody body = RequestBody.create(jsonRequest.toString(), MediaType.parse("application/json"));
-
-		final Request request = new Request.Builder().url("https://cognito-identity.eu-west-1.amazonaws.com/")
-				.post(body).addHeader("Content-Type", "application/json")
-				.addHeader("X-Amz-Target", "AWSCognitoIdentityService.GetId").build();
-
-		try (Response response = httpClient.newCall(request).execute()) {
-			if (!response.isSuccessful()) {
-				System.err.println("Errore durante l'autenticazione con Facebook: " + response.code());
-				return false;
-			}
-			if (response.body() != null) {
-				response.body().string();
-			}
-			System.out.println("Autenticazione Facebook avvenuta con successo");
-			return true;
-		} catch (Exception e) {
-			System.err.println("Errore durante l'autenticazione Facebook: " + e.getMessage());
-			e.printStackTrace();
-			return false;
-		}
-	}
-
-	/**
-	 * Autentica un utente utilizzando un token di accesso di Google. Questo metodo
-	 * implementa l'autenticazione federata tramite Google Sign-In.
-	 *
-	 * <p>
-	 * Il metodo invia il token Google a Cognito Identity per ottenere un'identità
-	 * federata all'interno del pool identità configurato.
-	 *
-	 * @param googleAccessToken Token di accesso ottenuto da Google Sign-In
-	 * @return true se l'autenticazione ha successo, false altrimenti
-	 *
-	 * @throws IllegalArgumentException Se il token Google è null o vuoto
-	 * @see AuthConfig#getIdentityPoolId()
-	 */
-	@Override
-	public boolean authenticateWithGoogle(String googleAccessToken) {
-		final JsonObject jsonRequest = new JsonObject();
-		jsonRequest.addProperty("IdentityPoolId", config.getIdentityPoolId());
-		jsonRequest.addProperty("Logins", "accounts.google.com:" + googleAccessToken);
-
-		final RequestBody body = RequestBody.create(jsonRequest.toString(), MediaType.parse("application/json"));
-
-		final Request request = new Request.Builder().url("https://cognito-identity.eu-west-1.amazonaws.com/")
-				.post(body).addHeader("Content-Type", "application/json")
-				.addHeader("X-Amz-Target", "AWSCognitoIdentityService.GetId").build();
-
-		try (Response response = httpClient.newCall(request).execute()) {
-			if (!response.isSuccessful()) {
-				System.err.println("Errore durante l'autenticazione con Google: " + response.code());
-				return false;
-			}
-			if (response.body() != null) {
-				response.body().string();
-			}
-			System.out.println("Autenticazione Google avvenuta con successo");
-			return true;
-		} catch (Exception e) {
-			System.err.println("Errore durante l'autenticazione Google: " + e.getMessage());
-			e.printStackTrace();
-			return false;
-		}
-	}
-
-	/**
-	 * Ottiene un token di accesso dal servizio Cognito utilizzando le credenziali
-	 * client. Il token viene richiesto utilizzando il flusso OAuth2
-	 * "client_credentials".
-	 *
-	 * <p>
-	 * Il metodo verifica prima la validità della configurazione e del client
-	 * secret. Se la richiesta ha successo, restituisce il token di accesso;
-	 * altrimenti restituisce null.
+	 * <p>Il metodo verifica prima la validità della configurazione e del client secret.
+	 * Se la richiesta ha successo, restituisce il token di accesso; altrimenti restituisce null.
 	 *
 	 * @return Token di accesso come stringa, o null in caso di errore
 	 *
@@ -171,58 +90,66 @@ public class CognitoAuthServiceImpl implements CognitoAuthService {
 	 */
 	@Override
 	public String getAccessToken() {
-		if (!config.isValid()) {
-			System.err.println("Configurazione Cognito non valida");
-			return null;
-		}
+	    if (!config.isValid()) {
+	        logger.severe("Configurazione Cognito non valida");
+	        return null;
+	    }
 
-		final String clientSecret = config.getClientSecret();
-		if (clientSecret == null || clientSecret.isEmpty()) {
-			System.err.println("Client secret non configurato. Imposta COGNITO_CLIENT_SECRET");
-			return null;
-		}
+	    final String clientSecret = config.getClientSecret();
+	    if (clientSecret == null || clientSecret.isEmpty()) {
+	        logger.severe("Client secret non configurato. Imposta COGNITO_CLIENT_SECRET");
+	        return null;
+	    }
 
-		final RequestBody formBody = new FormBody.Builder().add("client_id", config.getClientId())
-				.add("client_secret", clientSecret).add("scope", config.getScope())
-				.add("grant_type", "client_credentials").build();
+	    final RequestBody formBody = new FormBody.Builder()
+	            .add("client_id", config.getClientId())
+	            .add("client_secret", clientSecret)
+	            .add("scope", config.getScope())
+	            .add("grant_type", "client_credentials")
+	            .build();
 
-		final Request request = new Request.Builder()
-				.url("https://eu-west-1xrobh5glh.auth.eu-west-1.amazoncognito.com/oauth2/token").post(formBody)
-				.header("Content-Type", "application/x-www-form-urlencoded").build();
+	    final Request request = new Request.Builder()
+	            .url("https://eu-west-1.xrobh5glh.auth.eu-west-1.amazoncognito.com/oauth2/token") 
+	            .post(formBody)
+	            .header(HEADER_CONTENT_TYPE, CONTENT_TYPE_FORM)
+	            .build();
 
-		try (Response response = httpClient.newCall(request).execute()) {
-			if (response.isSuccessful() && response.body() != null) {
-				final String responseBody = response.body().string();
-				final JsonObject jsonObject = JsonParser.parseString(responseBody).getAsJsonObject();
-				return jsonObject.get("access_token").getAsString();
-			}
-			System.err.println("Errore nella richiesta del token: " + response.code());
-			if (response.body() != null) {
-				System.err.println("Response body: " + response.body().string());
-			}
-			return null;
-		} catch (Exception e) {
-			System.err.println("Errore durante la richiesta del token: " + e.getMessage());
-			e.printStackTrace();
-			return null;
-		}
+	    try (Response response = httpClient.newCall(request).execute()) {
+	        String responseBody = null;
+	        if (response.body() != null) {
+	            responseBody = response.body().string(); // leggi una volta sola
+	        }
+
+	        if (response.isSuccessful() && responseBody != null) {
+	            final JsonObject jsonObject = JsonParser.parseString(responseBody).getAsJsonObject();
+	            return jsonObject.get("access_token").getAsString();
+	        } else {
+	            logger.severe("Errore nella richiesta del token: " + response.code());
+	            if (responseBody != null) {
+	                logger.log(Level.SEVERE, "Response body: {0}", responseBody);
+	            }
+	            return null;
+	        }
+	    } catch (Exception e) {
+	        logger.log(Level.SEVERE, "Errore durante la richiesta del token", e);
+	        return null;
+	    }
 	}
 
+
 	/**
-	 * Registra un nuovo utente nel pool utenti Cognito. Crea un account con
-	 * username, password e email forniti.
+	 * Registra un nuovo utente nel pool utenti Cognito.
+	 * Crea un account con username, password e email forniti.
 	 *
-	 * <p>
-	 * Il metodo invia una richiesta di SignUp all'endpoint Cognito Identity
-	 * Provider. L'email viene aggiunta come attributo utente.
+	 * <p>Il metodo invia una richiesta di SignUp all'endpoint Cognito Identity Provider.
+	 * L'email viene aggiunta come attributo utente.
 	 *
 	 * @param username Nome utente per la registrazione
 	 * @param password Password per l'account
-	 * @param email    Indirizzo email dell'utente
+	 * @param email Indirizzo email dell'utente
 	 * @return true se la registrazione ha successo, false altrimenti
 	 *
-	 * @throws IllegalArgumentException Se username, password o email sono null o
-	 *                                  vuoti
+	 * @throws IllegalArgumentException Se username, password o email sono null o vuoti
 	 * @see AuthConfig#getClientId()
 	 * @see AuthConfig#getRegion()
 	 */
@@ -241,24 +168,115 @@ public class CognitoAuthServiceImpl implements CognitoAuthService {
 
 		jsonRequest.add("UserAttributes", userAttributes);
 
-		final RequestBody body = RequestBody.create(jsonRequest.toString(), MediaType.parse("application/json"));
+		final RequestBody body = RequestBody.create(jsonRequest.toString(), MediaType.parse(CONTENT_TYPE_JSON));
 
 		final Request request = new Request.Builder()
 				.url("https://cognito-idp." + config.getRegion() + ".amazonaws.com/").post(body)
-				.header("Content-Type", "application/json")
-				.header("X-Amz-Target", "AWSCognitoIdentityProviderService.SignUp")
+				.header(HEADER_CONTENT_TYPE, CONTENT_TYPE_JSON)
+				.header(HEADER_X_AMZ_TARGET, "AWSCognitoIdentityProviderService.SignUp")
 				.header("X-Amz-Region", config.getRegion()).build();
 
 		try (Response response = httpClient.newCall(request).execute()) {
 			if (response.isSuccessful()) {
-				return true;
+			    logger.info("Registrazione avvenuta con successo");
+			    return true;
+			} else {
+			    
+			    final String errorBody = response.body() != null ? response.body().string() : "Nessun body";
+			    
+			    
+			    logger.log(Level.SEVERE,
+			            "Errore durante la registrazione: {0} - {1}",
+			            new Object[]{response.code(), errorBody});
+			    return false;
 			}
-			final String errorBody = response.body() != null ? response.body().string() : "Nessun body";
-			System.err.println("Errore durante la registrazione: " + response.code() + " - " + errorBody);
-			return false;
+
 		} catch (Exception e) {
-			System.err.println("Errore durante la registrazione: " + e.getMessage());
-			e.printStackTrace();
+			logger.log(Level.SEVERE, "Errore durante la registrazione", e);
+			return false;
+		}
+	}
+
+	/**
+	 * Autentica un utente utilizzando un token di accesso di Facebook.
+	 * Questo metodo implementa l'autenticazione federata tramite Facebook Login.
+	 *
+	 * <p>Il metodo invia il token Facebook a Cognito Identity per ottenere
+	 * un'identità federata all'interno del pool identità configurato.
+	 *
+	 * @param facebookAccessToken Token di accesso ottenuto da Facebook Login
+	 * @return true se l'autenticazione ha successo, false altrimenti
+	 *
+	 * @throws IllegalArgumentException Se il token Facebook è null o vuoto
+	 * @see AuthConfig#getIdentityPoolId()
+	 */
+	@Override
+	public boolean authenticateWithFacebook(String facebookAccessToken) {
+		final JsonObject jsonRequest = new JsonObject();
+		jsonRequest.addProperty("IdentityPoolId", config.getIdentityPoolId());
+		jsonRequest.addProperty("Logins", "graph.facebook.com:" + facebookAccessToken);
+
+		final RequestBody body = RequestBody.create(jsonRequest.toString(), MediaType.parse(CONTENT_TYPE_JSON));
+
+		final Request request = new Request.Builder().url("https://cognito-identity.eu-west-1.amazonaws.com/")
+				.post(body).addHeader(HEADER_CONTENT_TYPE, CONTENT_TYPE_JSON)
+				.addHeader(HEADER_X_AMZ_TARGET, "AWSCognitoIdentityService.GetId").build();
+
+		try (Response response = httpClient.newCall(request).execute()) {
+			if (response.isSuccessful()) {
+				if (response.body() != null) {
+					response.body().string();
+				}
+				logger.info("Autenticazione Facebook avvenuta con successo");
+				return true;
+			} else {
+				logger.severe("Errore durante l'autenticazione con Facebook: " + response.code());
+				return false;
+			}
+		} catch (Exception e) {
+			logger.log(Level.SEVERE, "Errore durante l'autenticazione Facebook", e);
+			return false;
+		}
+	}
+
+	/**
+	 * Autentica un utente utilizzando un token di accesso di Google.
+	 * Questo metodo implementa l'autenticazione federata tramite Google Sign-In.
+	 *
+	 * <p>Il metodo invia il token Google a Cognito Identity per ottenere
+	 * un'identità federata all'interno del pool identità configurato.
+	 *
+	 * @param googleAccessToken Token di accesso ottenuto da Google Sign-In
+	 * @return true se l'autenticazione ha successo, false altrimenti
+	 *
+	 * @throws IllegalArgumentException Se il token Google è null o vuoto
+	 * @see AuthConfig#getIdentityPoolId()
+	 */
+	@Override
+	public boolean authenticateWithGoogle(String googleAccessToken) {
+		final JsonObject jsonRequest = new JsonObject();
+		jsonRequest.addProperty("IdentityPoolId", config.getIdentityPoolId());
+		jsonRequest.addProperty("Logins", "accounts.google.com:" + googleAccessToken);
+
+		final RequestBody body = RequestBody.create(jsonRequest.toString(), MediaType.parse(CONTENT_TYPE_JSON));
+
+		final Request request = new Request.Builder().url("https://cognito-identity.eu-west-1.amazonaws.com/")
+				.post(body).addHeader(HEADER_CONTENT_TYPE, CONTENT_TYPE_JSON)
+				.addHeader(HEADER_X_AMZ_TARGET, "AWSCognitoIdentityService.GetId").build();
+
+		try (Response response = httpClient.newCall(request).execute()) {
+			if (response.isSuccessful()) {
+				if (response.body() != null) {
+					response.body().string();
+				}
+				logger.info("Autenticazione Google avvenuta con successo");
+				return true;
+			} else {
+				logger.severe("Errore durante l'autenticazione con Google: " + response.code());
+				return false;
+			}
+		} catch (Exception e) {
+			logger.log(Level.SEVERE, "Errore durante l'autenticazione Google", e);
 			return false;
 		}
 	}

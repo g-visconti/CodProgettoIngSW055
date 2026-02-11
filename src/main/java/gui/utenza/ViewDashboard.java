@@ -32,6 +32,8 @@ import javax.swing.border.EmptyBorder;
 
 import controller.AccountController;
 import controller.ImmobileController;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 import database.ConnessioneDatabase;
 import gui.ViewAccesso;
 import gui.ViewFiltri;
@@ -71,7 +73,7 @@ import util.InputUtils;
  * @see ViewModificaPassword
  */
 public class ViewDashboard extends JFrame {
-
+	private static final Logger LOGGER = Logger.getLogger(ViewDashboard.class.getName());
 	private static final long serialVersionUID = 1L;
 	private String idCliente = null;
 	private final String emailCliente;
@@ -609,7 +611,7 @@ public class ViewDashboard extends JFrame {
 			try {
 				idCliente = controller.getIdAccountByEmail(emailAgente);
 			} catch (SQLException ex) {
-				ex.printStackTrace();
+				LOGGER.log(Level.SEVERE, "Errore", ex);
 				JOptionPane.showMessageDialog(this, "Errore nel recupero dell'ID account: " + ex.getMessage(), "Errore",
 						JOptionPane.ERROR_MESSAGE);
 			}
