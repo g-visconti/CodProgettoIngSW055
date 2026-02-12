@@ -16,6 +16,8 @@ Testing: JUnit 5
 
 
 -------- Build e Deployment --------
+#Aprire Powershell all'interno della directory progetto
+
 
 1. Build Locale con Maven
 
@@ -32,7 +34,7 @@ java -jar eseguibili/DietiEstates25.jar
 
 
 
- 2. Deplyment con Docker Compose
+ 2. Deployment con Docker Compose
 
 Build dell'applicazione
 docker-compose build
