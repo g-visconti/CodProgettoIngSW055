@@ -25,23 +25,28 @@ mvn clean compile
 Crea il JAR eseguibile
 mvn clean package
 
-Il JAR sarà in: target/DietiEstates25-jar-with-dependencies.jar
+Il JAR sarà in: target/DietiEstates25.jar
 
  Eseguire l'applicazione:
-java -jar target/DietiEstates25-jar-with-dependencies.jar
+java -jar eseguibili/DietiEstates25.jar
 
 
 
  2. Deplyment con Docker Compose
 
+Build dell'applicazione
+docker-compose build
+
 Avvia l'applicazione (si connette a RDS)
-docker-compose up -d
+docker-compose up 
 
 Verifica lo stato
 docker-compose ps
 
 Per fermare l'applicazione
 docker-compose down
+
+Docker funziona correttamente, per testare anche la gui scegliere il 1° deploy con Maven
 
 
 
