@@ -1,0 +1,578 @@
+@startuml DietiEstates_MVC_Complete
+!theme plain
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+
+!define VIEW_COLOR #E3F2FD
+!define CONTROLLER_COLOR #FFF9C4
+!define MODEL_COLOR #C8E6C9
+!define DAO_COLOR #F8BBD0
+!define DTO_COLOR #FFE0B2
+
+package "VIEW (GUI)" <<Rectangle>> #E3F2FD {
+  package "gui" {
+    class ViewAccessoConPassword {
+      - contentPane: JPanel
+      - txtAccediORegistrati: JTextField
+      - campoPieno: String
+      - passwordField: JPasswordField
+      --
+      + keyTyped(e: KeyEvent): void
+      + mouseClicked(e: MouseEvent): void
+      + mouseClicked(e: MouseEvent): void
+      + mouseClicked(e: MouseEvent): void
+      + actionPerformed(e: ActionEvent): void
+    }
+    class ViewInfoAccount {
+      - contentPane: JPanel
+      --
+      + mouseClicked(e: MouseEvent): void
+    }
+    class ViewAccesso {
+      - oauthController: transient OAuthController
+      - contentPane: JPanel
+      - txtEmail: JTextField
+      --
+      - initPanelLogo(): void
+      - initPanelAccesso(): void
+      - initTextFields(panel: JPanel): void
+      + mouseClicked(e: MouseEvent): void
+      - initOAuthButtons(panel: JPanel): void
+      - initEmailLogin(panel: JPanel): void
+      - handleEmailLogin(): void
+      - handleProviderToken(token: String, provider: String): void
+      ...
+    }
+    class ViewFiltri {
+      - prefs: transient Preferences
+      - contentPane: JPanel
+      - comboBoxPMin: JComboBox<String>
+      - comboBoxPMax: JComboBox<String>
+      - comboBoxSMin: JComboBox<String>
+      - comboBoxSMax: JComboBox<String>
+      - comboBoxNumLocali: JComboBox<String>
+      - comboBoxPiano: JComboBox<String>
+      - comboBoxNumBagni: JComboBox<String>
+      - chckbxAscensore: JCheckBox
+      ...
+      --
+      + mouseClicked(e: MouseEvent): void
+      + actionPerformed(e: ActionEvent): void
+      + actionPerformed(e: ActionEvent): void
+      + actionPerformed(e: ActionEvent): void
+      - creaFiltriDaInput(): Filtri
+    }
+    class ViewModificaPassword {
+      - contentPane: JPanel
+      - passwordField: JPasswordField
+      - confermaPasswordField: JPasswordField
+      - campoPieno: String
+      - campoVuoto: String
+      --
+      + keyTyped(e: KeyEvent): void
+      + mouseClicked(e: MouseEvent): void
+      + keyTyped(e: KeyEvent): void
+      + mouseClicked(e: MouseEvent): void
+      + mouseClicked(e: MouseEvent): void
+      + mouseClicked(e: MouseEvent): void
+      + mouseClicked(e: MouseEvent): void
+    }
+  }
+
+  package "gui.amministrazione" {
+    class ViewInserimentoEmail {
+      - contentPane: JPanel
+      - panel: JPanel
+      - tipoInserimento: TipoInserimento
+      - txtEmail: JTextField
+      - campoPieno: String
+      --
+      + mouseClicked(e: MouseEvent): void
+      + mouseClicked(e: MouseEvent): void
+      + keyTyped(e: KeyEvent): void
+      + actionPerformed(e: ActionEvent): void
+      + labelClicked(field: JTextField, text: String): void
+      + focusGained(e: FocusEvent): void
+      + focusLost(e: FocusEvent): void
+    }
+    class ViewStoricoAgente {
+      - tableStoricoOfferte: JTable
+      - contentPane: JPanel
+      --
+      + actionPerformed(e: ActionEvent): void
+      - apriDettagliOfferta(idOfferta: Long, emailAgente: String): void
+      - apriValutazioneOfferta(idOfferta: Long, emailAgente: String): void
+    }
+    class ViewDashboardDietiEstates {
+      - idAgente: String
+      - emailAgente: String
+      - ruoloDietiEstates: String
+      - campoRicerca: JTextField
+      - campoPieno: String
+      - campoVuoto: String
+      - tableRisultati: JTable
+      - lblRisultati: JLabel
+      - viewFiltri: ViewFiltri
+      - comboBoxAppartamento: JComboBox<String>
+      ...
+      --
+      + mouseClicked(e: MouseEvent): void
+      + actionPerformed(e: ActionEvent): void
+      + run(): void
+      + actionPerformed(e: ActionEvent): void
+      + run(): void
+      + mousePressed(evt: java.awt.event.MouseEvent): void
+      + actionPerformed(e: ActionEvent): void
+      + actionPerformed(e: ActionEvent): void
+      ...
+    }
+    class ViewOffertaProposta {
+      - contentPane: JPanel
+      - descrizioneField: JTextArea
+      - immagini: List<byte[]>
+      - indiceFotoCorrente: int
+      - offertaCorrente: OffertaIniziale
+      - isInAttesa: boolean
+      --
+      + mouseClicked(e: MouseEvent): void
+      + mouseClicked(e: MouseEvent): void
+      # paintComponent(g: Graphics): void
+      # paintComponent(g: Graphics): void
+      # paintComponent(g: Graphics): void
+      + mouseClicked(e: MouseEvent): void
+    }
+    class ViewRegistraAgente {
+      - authService: CognitoAuthService
+      - contentPane: JPanel
+      - txtNome: JTextField
+      - txtCognome: JTextField
+      - txtTelefono: JTextField
+      - txtCitta: JTextField
+      - txtIndirizzo: JTextField
+      - txtConfirmPass: JPasswordField
+      - txtPass: JPasswordField
+      - panel: JPanel
+      ...
+      --
+      + mouseClicked(e: MouseEvent): void
+      + mouseClicked(e: MouseEvent): void
+      + actionPerformed(e: ActionEvent): void
+      + labelClicked(field: JTextField, text: String): void
+      + focusGained(e: FocusEvent): void
+      + focusLost(e: FocusEvent): void
+    }
+    class ViewRispostaOfferte {
+      - contentPane: JPanel
+      - txtControproposta: JTextField
+      --
+      + mouseClicked(e: MouseEvent): void
+      + mouseClicked(e: MouseEvent): void
+      + mouseClicked(e: MouseEvent): void
+    }
+    class ViewRegistraSupporto {
+      - authService: CognitoAuthService
+      - contentPane: JPanel
+      - txtNome: JTextField
+      - txtCognome: JTextField
+      - txtTelefono: JTextField
+      - txtCitta: JTextField
+      - txtIndirizzo: JTextField
+      - txtConfirmPass: JPasswordField
+      - txtPass: JPasswordField
+      - panel: JPanel
+      ...
+      --
+      + mouseClicked(e: MouseEvent): void
+      + mouseClicked(e: MouseEvent): void
+      + actionPerformed(e: ActionEvent): void
+      + labelClicked(field: JTextField, text: String): void
+      + focusGained(e: FocusEvent): void
+      + focusLost(e: FocusEvent): void
+    }
+    class ViewCaricaImmobile {
+      - contentPane: JPanel
+      - descrizioneField: JTextArea
+      - titoloField: JTextField
+      - localitaField: JTextField
+      - dimensioneField: JTextField
+      - indirizzoField: JTextField
+      - prezzoField: JTextField
+      - immaginiCaricate: List<byte[]>
+      --
+      + mouseClicked(e: MouseEvent): void
+      + actionPerformed(e: ActionEvent): void
+      - caricaFoto(lblFoto: JLabel, lblNuovaFoto: JLabel): void
+    }
+  }
+
+  package "gui.utenza" {
+    class ViewRegistrazione {
+      - authService: CognitoAuthService
+      - contentPane: JPanel
+      - txtNome: JTextField
+      - txtCognome: JTextField
+      - txtTelefono: JTextField
+      - txtCitta: JTextField
+      - txtIndirizzo: JTextField
+      - txtConfirmPass: JPasswordField
+      - txtPass: JPasswordField
+      - panelRegistrazione: JPanel
+      ...
+      --
+      + mouseClicked(e: MouseEvent): void
+      + mouseClicked(e: MouseEvent): void
+      + actionPerformed(e: ActionEvent): void
+      + mouseClicked(e: MouseEvent): void
+      + labelClicked(field: JTextField, text: String): void
+      + focusGained(e: FocusEvent): void
+      + focusLost(e: FocusEvent): void
+    }
+    class ViewContropropostaAgente {
+      - contentPane: JPanel
+      --
+      + actionPerformed(e: ActionEvent): void
+    }
+    class ViewStoricoCliente {
+      - tableStoricoOfferte: JTable
+      - contentPane: JPanel
+      --
+      + actionPerformed(e: ActionEvent): void
+    }
+    class ViewOffertaIniziale {
+      - contentPane: JPanel
+      - lblOfferta: JTextField
+      --
+      + actionPerformed(e: ActionEvent): void
+    }
+    class ViewImmobile {
+      - contentPane: JPanel
+      - descrizioneField: JTextArea
+      - immagini: List<byte[]>
+      - indiceFotoCorrente: int
+      --
+      + mouseClicked(e: MouseEvent): void
+      + mouseClicked(e: MouseEvent): void
+      # paintComponent(g: Graphics): void
+      # paintComponent(g: Graphics): void
+      # paintComponent(g: Graphics): void
+      + mouseClicked(e: MouseEvent): void
+    }
+    class ViewDashboard {
+      - idCliente: String
+      - emailCliente: String
+      - campoRicerca: JTextField
+      - campoPieno: String
+      - campoVuoto: String
+      - tableRisultati: JTable
+      - lblLogout: JLabel
+      - lblRisultati: JLabel
+      - viewFiltri: ViewFiltri
+      - comboBoxAppartamento: JComboBox<String>
+      ...
+      --
+      + actionPerformed(e: ActionEvent): void
+      + mouseClicked(e: MouseEvent): void
+      + mouseClicked(e: MouseEvent): void
+      + actionPerformed(e: ActionEvent): void
+      + keyTyped(e: KeyEvent): void
+      + mouseClicked(e: MouseEvent): void
+      + mouseClicked(e: MouseEvent): void
+      + mouseClicked(e: MouseEvent): void
+      ...
+    }
+  }
+
+}
+
+package "CONTROLLER" <<Rectangle>> #FFF9C4 {
+  class OfferteController {
+    - impostaRendererStato(table: JTable, colonnaStatoIndex: int, isAgente: boolean): void
+    + inserisciOffertaIniziale(offertaProposta: double, idCliente: String, idImmobile: long): boolean
+    - popolaTabellaOfferteProposteCliente(tableOfferteProposte: JTable, offerte: List<StoricoClienteDTO>): void
+    - popolaTabellaOfferteRicevuteAgente(tableOfferteRicevute: JTable, offerte: List<StoricoAgenteDTO>): void
+    + riempiTableOfferte(tableOfferte: JTable, emailUtente: String, isAgente: boolean): void
+    + riempiTableOfferteProposte(tableOfferteProposte: JTable, emailUtente: String): void
+    + riempiTableOfferteRicevuteAgente(tableOfferteRicevute: JTable, emailAgente: String): void
+  }
+  class AccessController {
+    + checkCredenziali(email: String, password: String): boolean
+    + checkUtente(email: String): boolean
+    + registraNuovoUtente(email: String, password: String, ruolo: String): void
+  }
+  class ImmobileController {
+    + caricaImmobile(imm: Immobile): boolean
+    + recuperaDettagli(idImmobile: long): Immobile
+    + riempiTableRisultati(tableRisultati: JTable, ricercaDTO: RicercaDTO): int
+  }
+  class AccountController {
+    + emailToId(email: String): String
+    + recuperaDettagliAgente(idAccount: String): Account
+    + updatePassword(emailAssociata: String, pass: String, confermaPass: String): boolean
+  }
+  class OAuthController {
+    - oauthService: OAuthService
+    - accessController: AccessController
+    --
+    + handleOAuthLogin(token: String, provider: String): String
+    + validateToken(token: String, provider: String): boolean
+    - showMessage(message: String, title: String, messageType: int): void
+    - logAccesso(email: String, provider: String): void
+  }
+}
+
+package "AUTH" <<Rectangle>> #FFCCBC {
+  class CognitoAuthServiceImpl {
+    - config: AuthConfig
+    - httpClient: OkHttpClient
+    --
+    + registerUser(username: String, password: String, email: String): boolean
+    + authenticateWithFacebook(facebookAccessToken: String): boolean
+    + authenticateWithGoogle(googleAccessToken: String): boolean
+  }
+  interface CognitoAuthService {
+  }
+  class AuthConfig {
+    - region: String
+    - clientId: String
+    - clientSecret: String
+    - tokenUrl: String
+    - signupUrl: String
+    - scope: String
+    - identityPoolId: String
+  }
+}
+
+package "MODEL" <<Rectangle>> #C8E6C9 {
+  package "model.entity" {
+    class AgenteImmobiliare {
+      - agenzia: String
+    }
+    class AmministratoreAgenzia {
+    }
+    class Cliente {
+    }
+    class Filtri {
+      + prezzoMin: Integer
+      + prezzoMax: Integer
+      + superficieMin: Integer
+      + superficieMax: Integer
+      + piano: String
+      + numLocali: Integer
+      + numBagni: Integer
+      + ascensore: Boolean
+      + portineria: Boolean
+      + climatizzazione: Boolean
+    }
+    class Immobile {
+      - foto: List<byte[]>
+      - id: long
+      - titolo: String
+      - indirizzo: String
+      - localita: String
+      - dimensione: int
+      - descrizione: String
+      - tipologia: String
+      - numeroLocali: int
+      - numeroBagni: int
+      ...
+    }
+    class ImmobileInAffitto {
+      - prezzoMensile: double
+    }
+    class RispostaOfferta {
+      - idRisposta: Long
+      - offertaInizialeAssociata: Long
+      - agenteAssociato: String
+      - nomeAgente: String
+      - cognomeAgente: String
+      - tipoRisposta: String
+      - importoControproposta: Double
+      - dataRisposta: LocalDateTime
+      - attiva: Boolean
+    }
+    class Account {
+      - idAccount: String
+      - email: String
+      - nome: String
+      - cognome: String
+      - password: String
+      - citta: String
+      - telefono: String
+      - cap: String
+      - indirizzo: String
+      - ruolo: String
+    }
+    class OffertaIniziale {
+      - idOfferta: long
+      - immobileAssociato: long
+      - clienteAssociato: String
+      - dataOfferta: LocalDateTime
+      - stato: String
+      - importoProposto: double
+      --
+      + toString(): String
+    }
+    class AmministratoreDiSupporto {
+    }
+    class ImmobileInVendita {
+      - prezzoTotale: int
+    }
+  }
+
+  package "model.dto" {
+    class AccountInfoDTO {
+      - idAccount: String
+      - email: String
+      - nome: String
+      - cognome: String
+      - telefono: String
+      - citta: String
+      - indirizzo: String
+      - cap: String
+      - ruolo: String
+    }
+    class RicercaDTO {
+      - queryRicerca: String
+      - tipologiaImmobile: String
+      - filtri: Filtri
+      - emailUtente: String
+      - tipoRicerca: TipoRicerca
+    }
+    class StoricoAgenteDTO {
+      - idOfferta: Long
+      - primaImmagineBase64: String
+      - categoria: String
+      - descrizione: String
+      - dataOfferta: LocalDateTime
+      - importoProposto: BigDecimal
+      - stato: String
+      --
+      + hasImmagine(): boolean
+      + toString(): String
+    }
+    class StoricoClienteDTO {
+      - idOfferta: Long
+      - primaImmagineBase64: String
+      - categoria: String
+      - descrizione: String
+      - dataOfferta: LocalDateTime
+      - importoProposto: BigDecimal
+      - stato: String
+      --
+      + hasImmagine(): boolean
+      + toString(): String
+    }
+  }
+
+}
+
+package "DAO (Data Access)" <<Rectangle>> #F8BBD0 {
+  class AmministratoreDiSupportoDAO {
+    - conn: Connection
+    --
+    + insertSupporto(supporto: AmministratoreDiSupporto): void
+  }
+  class AccountDAO {
+    - connection: Connection
+    --
+    + emailEsiste(email: String): boolean
+    + checkCredenziali(email: String, passwordInserita: String): boolean
+    + insertAccount(account: Account): String
+    + insertAccount(cliente: Cliente): String
+    + cambiaPassword(emailAssociata: String, pass: String, confermaPass: String): boolean
+  }
+  class ImmobileDAO {
+    - connection: Connection
+    --
+    + caricaImmobileInAffitto(immobile: ImmobileInAffitto): void
+    + caricaImmobileInVendita(immobile: ImmobileInVendita): void
+    - costruisciQueryBase(tipologia: String, ricercaDTO: RicercaDTO): String
+    - aggiungiFiltriQuery(query: String, filtri: Filtri, tipologia: String): String
+    - aggiungiParametriFiltri(ps: PreparedStatement, filtri: Filtri, index: int): int
+  }
+  class AgenteImmobiliareDAO {
+    - conn: Connection
+    --
+    + insertAgente(agente: AgenteImmobiliare): void
+  }
+  class AmministratoreDAO {
+    - conn: Connection
+  }
+  class RispostaOffertaDAO {
+    - connection: Connection
+    --
+    + inserisciRispostaOfferta(risposta: RispostaOfferta): boolean
+    + disattivaRispostePrecedenti(offertaInizialeAssociata: Long): boolean
+  }
+  class OffertaInizialeDAO {
+    - connection: Connection
+    --
+    + inserisciOffertaIniziale(offerta: OffertaIniziale): boolean
+    + aggiornaStatoOfferta(idOfferta: Long, nuovoStato: String): boolean
+  }
+  class ClienteDAO {
+    - connection: Connection
+    --
+    + insertCliente(cliente: Cliente): void
+  }
+}
+
+' ==================== RELATIONSHIPS ====================
+
+ColorazioneAlternataRenderer <|-- Base64ImageRenderer
+ColorazioneAlternataRenderer <|-- TextBoldRenderer
+DefaultTableCellRenderer <|-- ColorazioneAlternataRenderer
+JTextArea implements TableCellRenderer <|-- TextAreaRenderer
+JFrame <|-- ViewAccessoConPassword
+JFrame <|-- ViewInfoAccount
+JFrame <|-- ViewAccesso
+JFrame <|-- ViewFiltri
+JFrame <|-- ViewModificaPassword
+Account <|-- AgenteImmobiliare
+AmministratoreDiSupporto <|-- AmministratoreAgenzia
+Account <|-- Cliente
+Immobile <|-- ImmobileInAffitto
+AgenteImmobiliare <|-- AmministratoreDiSupporto
+Immobile <|-- ImmobileInVendita
+JFrame <|-- ViewRegistrazione
+JFrame <|-- ViewContropropostaAgente
+JFrame <|-- ViewStoricoCliente
+JFrame <|-- ViewOffertaIniziale
+JFrame <|-- ViewImmobile
+JFrame <|-- ViewDashboard
+JFrame <|-- ViewInserimentoEmail
+JFrame <|-- ViewStoricoAgente
+JFrame <|-- ViewDashboardDietiEstates
+JFrame <|-- ViewOffertaProposta
+JFrame <|-- ViewRegistraAgente
+JFrame <|-- ViewRispostaOfferte
+JFrame <|-- ViewRegistraSupporto
+JFrame <|-- ViewCaricaImmobile
+
+note top of "VIEW (GUI)"
+  <b>VIEW</b>
+  Interfacce grafiche Swing (JFrame, JPanel)
+  che interagiscono con i Controller
+end note
+
+note top of CONTROLLER
+  <b>CONTROLLER</b>
+  Gestisce la logica applicativa
+  e coordina View e Model
+end note
+
+note top of MODEL
+  <b>MODEL</b>
+  Entità di dominio (Entity)
+  e oggetti di trasferimento dati (DTO)
+end note
+
+note top of "DAO (Data Access)"
+  <b>DAO</b>
+  Pattern Data Access Object
+  per la persistenza dei dati
+end note
+
+@enduml
