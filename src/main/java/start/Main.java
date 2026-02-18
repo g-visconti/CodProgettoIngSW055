@@ -1,8 +1,6 @@
 package start;
 
 import gui.ViewAccesso;
-import gui.amministrazione.ViewDashboardDietiEstates;
-import gui.utenza.ViewDashboard;
 
 /**
  * Classe principale di avvio dell'applicazione DietiEstates25. Contiene il
@@ -28,8 +26,6 @@ import gui.utenza.ViewDashboard;
  *
  * @author IngSW2425_055 Team
  * @see ViewAccesso
- * @see ViewDashboard
- * @see ViewDashboardDietiEstates
  */
 public class Main {
 

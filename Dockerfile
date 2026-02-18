@@ -8,7 +8,7 @@ RUN mvn clean package -DskipTests
 # Runtime
 FROM eclipse-temurin:21-jre
 WORKDIR /app
-COPY --from=build /app/target/DietiEstates25.jar app.jar
+COPY --from=build /app/target/DietiEstates25-jar-with-dependencies.jar app.jar
 
 # Avvio applicazione
 ENTRYPOINT ["java", "-jar", "app.jar"]

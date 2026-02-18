@@ -16,8 +16,6 @@ Testing: JUnit 5
 
 
 -------- Build e Deployment --------
-#Aprire Powershell all'interno della directory progetto
-
 
 1. Build Locale con Maven
 
@@ -27,28 +25,23 @@ mvn clean compile
 Crea il JAR eseguibile
 mvn clean package
 
-Il JAR sarà in: target/DietiEstates25.jar
+Il JAR sarà in: target/DietiEstates25-jar-with-dependencies.jar
 
  Eseguire l'applicazione:
-java -jar eseguibili/DietiEstates25.jar
+java -jar target/DietiEstates25-jar-with-dependencies.jar
 
 
 
- 2. Deployment con Docker Compose
-
-Build dell'applicazione
-docker-compose build
+ 2. Deplyment con Docker Compose
 
 Avvia l'applicazione (si connette a RDS)
-docker-compose up 
+docker-compose up -d
 
 Verifica lo stato
 docker-compose ps
 
 Per fermare l'applicazione
 docker-compose down
-
-Docker funziona correttamente, per testare anche la gui scegliere il 1° deploy con Maven
 
 
 
