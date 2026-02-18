@@ -4,9 +4,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.logging.Logger;
-import java.util.logging.Level;
-
 
 /**
  * Data Access Object per la gestione degli amministratori di agenzia nel sistema.
@@ -27,8 +24,6 @@ import java.util.logging.Level;
  * @see ResultSet
  */
 public class AmministratoreDAO {
-	
-	private static final Logger LOGGER = Logger.getLogger(AmministratoreDAO.class.getName());
 	private final Connection conn;
 
 	/**
@@ -73,7 +68,7 @@ public class AmministratoreDAO {
 				}
 			}
 		} catch (SQLException e) {
-			LOGGER.log(Level.SEVERE, "Errore", e);
+			e.printStackTrace();
 		}
 
 		return agenzia;

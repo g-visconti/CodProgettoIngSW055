@@ -15,9 +15,12 @@
     <packaging>jar</packaging>
 
     <properties>
-       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.release>21</maven.compiler.release>
-    <java.version>21</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>22</maven.compiler.source>
+        <maven.compiler.target>22</maven.compiler.target>
+        
+        <!-- Versione Java -->
+        <java.version>22</java.version>
         
         <!-- SonarQube -->
         <sonar.host.url>http://localhost:9000</sonar.host.url>
@@ -72,56 +75,18 @@
 		</dependency>
     </dependencies>
 
-   <build>
+    <build>
         <plugins>
-            <!-- Maven Compiler -->
-          <plugin>
-    <groupId>org.apache.maven.plugins</groupId>
-    <artifactId>maven-compiler-plugin</artifactId>
-    <version>3.13.0</version>
-    <configuration>
-        <release>21</release>
-    </configuration>
-</plugin>
-
-<!-- Maven Surefire Plugin (per test) -->
-<plugin>
-    <groupId>org.apache.maven.plugins</groupId>
-    <artifactId>maven-surefire-plugin</artifactId>
-    <version>3.2.5</version>
-</plugin>
-
-            <!-- Maven Assembly Plugin - Crea JAR con dependencies -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>3.7.1</version>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-compiler-plugin.version}</version>
                 <configuration>
-                    <archive>
-                        <manifest>
-                            <!-- Classe main dell'applicazione -->
-                            <mainClass>start.Main</mainClass>
-                        </manifest>
-                    </archive>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
-                    <!-- Nome del JAR finale -->
-                    <finalName>DietiEstates25</finalName>
-                    <appendAssemblyId>false</appendAssemblyId>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
                 </configuration>
-                <executions>
-                    <execution>
-                        <id>make-assembly</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
-
-            <!-- Sonar Maven Plugin -->
+            
             <plugin>
                 <groupId>org.sonarsource.scanner.maven</groupId>
                 <artifactId>sonar-maven-plugin</artifactId>

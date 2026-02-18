@@ -29,8 +29,6 @@ import javax.swing.border.EmptyBorder;
 
 import controller.AccountController;
 import controller.ImmobileController;
-import java.util.logging.Logger;
-import java.util.logging.Level;
 import model.entity.Account;
 import model.entity.AgenteImmobiliare;
 import model.entity.Immobile;
@@ -68,7 +66,6 @@ import util.GuiUtils;
  * @see GuiUtils#caricaImmagineInEtichetta(JLabel, byte[], int, int)
  */
 public class ViewImmobile extends JFrame {
-	private static final Logger LOGGER = Logger.getLogger(ViewImmobile.class.getName());
 
 	private static final long serialVersionUID = 1L;
 	private final JPanel contentPane;
@@ -179,7 +176,7 @@ public class ViewImmobile extends JFrame {
 				try {
 					Desktop.getDesktop().browse(new URI(url));
 				} catch (Exception ex) {
-					LOGGER.log(Level.SEVERE, "Errore", ex);
+					ex.printStackTrace();
 					JOptionPane.showMessageDialog(null, "Errore nell'apertura del browser");
 				}
 
@@ -499,7 +496,7 @@ public class ViewImmobile extends JFrame {
 			final Account account = controllerAccount.recuperaDettagliAgente(immobile.getAgenteAssociato());
 			System.out.println("DEBUG: account = " + account);
 
-			if ((account != null)) {
+			if ((account != null) && (account != null)) {
 				lblNomeAgente.setText(account.getNome());
 				lblCognomeAgente.setText(account.getCognome());
 				lblEmailAgente.setText(account.getEmail());

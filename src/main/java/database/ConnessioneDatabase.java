@@ -1,12 +1,9 @@
 package database;
 
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.net.UnknownHostException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -43,12 +40,12 @@ public class ConnessioneDatabase {
 
 	// Attributi
 	private static ConnessioneDatabase instance;
-	
+	private static final String DRIVER = "org.postgresql.Driver";
 	// Logger per la gestione degli errori
-	private static final Logger LOGGER = Logger.getLogger(ConnessioneDatabase.class.getName());
-	private final static String nome = "postgres";
-	private final String password;
-	private final static String DB_URL = "jdbc:postgresql://database-1.cshockuiujqi.us-east-1.rds.amazonaws.com:5432/DietiEstates25DB";
+	private static final Logger logger = Logger.getLogger(ConnessioneDatabase.class.getName());
+	private final String nome = "postgres";
+	private final String password = "PostgresDB";
+	private final String url = "jdbc:postgresql://database-1.cshockuiujqi.us-east-1.rds.amazonaws.com:5432/DietiEstates25DB";
 	// Connessione
 	private Connection connection;
 
@@ -70,49 +67,41 @@ public class ConnessioneDatabase {
 	 *                      in base al tipo di problema riscontrato.
 	 * @throws ClassNotFoundException Se il driver PostgreSQL non è disponibile nel classpath
 	 */
-	
-	
-
+	// Costruttore privato
 	private ConnessioneDatabase() throws SQLException {
-	    // Legge la password da db.properties
-	    Properties props = new Properties();
-	    try (FileInputStream fis = new FileInputStream("db.properties")) {
-	        props.load(fis);
-	        password = props.getProperty("db.password");
-	        if (password == null || password.isEmpty()) {
-	            throw new SQLException("Password non trovata in db.properties");
-	        }
-	    } catch (IOException e) {
-	        JOptionPane.showMessageDialog(null,
-	            "Errore: impossibile leggere la password dal file db.properties.\n"
-	            + "Assicurati che il file esista nella cartella del progetto.",
-	            "Errore di configurazione", JOptionPane.ERROR_MESSAGE);
-	        throw new SQLException("Errore lettura password", e);
-	    }
+		try {
+			// Carica il driver PostgreSQL
+			Class.forName(DRIVER);
 
-	    try {
-	        // Crea la connessione
-	        connection = DriverManager.getConnection(DB_URL, nome, password);
-	        LOGGER.info("Connessione al database avvenuta con successo.");
-	    } catch (SQLException e) {
-	        if (e.getCause() instanceof UnknownHostException) {
-	        	LOGGER.log(Level.SEVERE, "Host del database non raggiungibile.", e);
-	            JOptionPane.showMessageDialog(null,
-	                "Attenzione: il database al momento non è raggiungibile.\n"
-	                + "Verifica la connessione di rete e riprova.",
-	                "Connessione non disponibile", JOptionPane.WARNING_MESSAGE);
-	        } else {
-	        	LOGGER.log(Level.SEVERE, "Errore di connessione al database.", e);
-	            JOptionPane.showMessageDialog(null,
-	                "Si è verificato un errore durante la connessione al database.\n"
-	                + "Controlla la connessione Internet o riprova più tardi.",
-	                "Errore di connessione", JOptionPane.ERROR_MESSAGE);
-	        }
-	        throw e;
-	    }
+			// Crea la connessione
+			connection = DriverManager.getConnection(url, nome, password);
+			logger.info("Connessione al database avvenuta con successo.");
 
+		} catch (ClassNotFoundException e) {
+			logger.log(Level.SEVERE, "Driver PostgreSQL non trovato.", e);
+			JOptionPane.showMessageDialog(null,
+					"Errore interno: driver PostgreSQL non trovato.\nContattare l'amministratore del sistema.",
+					"Errore di connessione", JOptionPane.ERROR_MESSAGE);
+			throw new SQLException("Errore durante il caricamento del driver", e);
+
+		} catch (SQLException e) {
+			// Controlla se la causa è UnknownHostException (nessuna rete o host non valido)
+			if (e.getCause() instanceof UnknownHostException) {
+				logger.log(Level.SEVERE, "Host del database non raggiungibile.", e);
+				JOptionPane.showMessageDialog(null,
+						"Attenzione: il database al momento non è raggiungibile.\n"
+								+ "Verifica la connessione di rete e riprova.",
+								"Connessione non disponibile", JOptionPane.WARNING_MESSAGE);
+			} else {
+				logger.log(Level.SEVERE, "Errore di connessione al database.", e);
+				JOptionPane.showMessageDialog(null,
+						"Si è verificato un errore durante la connessione al database.\n"
+								+ "Controlla la connessione Internet o riprova più tardi.",
+								"Errore di connessione", JOptionPane.ERROR_MESSAGE);
+			}
+			throw e; // rilancia per permettere gestione a livello superiore, se serve
+		}
 	}
-
 
 	/**
 	 * Restituisce l'oggetto {@link Connection} attualmente attivo per il database.
@@ -140,10 +129,12 @@ public class ConnessioneDatabase {
 	 *                      errate o database non raggiungibile.
 	 */
 	public static ConnessioneDatabase getInstance() throws SQLException {
-	    if (instance == null || instance.connection == null || instance.connection.isClosed()) {
-	        instance = new ConnessioneDatabase();
-	    }
-	    return instance;
+		if (instance == null) {
+			instance = new ConnessioneDatabase();
+		} else if (instance.connection == null || instance.connection.isClosed()) {
+			instance = new ConnessioneDatabase();
+		}
+		return instance;
 	}
 
 	/**
@@ -169,10 +160,10 @@ public class ConnessioneDatabase {
 		try {
 			if (connection != null && !connection.isClosed()) {
 				connection.close();
-				LOGGER.info("Connessione al database chiusa correttamente.");
+				logger.info("Connessione al database chiusa correttamente.");
 			}
 		} catch (SQLException e) {
-			LOGGER.log(Level.WARNING, "Errore durante la chiusura della connessione.", e);
+			logger.log(Level.WARNING, "Errore durante la chiusura della connessione.", e);
 		}
 	}
 }

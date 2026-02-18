@@ -22,9 +22,6 @@ import javax.swing.border.EmptyBorder;
 
 import controller.AccessController;
 import controller.AccountController;
-import java.util.logging.Logger;
-import java.util.logging.Level;
-
 import util.GuiUtils;
 
 /**
@@ -55,7 +52,7 @@ import util.GuiUtils;
  * @see GuiUtils
  */
 public class ViewModificaPassword extends JFrame {
-	private static final Logger LOGGER = Logger.getLogger(ViewModificaPassword.class.getName());
+
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JPasswordField passwordField;
@@ -293,7 +290,7 @@ public class ViewModificaPassword extends JFrame {
 						dispose();
 					}
 				} catch (HeadlessException | SQLException e1) {
-					LOGGER.log(Level.SEVERE, "Errore", e1);
+					e1.printStackTrace();
 				}
 			}
 		});

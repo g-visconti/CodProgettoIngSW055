@@ -395,11 +395,12 @@ public class ViewRegistrazione extends JFrame {
 					viewDashboard.setVisible(true);
 					dispose();
 				} else {
-					JOptionPane.showMessageDialog(null, "La registrazione è fallita. Riprova con i dati corretti.",
+					JOptionPane.showMessageDialog(null, "La registrazione � fallita. Riprova con i dati corretti.",
 							"Errore nella registrazione", JOptionPane.ERROR_MESSAGE);
 				}
 
-				
+				ViewDashboard schermata = new ViewDashboard(emailUtente);
+				schermata.setVisible(true);
 
 			}
 		});

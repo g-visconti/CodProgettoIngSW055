@@ -23,8 +23,6 @@ import javax.swing.table.TableColumn;
 
 import controller.AccountController;
 import controller.OfferteController;
-import java.util.logging.Logger;
-import java.util.logging.Level;
 import util.GuiUtils;
 
 /**
@@ -51,7 +49,7 @@ import util.GuiUtils;
  * @see ViewContropropostaAgente
  */
 public class ViewStoricoCliente extends JFrame {
-	private static final Logger LOGGER = Logger.getLogger(ViewStoricoCliente.class.getName());
+
 	private static final long serialVersionUID = 1L;
 	private final JTable tableStoricoOfferte;
 	private final JPanel contentPane;
@@ -248,7 +246,7 @@ public class ViewStoricoCliente extends JFrame {
 						} catch (SQLException e1) {
 							JOptionPane.showMessageDialog(null, "Non è stato possibile recuperare l'id del cliente",
 									"Errore", JOptionPane.INFORMATION_MESSAGE);
-							LOGGER.log(Level.SEVERE, "Errore", e1);
+							e1.printStackTrace();
 						}
 						final ViewContropropostaAgente viewControproposta = new ViewContropropostaAgente(idOfferta,
 								idCliente);

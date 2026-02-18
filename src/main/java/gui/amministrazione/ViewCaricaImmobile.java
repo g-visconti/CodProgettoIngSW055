@@ -36,9 +36,6 @@ import org.json.JSONObject;
 
 import controller.AccountController;
 import controller.ImmobileController;
-import java.util.logging.Logger;
-import java.util.logging.Level;
-
 import model.entity.Immobile;
 import model.entity.ImmobileInAffitto;
 import model.entity.ImmobileInVendita;
@@ -63,7 +60,7 @@ import util.GuiUtils;
  * @see Immobile
  */
 public class ViewCaricaImmobile extends JFrame {
-	private static final Logger LOGGER = Logger.getLogger(ViewCaricaImmobile.class.getName());
+
 	private static final long serialVersionUID = 1L;
 	// attributi
 	private final JPanel contentPane;
@@ -297,7 +294,7 @@ public class ViewCaricaImmobile extends JFrame {
 					final byte[] bytes = Files.readAllBytes(file.toPath());
 					immaginiCaricate.add(bytes);
 				} catch (IOException ex) {
-					LOGGER.log(Level.SEVERE, "Errore", ex);
+					ex.printStackTrace();
 				}
 			}
 
@@ -432,7 +429,7 @@ public class ViewCaricaImmobile extends JFrame {
 			dispose();
 
 		} catch (Exception ex) {
-			LOGGER.log(Level.SEVERE, "Errore", ex);
+			ex.printStackTrace();
 			JOptionPane.showMessageDialog(null, "Errore generico durante il caricamento dell'immobile");
 		}
 	}

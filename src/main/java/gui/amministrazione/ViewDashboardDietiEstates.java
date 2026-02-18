@@ -32,9 +32,6 @@ import javax.swing.border.EmptyBorder;
 
 import controller.AccountController;
 import controller.ImmobileController;
-import java.util.logging.Logger;
-import java.util.logging.Level;
-
 import database.ConnessioneDatabase;
 import gui.ViewAccesso;
 import gui.ViewFiltri;
@@ -66,7 +63,7 @@ import util.InputUtils;
  * @see ViewFiltri
  */
 public class ViewDashboardDietiEstates extends JFrame {
-	private static final Logger LOGGER = Logger.getLogger(ViewDashboardDietiEstates.class.getName());
+
 	private static final long serialVersionUID = 1L;
 	// attributi
 	private String idAgente = null;
@@ -76,7 +73,7 @@ public class ViewDashboardDietiEstates extends JFrame {
 	private String campoPieno;
 	private final String campoVuoto = "";
 	private JTable tableRisultati;
-	
+	private JLabel lblLogout;
 	private JLabel lblRisultati;
 	private ViewFiltri viewFiltri;
 	private JComboBox<String> comboBoxAppartamento;
@@ -135,7 +132,7 @@ public class ViewDashboardDietiEstates extends JFrame {
 		} catch (SQLException e) {
 			JOptionPane.showMessageDialog(null, "Non è stato possibile recuperare il ruolo", "Errore",
 					JOptionPane.INFORMATION_MESSAGE);
-			LOGGER.log(Level.SEVERE, "Errore", e);
+			e.printStackTrace();
 		}
 
 		// Crea il pannello di ricerca comune a tutti i ruoli
@@ -226,7 +223,7 @@ public class ViewDashboardDietiEstates extends JFrame {
 		ricerca.add(campoRicerca);
 
 		// Logout
-		JLabel lblLogout = new JLabel();
+		lblLogout = new JLabel();
 		setupLogoutListener(lblLogout);
 		lblLogout.setToolTipText("Clicca per uscire da DietiEstates25");
 		ricerca.add(lblLogout);
@@ -837,7 +834,7 @@ public class ViewDashboardDietiEstates extends JFrame {
 			try {
 				idAgente = controller.getIdAccountByEmail(emailAgente);
 			} catch (SQLException ex) {
-				LOGGER.log(Level.SEVERE, "Errore", ex);
+				ex.printStackTrace();
 				JOptionPane.showMessageDialog(this, "Errore nel recupero dell'ID account: " + ex.getMessage(), "Errore",
 						JOptionPane.ERROR_MESSAGE);
 			}

@@ -33,16 +33,7 @@ import model.entity.RispostaOfferta;
  */
 public class RispostaOffertaDAO {
 	private final Connection connection;
-	
-	
-	private static final String ID_RISPOSTA = "idRisposta";
-	private static final String TIPO_RISPOSTA = "tipoRisposta";
-	private static final String IMPORTO_CONTROPROPOSTA = "importoControproposta";
-	private static final String DATA_RISPOSTA = "dataRisposta";
-	private static final String OFFERTA_ASSOCIATA = "offertaInizialeAssociata";
-	private static final String AGENTE_ASSOCIATO = "agenteAssociato";
-	
-	private static final String STATO_ATTIVA = "attiva";
+
 	/**
 	 * Costruttore per RispostaOffertaDAO.
 	 * Inizializza il DAO con una connessione al database.
@@ -108,16 +99,16 @@ public class RispostaOffertaDAO {
 			final ResultSet rs = stmt.executeQuery();
 			while (rs.next()) {
 				final RispostaOfferta risposta = new RispostaOfferta();
-				risposta.setIdRisposta(rs.getLong(ID_RISPOSTA));
-				risposta.setOffertaInizialeAssociata(rs.getLong(OFFERTA_ASSOCIATA));
-				risposta.setAgenteAssociato(rs.getString(AGENTE_ASSOCIATO));
-				risposta.setTipoRisposta(rs.getString(TIPO_RISPOSTA));
+				risposta.setIdRisposta(rs.getLong("idRisposta"));
+				risposta.setOffertaInizialeAssociata(rs.getLong("offertaInizialeAssociata"));
+				risposta.setAgenteAssociato(rs.getString("agenteAssociato"));
+				risposta.setTipoRisposta(rs.getString("tipoRisposta"));
 
-				final double importo = rs.getDouble(IMPORTO_CONTROPROPOSTA);
+				final double importo = rs.getDouble("importoControproposta");
 				risposta.setImportoControproposta(rs.wasNull() ? null : importo);
 
-				risposta.setDataRisposta(rs.getTimestamp(DATA_RISPOSTA).toLocalDateTime());
-				risposta.setAttiva(rs.getBoolean(STATO_ATTIVA));
+				risposta.setDataRisposta(rs.getTimestamp("dataRisposta").toLocalDateTime());
+				risposta.setAttiva(rs.getBoolean("attiva"));
 				risposte.add(risposta);
 			}
 		}
@@ -142,16 +133,16 @@ public class RispostaOffertaDAO {
 			final ResultSet rs = stmt.executeQuery();
 			if (rs.next()) {
 				final RispostaOfferta risposta = new RispostaOfferta();
-				risposta.setIdRisposta(rs.getLong(ID_RISPOSTA));
-				risposta.setOffertaInizialeAssociata(rs.getLong(OFFERTA_ASSOCIATA));
-				risposta.setAgenteAssociato(rs.getString(AGENTE_ASSOCIATO));
-				risposta.setTipoRisposta(rs.getString(TIPO_RISPOSTA));
+				risposta.setIdRisposta(rs.getLong("idRisposta"));
+				risposta.setOffertaInizialeAssociata(rs.getLong("offertaInizialeAssociata"));
+				risposta.setAgenteAssociato(rs.getString("agenteAssociato"));
+				risposta.setTipoRisposta(rs.getString("tipoRisposta"));
 
-				final double importo = rs.getDouble(IMPORTO_CONTROPROPOSTA);
+				final double importo = rs.getDouble("importoControproposta");
 				risposta.setImportoControproposta(rs.wasNull() ? null : importo);
 
-				risposta.setDataRisposta(rs.getTimestamp(DATA_RISPOSTA).toLocalDateTime());
-				risposta.setAttiva(rs.getBoolean(STATO_ATTIVA));
+				risposta.setDataRisposta(rs.getTimestamp("dataRisposta").toLocalDateTime());
+				risposta.setAttiva(rs.getBoolean("attiva"));
 				return risposta;
 			}
 		}
@@ -200,16 +191,16 @@ public class RispostaOffertaDAO {
 
 			if (rs.next()) {
 				final RispostaOfferta risposta = new RispostaOfferta();
-				risposta.setIdRisposta(rs.getLong(ID_RISPOSTA));
-				risposta.setOffertaInizialeAssociata(rs.getLong(OFFERTA_ASSOCIATA));
-				risposta.setAgenteAssociato(rs.getString(AGENTE_ASSOCIATO));
-				risposta.setTipoRisposta(rs.getString(TIPO_RISPOSTA));
+				risposta.setIdRisposta(rs.getLong("idRisposta"));
+				risposta.setOffertaInizialeAssociata(rs.getLong("offertaInizialeAssociata"));
+				risposta.setAgenteAssociato(rs.getString("agenteAssociato"));
+				risposta.setTipoRisposta(rs.getString("tipoRisposta"));
 
-				final double importo = rs.getDouble(IMPORTO_CONTROPROPOSTA);
+				final double importo = rs.getDouble("importoControproposta");
 				risposta.setImportoControproposta(rs.wasNull() ? null : importo);
 
-				risposta.setDataRisposta(rs.getTimestamp(DATA_RISPOSTA).toLocalDateTime());
-				risposta.setAttiva(rs.getBoolean(STATO_ATTIVA));
+				risposta.setDataRisposta(rs.getTimestamp("dataRisposta").toLocalDateTime());
+				risposta.setAttiva(rs.getBoolean("attiva"));
 				risposta.setNomeAgente(rs.getString("nome"));
 				risposta.setCognomeAgente(rs.getString("cognome"));
 
@@ -247,12 +238,12 @@ public class RispostaOffertaDAO {
 				final String[] result = new String[5];
 				result[0] = rs.getString("nome");
 				result[1] = rs.getString("cognome");
-				result[2] = rs.getTimestamp(DATA_RISPOSTA).toString();
+				result[2] = rs.getTimestamp("dataRisposta").toString();
 
-				final double importo = rs.getDouble(IMPORTO_CONTROPROPOSTA);
+				final double importo = rs.getDouble("importoControproposta");
 				result[3] = rs.wasNull() ? "N/A" : String.valueOf(importo);
 
-				result[4] = rs.getString(TIPO_RISPOSTA);
+				result[4] = rs.getString("tipoRisposta");
 				return result;
 			} else {
 				return null;

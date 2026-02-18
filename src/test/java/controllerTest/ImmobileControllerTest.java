@@ -1,4 +1,4 @@
-package controllertest;
+package controllerTest;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;

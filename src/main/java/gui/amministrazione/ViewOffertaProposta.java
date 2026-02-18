@@ -29,8 +29,6 @@ import javax.swing.border.EmptyBorder;
 
 import controller.ImmobileController;
 import controller.OfferteController;
-import java.util.logging.Logger;
-import java.util.logging.Level;
 import model.entity.Immobile;
 import model.entity.ImmobileInAffitto;
 import model.entity.ImmobileInVendita;
@@ -58,7 +56,6 @@ import util.GuiUtils;
  * @see ViewRispostaOfferte
  */
 public class ViewOffertaProposta extends JFrame {
-	private static final Logger LOGGER = Logger.getLogger(ViewOffertaProposta.class.getName());
 	private static final long serialVersionUID = 1L;
 	// attributi
 	private JPanel contentPane;
@@ -170,7 +167,7 @@ public class ViewOffertaProposta extends JFrame {
 				try {
 					Desktop.getDesktop().browse(new URI(url));
 				} catch (Exception ex) {
-					LOGGER.log(Level.SEVERE, "Errore", ex);
+					ex.printStackTrace();
 					JOptionPane.showMessageDialog(null, "Errore nell'apertura del browser");
 				}
 

@@ -25,9 +25,6 @@ import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
-import java.util.logging.Logger;
-import java.util.logging.Level;
-
 
 import controller.AccessController;
 import controller.OAuthController;
@@ -66,13 +63,13 @@ import util.GuiUtils;
  * @see ViewDashboard
  */
 public class ViewAccesso extends JFrame {
-	private static final Logger LOGGER = Logger.getLogger(ViewAccesso.class.getName());
+
 	private static final long serialVersionUID = 1L;
-	private final transient OAuthController oauthController;
+	private final OAuthController oauthController;
 	private JPanel contentPane;
 	private JTextField txtEmail;
-	
-	
+	private JTextField txtAccediORegistrati;
+	private JTextField txtOppure;
 
 
 	/**
@@ -170,7 +167,7 @@ public class ViewAccesso extends JFrame {
 	 * @param panel Pannello contenitore dove aggiungere i componenti
 	 */
 	private void initTextFields(JPanel panel) {
-		JTextField txtAccediORegistrati = new JTextField("Accedi o registrati con");
+		txtAccediORegistrati = new JTextField("Accedi o registrati con");
 		txtAccediORegistrati.setBounds(13, 40, 344, 39);
 		txtAccediORegistrati.setFont(new Font("Tahoma", Font.BOLD, 18));
 		txtAccediORegistrati.setHorizontalAlignment(SwingConstants.CENTER);
@@ -190,7 +187,7 @@ public class ViewAccesso extends JFrame {
 			}
 		});
 
-		JTextField txtOppure = new JTextField("oppure");
+		txtOppure = new JTextField("oppure");
 		txtOppure.setBounds(13, 240, 344, 20);
 		txtOppure.setHorizontalAlignment(SwingConstants.CENTER);
 		txtOppure.setEditable(false);
@@ -223,7 +220,7 @@ public class ViewAccesso extends JFrame {
 		JLabel lblFacebook = createOAuthLabel(
 				"Facebook",
 				SystemColor.textHighlight,
-				e -> {
+				_ -> {
 					loginWithFacebook();
 					showTokenConfirmationDialog("Facebook");
 				}
@@ -234,7 +231,7 @@ public class ViewAccesso extends JFrame {
 		JLabel lblGoogle = createOAuthLabel(
 				"Google",
 				new Color(178, 34, 34),
-				e -> {
+				_ -> {
 					loginWithGoogle();
 					showTokenConfirmationDialog("Google");
 				}
@@ -263,7 +260,7 @@ public class ViewAccesso extends JFrame {
 		btnProsegui.setForeground(Color.WHITE);
 		panel.add(btnProsegui);
 
-		btnProsegui.addActionListener(e -> handleEmailLogin());
+		btnProsegui.addActionListener(_ -> handleEmailLogin());
 		getRootPane().setDefaultButton(btnProsegui);
 	}
 
@@ -307,7 +304,7 @@ public class ViewAccesso extends JFrame {
 			}
 			dispose();
 		} catch (SQLException e) {
-			LOGGER.log(Level.SEVERE, "Errore", e);
+			e.printStackTrace();
 		}
 	}
 
@@ -418,13 +415,13 @@ public class ViewAccesso extends JFrame {
 		GuiUtils.setIconaFinestra(frame);
 
 		JButton btn = new JButton("Conferma Accesso");
-		btn.addActionListener(e -> {
+		btn.addActionListener(_ -> {
 			try {
 				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 				String token = (String) clipboard.getData(DataFlavor.stringFlavor);
 				handleProviderToken(token, provider);
 			} catch (Exception ex) {
-				LOGGER.log(Level.SEVERE, "Errore", ex);
+				ex.printStackTrace();
 			}
 			frame.dispose();
 		});

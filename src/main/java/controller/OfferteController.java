@@ -28,9 +28,6 @@ import util.Base64ImageRenderer;
 import util.TableUtils;
 import util.TextAreaRenderer;
 import util.TextBoldRenderer;
-import java.util.logging.Logger;
-import java.util.logging.Level;
-
 
 /**
  * Controller per la gestione delle offerte immobiliari nel sistema.
@@ -54,24 +51,11 @@ import java.util.logging.Level;
  * @see StoricoAgenteDTO
  */
 public class OfferteController {
-	
-	private static final Logger LOGGER = Logger.getLogger(OfferteController.class.getName());
-	
-	private static final String TITOLO_ERRORE = "Errore";
-	private static final String TITOLO_AVVISO = "Operazione non permessa";
-	
-	private static final String STATO_IN_ATTESA = "In attesa";
-	private static final String STATO_VALUTATO = "Valutato";
-	private static final String STATO_RIFIUTATA = "Rifiutata";
-	private static final String STATO_ACCETTATA = "Accettata";
-	private static final String STATO_CONTROPROPOSTA = "Controproposta";
-	
+
+	/**
+	 * Costruttore di default per l'OfferteController.
+	 */
 	public OfferteController() {
-		
-		/**
-		 * Costruttore di default per l'OfferteController.
-		 */
-		
 	}
 
 	/**
@@ -90,47 +74,59 @@ public class OfferteController {
 	 * @param isAgente true se la tabella è per un agente, false se per un cliente
 	 */
 	private void impostaRendererStato(JTable table, int colonnaStatoIndex, boolean isAgente) {
-	    table.getColumnModel().getColumn(colonnaStatoIndex).setCellRenderer(new DefaultTableCellRenderer() {
-	        private static final long serialVersionUID = 8565820085308350483L;
+		final DefaultTableCellRenderer rendererStato = new DefaultTableCellRenderer() {
+			private static final long serialVersionUID = 8565820085308350483L;
 
-	        @Override
-	        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-	                                                       boolean hasFocus, int row, int column) {
+			@Override
+			public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+					boolean hasFocus, int row, int column) {
 
-	            Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-	            setHorizontalAlignment(SwingConstants.CENTER);
-	            c.setFont(c.getFont().deriveFont(java.awt.Font.BOLD));
-	            c.setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
+				final Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row,
+						column);
 
-	            // Colore di default
-	            Color colore = new Color(0, 0, 0);
+				// Allinea al centro
+				setHorizontalAlignment(SwingConstants.CENTER);
 
-	            if (value != null) {
-	                String stato = value.toString();
+				// Imposta colore in base al testo
+				if (value != null) {
+					final String stato = value.toString();
 
-	                if (isAgente) {
-	                    switch (stato) {
-	                        case STATO_IN_ATTESA -> colore = new Color(243, 182, 80); // Arancione
-	                        case STATO_VALUTATO -> colore = new Color(103, 235, 88);  // Verde
-	                        default -> colore = new Color(0, 0, 0);
-	                    }
-	                } else {
-	                    switch (stato) {
-	                        case STATO_RIFIUTATA -> colore = new Color(255, 68, 68);   // Rosso
-	                        case STATO_IN_ATTESA -> colore = new Color(243, 182, 80);   // Arancione
-	                        case STATO_ACCETTATA -> colore = new Color(103, 235, 88);   // Verde
-	                        case STATO_CONTROPROPOSTA -> colore = new Color(7, 170, 248); // Blu
-	                        default -> colore = new Color(0, 0, 0);
-	                    }
-	                }
-	            }
+					if (isAgente) {
+						// Stati per l'agente
+						switch (stato) {
+						case "In attesa" -> c.setForeground(new Color(243, 182, 80)); // Arancione
+						case "Valutato" -> c.setForeground(new Color(103, 235, 88)); // Verde
+						default -> c.setForeground(new Color(0, 0, 0));
+						}
+					} else {
+						// Stati per il cliente
+						switch (stato) {
+						case "Rifiutata" -> c.setForeground(new Color(255, 68, 68));
+						case "In attesa" -> c.setForeground(new Color(243, 182, 80));
+						case "Accettata" -> c.setForeground(new Color(103, 235, 88));
+						case "Controproposta" -> c.setForeground(new Color(7, 170, 248));
+						default -> c.setForeground(new Color(0, 0, 0));
+						}
+					}
+				} else {
+					c.setForeground(new Color(0, 0, 0));
+				}
 
-	            c.setForeground(colore);
-	            return c;
-	        }
-	    });
+				c.setFont(c.getFont().deriveFont(java.awt.Font.BOLD));
+
+				if (isSelected) {
+					c.setBackground(table.getSelectionBackground());
+				} else {
+					c.setBackground(table.getBackground());
+				}
+
+				return c;
+			}
+		};
+
+		// renderer per la colonna "stato"
+		table.getColumnModel().getColumn(colonnaStatoIndex).setCellRenderer(rendererStato);
 	}
-
 
 	/**
 	 * Inserisce una nuova offerta iniziale proposta da un cliente.
@@ -153,7 +149,7 @@ public class OfferteController {
 			final OffertaIniziale offerta = new OffertaIniziale(offertaProposta, idCliente, idImmobile);
 			return offertaInizialeDAO.inserisciOffertaIniziale(offerta);
 		} catch (SQLException e) {
-			LOGGER.log(Level.SEVERE, "Errore inserimento offerta iniziale", e);
+			e.printStackTrace();
 			return false;
 		}
 	}
@@ -181,80 +177,95 @@ public class OfferteController {
 	 * @see RispostaOffertaDAO#inserisciRispostaOfferta(RispostaOfferta)
 	 */
 	public boolean inserisciRispostaOfferta(long idOfferta, String idAgente, String tipoRisposta,
-            Double importoControproposta) {
+			Double importoControproposta) {
 		try {
+
 			final Connection connAWS = ConnessioneDatabase.getInstance().getConnection();
 			final RispostaOffertaDAO rispostaDAO = new RispostaOffertaDAO(connAWS);
 			final AccountDAO accountDAO = new AccountDAO(connAWS);
 			final OffertaInizialeDAO offertaDAO = new OffertaInizialeDAO(connAWS);
 
-			
+			// Recupera l'offerta per controllarne lo stato
 			final OffertaIniziale offerta = offertaDAO.getOffertaById(idOfferta);
 			if (offerta == null) {
-				JOptionPane.showMessageDialog(null, "Offerta non trovata!", TITOLO_ERRORE, JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(null, "Offerta non trovata!", "Errore", JOptionPane.ERROR_MESSAGE);
 				return false;
 			}
 
-			final boolean isOffertaInAttesa = STATO_IN_ATTESA.equals(offerta.getStato());
+			final String statoOfferta = offerta.getStato();
+			final boolean isOffertaInAttesa = "In attesa".equals(statoOfferta);
 
-			
-			String tipoNormalizzato = tipoRisposta == null ? null : tipoRisposta.trim().toUpperCase();
-			tipoNormalizzato = switch (tipoNormalizzato) {
-			case "ACCETTATA" -> STATO_ACCETTATA;
-			case "RIFIUTATA" -> STATO_RIFIUTATA;
-			case "CONTROPROPOSTA" -> STATO_CONTROPROPOSTA;
-			default -> tipoNormalizzato; // mantiene il valore così com'è se non corrisponde
-			};
+			// Normalizza il tipoRisposta in base al database
+			String tipoRispostaNormalizzato = null;
+			if (tipoRisposta != null) {
+				tipoRispostaNormalizzato = tipoRisposta.trim();
+				// Assicurati che corrisponda ai valori del constraint
+				if (tipoRispostaNormalizzato.equalsIgnoreCase("ACCETTATA")) {
+					tipoRispostaNormalizzato = "Accettata";
+				} else if (tipoRispostaNormalizzato.equalsIgnoreCase("RIFIUTATA")) {
+					tipoRispostaNormalizzato = "Rifiutata";
+				} else if (tipoRispostaNormalizzato.equalsIgnoreCase("CONTROPROPOSTA")) {
+					tipoRispostaNormalizzato = "Controproposta";
+				}
+			}
 
-			// Controllo stato offerta
-			if (!isOffertaInAttesa && !STATO_CONTROPROPOSTA.equals(tipoNormalizzato)) {
+			// Se l'offerta non è in attesa e non è una controproposta, non permettere
+			if (!isOffertaInAttesa && !"Controproposta".equals(tipoRispostaNormalizzato)) {
 				JOptionPane.showMessageDialog(null,
-						"Questa offerta è già stata valutata.\nPuoi solo fare una nuova controproposta.",
-						TITOLO_AVVISO, JOptionPane.WARNING_MESSAGE);
+						"Questa offerta è già stata valutata.\n" + "Puoi solo fare una nuova controproposta.",
+						"Operazione non permessa", JOptionPane.WARNING_MESSAGE);
 				return false;
 			}
 
-			// Recupera agente
 			Account agente = accountDAO.getAccountByEmail(idAgente);
-			if (agente == null) agente = accountDAO.getAccountById(idAgente);
+
 			if (agente == null) {
-				JOptionPane.showMessageDialog(null, "Agente non trovato! ID/Email: " + idAgente, TITOLO_ERRORE,
+				agente = accountDAO.getAccountById(idAgente);
+			}
+
+			if (agente == null) {
+				JOptionPane.showMessageDialog(null, "Agente non trovato! ID/Email: " + idAgente, "Errore",
 						JOptionPane.ERROR_MESSAGE);
 				return false;
 			}
 
-
+			// Disattiva risposte precedenti (per avere solo una risposta attiva)
 			rispostaDAO.disattivaRispostePrecedenti(idOfferta);
 
 			// Crea e inserisci nuova risposta
 			final RispostaOfferta risposta = new RispostaOfferta(idOfferta, agente.getIdAccount(),
-					agente.getNome(), agente.getCognome(), tipoNormalizzato, importoControproposta);
+					agente.getNome(), agente.getCognome(), tipoRispostaNormalizzato,
+					importoControproposta);
 
 			final boolean successo = rispostaDAO.inserisciRispostaOfferta(risposta);
 
-			if (successo && STATO_ACCETTATA.equals(tipoNormalizzato)) {
-				LOGGER.info("Offerta accettata, operazione completata.");
+			// Se l'inserimento è riuscito, aggiorna lo stato dell'offerta
+			if (successo) {
+				// Se l'offerta è stata accettata, potresti voler disabilitare altre azioni
+				if ("Accettata".equals(tipoRispostaNormalizzato)) {
+					System.out.println("Offerta accettata, operazione completata.");
+				}
 			}
 
 			return successo;
 
 		} catch (SQLException e) {
-			LOGGER.log(Level.SEVERE, "Errore durante l'inserimento della risposta", e);
+			e.printStackTrace();
 
+			// Mostra un messaggio di errore più specifico
 			if (e.getMessage().contains("RispostaOfferta_tipoRisposta_check")) {
 				JOptionPane.showMessageDialog(null,
-						"Errore: Tipo risposta non valido.\nI valori accettati sono: 'Accettata', 'Rifiutata', 'Controproposta'",
-						"Errore di validazione", JOptionPane.ERROR_MESSAGE);
+						"Errore: Tipo risposta non valido.\n"
+								+ "I valori accettati sono: 'Accettata', 'Rifiutata', 'Controproposta'",
+								"Errore di validazione", JOptionPane.ERROR_MESSAGE);
 			} else {
-				JOptionPane.showMessageDialog(null,
-						"Errore durante l'inserimento della risposta: " + e.getMessage(),
-						TITOLO_ERRORE, JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(null, "Errore durante l'inserimento della risposta: " + e.getMessage(),
+						"Errore database", JOptionPane.ERROR_MESSAGE);
 			}
 
 			return false;
 		}
 	}
-
 
 	/**
 	 * Recupera tutte le offerte effettuate da un cliente specifico.
@@ -270,10 +281,11 @@ public class OfferteController {
 			final OffertaInizialeDAO offertaDAO = new OffertaInizialeDAO(connAWS);
 			return offertaDAO.getOfferteByCliente(idCliente);
 		} catch (SQLException e) {
-			LOGGER.log(Level.SEVERE, "Errore recupero offerte cliente", e);
+			e.printStackTrace();
 			return new ArrayList<>();
 		}
 	}
+
 	/**
 	 * Recupera tutte le risposte associate a una specifica offerta.
 	 *
@@ -288,7 +300,7 @@ public class OfferteController {
 			final RispostaOffertaDAO rispostaDAO = new RispostaOffertaDAO(connAWS);
 			return rispostaDAO.getRisposteByOfferta(idOfferta);
 		} catch (SQLException e) {
-			LOGGER.log(Level.SEVERE, "Errore recupero risposte offerta", e);
+			e.printStackTrace();
 			return new ArrayList<>();
 		}
 	}
@@ -310,7 +322,7 @@ public class OfferteController {
 			final RispostaOffertaDAO rispostaDAO = new RispostaOffertaDAO(connAWS);
 			return rispostaDAO.getDettagliRispostaAttiva(idOfferta);
 		} catch (SQLException e) {
-			LOGGER.log(Level.SEVERE, "Errore recupero dettagli risposta attiva", e);
+			e.printStackTrace();
 			return null;
 		}
 	}
@@ -501,9 +513,9 @@ public class OfferteController {
 			}
 
 		} catch (SQLException e) {
-			LOGGER.log(Level.SEVERE, TITOLO_ERRORE, e);
+			e.printStackTrace();
 			JOptionPane.showMessageDialog(null, "Errore nel caricamento dello storico offerte: " + e.getMessage(),
-					TITOLO_ERRORE, JOptionPane.ERROR_MESSAGE);
+					"Errore", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 
@@ -548,7 +560,7 @@ public class OfferteController {
 			final OffertaInizialeDAO offertaDAO = new OffertaInizialeDAO(connAWS);
 			return offertaDAO.getOffertaById(idOfferta);
 		} catch (SQLException e) {
-			LOGGER.log(Level.SEVERE, "Errore", e);
+			e.printStackTrace();
 			return null;
 		}
 	}
@@ -576,7 +588,7 @@ public class OfferteController {
 			}
 			return "Cliente";
 		} catch (SQLException e) {
-			LOGGER.log(Level.SEVERE, "Errore", e);
+			e.printStackTrace();
 			return "Cliente";
 		}
 	}
@@ -596,7 +608,7 @@ public class OfferteController {
 			final RispostaOffertaDAO rispostaDAO = new RispostaOffertaDAO(connAWS);
 			return rispostaDAO.getContropropostaByOffertaCliente(idOfferta, idCliente);
 		} catch (SQLException e) {
-			LOGGER.log(Level.SEVERE, "Errore", e);
+			e.printStackTrace();
 			return null;
 		}
 	}

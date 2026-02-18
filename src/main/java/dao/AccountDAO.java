@@ -1,8 +1,5 @@
 package dao;
 
-import java.util.logging.Logger;
-import java.util.logging.Level;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -15,7 +12,6 @@ import model.entity.Account;
 import model.entity.AgenteImmobiliare;
 import model.entity.AmministratoreDiSupporto;
 import model.entity.Cliente;
-
 
 /**
  * Data Access Object per la gestione degli account nel sistema.
@@ -37,16 +33,7 @@ import model.entity.Cliente;
  * @see Connection
  */
 public class AccountDAO {
-	
-	private static final String ID_ACCOUNT = "idAccount";
-	private static final String COGNOME_ACCOUNT = "cognome";
-	private static final String EMAIL_ACCOUNT = "email";
-	private static final String TELEFONO_ACCOUNT = "numeroTelefono";
-	private static final String RUOLO_ACCOUNT = "ruolo";
-	private static final String CITTA_ACCOUNT = "citta";
-	private static final String INDIRIZZO_ACCOUNT = "indirizzo";
-	private static final String TITOLO_ERRORE = "Errore";
-	private static final Logger LOGGER = Logger.getLogger(AccountDAO.class.getName());
+
 	private final Connection connection;
 
 	/**
@@ -83,7 +70,7 @@ public class AccountDAO {
 			rs.close();
 
 		} catch (SQLException e) {
-		    LOGGER.log(Level.SEVERE, TITOLO_ERRORE, e);
+			e.printStackTrace();
 		}
 		return result;
 	}
@@ -130,7 +117,7 @@ public class AccountDAO {
 
 		final String query = "INSERT INTO \"Account\" (\"email\", \"password\", \"nome\", \"cognome\", \"citta\", \"numeroTelefono\",\"cap\", \"indirizzo\", ruolo ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-		try (PreparedStatement stmt = connection.prepareStatement(query, new String[] { ID_ACCOUNT })) {
+		try (PreparedStatement stmt = connection.prepareStatement(query, new String[] { "idAccount" })) {
 			stmt.setString(1, account.getEmail());
 			stmt.setString(2, account.getPassword());
 			stmt.setString(3, account.getNome());
@@ -186,7 +173,7 @@ public class AccountDAO {
 			final ResultSet rs = stmt.executeQuery();
 			if (rs.next()) {
 				// restituiamo la string generata dal DB
-				return rs.getString(ID_ACCOUNT);
+				return rs.getString("idAccount");
 			} else {
 				throw new SQLException("Creazione account fallita, nessun ID generato.");
 			}
@@ -217,15 +204,17 @@ public class AccountDAO {
 			final ResultSet rs = ps.executeQuery();
 
 			if (rs.next()) {
-				final String id = rs.getString(ID_ACCOUNT);
+				final String id = rs.getString("idAccount");
 				final String nome = rs.getString("nome");
-				final String cognome = rs.getString(COGNOME_ACCOUNT);
-				final String email = rs.getString(EMAIL_ACCOUNT);
-				final String numeroTelefono = rs.getString(TELEFONO_ACCOUNT);
+				final String cognome = rs.getString("cognome");
+				final String email = rs.getString("email");
+				final String numeroTelefono = rs.getString("numeroTelefono");
 				final String agenzia = rs.getString("agenzia");
 				final String supportoId = rs.getString("supporto_id");
 
-				
+				System.out.println("DEBUG: id=" + id + ", nome=" + nome + ", cognome=" + cognome + ", email=" + email
+						+ ", numeroTelefono=" + numeroTelefono + ", agenzia=" + agenzia + ", supporto_id="
+						+ supportoId);
 
 				if (supportoId != null) {
 					return new AmministratoreDiSupporto(id, // id
@@ -270,7 +259,7 @@ public class AccountDAO {
 			ps.setString(1, email);
 			try (ResultSet rs = ps.executeQuery()) {
 				if (rs.next()) {
-					return rs.getString(RUOLO_ACCOUNT);
+					return rs.getString("ruolo");
 				} else {
 					throw new SQLException("Nessun account trovato con email: " + email);
 				}
@@ -297,12 +286,12 @@ public class AccountDAO {
 			final ResultSet rs = stmt.executeQuery();
 
 			if (rs.next()) {
-				result = rs.getString(ID_ACCOUNT);
+				result = rs.getString("idAccount");
 			}
 
 			rs.close();
 		} catch (SQLException e) {
-			LOGGER.log(Level.SEVERE, TITOLO_ERRORE, e);
+			e.printStackTrace();
 		}
 
 		return result;
@@ -335,7 +324,7 @@ public class AccountDAO {
 			}
 
 		} catch (SQLException e) {
-			LOGGER.log(Level.SEVERE, TITOLO_ERRORE, e);
+			e.printStackTrace();
 		}
 		return result;
 	}
@@ -360,14 +349,15 @@ public class AccountDAO {
 			final ResultSet rs = stmt.executeQuery();
 
 			if (rs.next()) {
-				return new AccountInfoDTO(rs.getString(ID_ACCOUNT), rs.getString(EMAIL_ACCOUNT), rs.getString("nome"),
-						rs.getString(COGNOME_ACCOUNT), rs.getString(TELEFONO_ACCOUNT), rs.getString(CITTA_ACCOUNT),
-						rs.getString(INDIRIZZO_ACCOUNT), rs.getString("cap"), rs.getString(RUOLO_ACCOUNT));
+				return new AccountInfoDTO(rs.getString("idAccount"), rs.getString("email"), rs.getString("nome"),
+						rs.getString("cognome"), rs.getString("numeroTelefono"), rs.getString("citta"),
+						rs.getString("indirizzo"), rs.getString("cap"), rs.getString("ruolo"));
 			} else {
 				return null;
 			}
 		} catch (SQLException e) {
-		    throw new SQLException(TITOLO_ERRORE, e);
+			e.printStackTrace();
+			throw e;
 		}
 	}
 
@@ -390,12 +380,12 @@ public class AccountDAO {
 			final ResultSet rs = stmt.executeQuery();
 
 			if (rs.next()) {
-				idAccount = rs.getString(ID_ACCOUNT);
+				idAccount = rs.getString("idAccount");
 			}
 
 			rs.close();
 		} catch (SQLException e) {
-			LOGGER.log(Level.SEVERE, TITOLO_ERRORE, e);
+			e.printStackTrace();
 		}
 
 		return idAccount;
@@ -425,7 +415,7 @@ public class AccountDAO {
 
 			rs.close();
 		} catch (SQLException e) {
-			LOGGER.log(Level.SEVERE, TITOLO_ERRORE, e);
+			e.printStackTrace();
 		}
 
 		return agenteAssociato;
@@ -450,15 +440,15 @@ public class AccountDAO {
 
 			if (rs.next()) {
 				final Account account = new Account();
-				account.setIdAccount(rs.getString(ID_ACCOUNT));
-				account.setEmail(rs.getString(EMAIL_ACCOUNT));
+				account.setIdAccount(rs.getString("idAccount"));
+				account.setEmail(rs.getString("email"));
 				account.setNome(rs.getString("nome"));
-				account.setCognome(rs.getString(COGNOME_ACCOUNT));
-				account.setTelefono(rs.getString(TELEFONO_ACCOUNT));
-				account.setCitta(rs.getString(CITTA_ACCOUNT));
+				account.setCognome(rs.getString("cognome"));
+				account.setTelefono(rs.getString("numeroTelefono"));
+				account.setCitta(rs.getString("citta"));
 				account.setCap(rs.getString("cap"));
-				account.setIndirizzo(rs.getString(INDIRIZZO_ACCOUNT));
-				account.setRuolo(rs.getString(RUOLO_ACCOUNT));
+				account.setIndirizzo(rs.getString("indirizzo"));
+				account.setRuolo(rs.getString("ruolo"));
 				return account;
 			}
 		}
@@ -484,15 +474,15 @@ public class AccountDAO {
 
 			if (rs.next()) {
 				final Account account = new Account();
-				account.setIdAccount(rs.getString(ID_ACCOUNT));
-				account.setEmail(rs.getString(EMAIL_ACCOUNT));
+				account.setIdAccount(rs.getString("idAccount"));
+				account.setEmail(rs.getString("email"));
 				account.setNome(rs.getString("nome"));
-				account.setCognome(rs.getString(COGNOME_ACCOUNT));
-				account.setTelefono(rs.getString(TELEFONO_ACCOUNT));
-				account.setCitta(rs.getString(CITTA_ACCOUNT));
+				account.setCognome(rs.getString("cognome"));
+				account.setTelefono(rs.getString("numeroTelefono"));
+				account.setCitta(rs.getString("citta"));
 				account.setCap(rs.getString("cap"));
-				account.setIndirizzo(rs.getString(INDIRIZZO_ACCOUNT));
-				account.setRuolo(rs.getString(RUOLO_ACCOUNT));
+				account.setIndirizzo(rs.getString("indirizzo"));
+				account.setRuolo(rs.getString("ruolo"));
 				account.setPassword(rs.getString("password"));
 
 				return account;

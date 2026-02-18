@@ -18,8 +18,6 @@ import javax.swing.table.TableCellRenderer;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.postgresql.util.PGobject;
-import java.util.logging.Logger;
-import java.util.logging.Level;
 
 import model.dto.RicercaDTO;
 import model.dto.StoricoAgenteDTO;
@@ -53,14 +51,6 @@ import model.entity.ImmobileInVendita;
  * @see Connection
  */
 public class ImmobileDAO {
-	private static final String ID_IMMOBILE = "idImmobile";
-	private static final String AFFITTO_IMMOBILE = "Affitto";
-	private static final String VENDITA_IMMOBILE = "Vendita";
-	
-	private static final String TITOLO_ERRORE_STORICO = "Errore";
-	private static final String TITOLO_ERRORE = "Errore";
-	private static final String TYPE_JSONB = "jsonb";
-	private static final Logger LOGGER = Logger.getLogger(ImmobileDAO.class.getName());
 	private Connection connection;
 
 	/**
@@ -99,7 +89,7 @@ public class ImmobileDAO {
 
 			// Filtri JSON
 			final PGobject jsonObject = new PGobject();
-			jsonObject.setType(TYPE_JSONB);
+			jsonObject.setType("jsonb");
 			jsonObject.setValue(immobile.getFiltriAsJson().toString());
 			stmt.setObject(7, jsonObject);
 
@@ -109,7 +99,7 @@ public class ImmobileDAO {
 				immobile.getImmagini().forEach(img -> immaginiBase64.add(Base64.getEncoder().encodeToString(img)));
 			}
 			final PGobject immaginiJson = new PGobject();
-			immaginiJson.setType(TYPE_JSONB);
+			immaginiJson.setType("jsonb");
 			immaginiJson.setValue(new org.json.JSONArray(immaginiBase64).toString());
 			stmt.setObject(8, immaginiJson);
 
@@ -120,7 +110,7 @@ public class ImmobileDAO {
 			final ResultSet rs = stmt.executeQuery();
 			int generatedId = -1;
 			if (rs.next()) {
-				generatedId = rs.getInt(ID_IMMOBILE);
+				generatedId = rs.getInt("idImmobile");
 			}
 			rs.close();
 			// Inserimento specifico per affitto
@@ -158,7 +148,7 @@ public class ImmobileDAO {
 
 			// Filtri JSONB
 			final PGobject jsonObject = new PGobject();
-			jsonObject.setType(TYPE_JSONB);
+			jsonObject.setType("jsonb");
 			jsonObject.setValue(immobile.getFiltriAsJson().toString());
 			stmt.setObject(7, jsonObject);
 
@@ -168,7 +158,7 @@ public class ImmobileDAO {
 				immobile.getImmagini().forEach(img -> immaginiBase64.add(Base64.getEncoder().encodeToString(img)));
 			}
 			final PGobject immaginiJson = new PGobject();
-			immaginiJson.setType(TYPE_JSONB);
+			immaginiJson.setType("jsonb");
 			immaginiJson.setValue(new org.json.JSONArray(immaginiBase64).toString());
 			stmt.setObject(8, immaginiJson);
 
@@ -179,7 +169,7 @@ public class ImmobileDAO {
 			final ResultSet rs = stmt.executeQuery();
 			int generatedId = -1;
 			if (rs.next()) {
-				generatedId = rs.getInt(ID_IMMOBILE);
+				generatedId = rs.getInt("idImmobile");
 			}
 			rs.close();
 			// Inserimento specifico per vendita
@@ -218,56 +208,50 @@ public class ImmobileDAO {
 			final ResultSet rs = stmt.executeQuery();
 
 			while (rs.next()) {
-			    
-			    final StoricoClienteDTO dto = new StoricoClienteDTO();
+				// Crea un nuovo DTO per ogni riga
+				final StoricoClienteDTO dto = new StoricoClienteDTO();
 
-			    
-			    dto.setIdOfferta(rs.getLong("idOfferta"));
+				// ID Offerta
+				dto.setIdOfferta(rs.getLong("idOfferta"));
 
-			    // Estrai la prima immagine dal JSON
-			    final String immaginiJson = rs.getString("Foto");
-			    String primaImmagineBase64 = "";
+				// Estrai la prima immagine dal JSON
+				final String immaginiJson = rs.getString("Foto");
+				String primaImmagineBase64 = "";
 
-			    if (immaginiJson != null && !immaginiJson.isBlank()) {
-			        try {
-			            final JSONArray array = new JSONArray(immaginiJson);
-			            if (array.length() > 0) {
-			                primaImmagineBase64 = array.getString(0);
-			            }
-			        } catch (Exception e) {
-			            
-			            LOGGER.warning(() -> "Errore parsing JSON immagini: " + e.getMessage());
-			        }
-			    }
-			    dto.setPrimaImmagineBase64(primaImmagineBase64);
+				if (immaginiJson != null && !immaginiJson.isBlank()) {
+					try {
+						final JSONArray array = new JSONArray(immaginiJson);
+						if (array.length() > 0) {
+							primaImmagineBase64 = array.getString(0);
+						}
+					} catch (Exception e) {
+						// Log errore ma continua
+						System.err.println("Errore parsing JSON immagini: " + e.getMessage());
+					}
+				}
+				dto.setPrimaImmagineBase64(primaImmagineBase64);
 
-			   
-			    dto.setCategoria(rs.getString("Categoria"));
-			    dto.setDescrizione(rs.getString("Descrizione"));
+				// Altri campi
+				dto.setCategoria(rs.getString("Categoria"));
+				dto.setDescrizione(rs.getString("Descrizione"));
 
-			    
-			    final java.sql.Timestamp timestamp = rs.getTimestamp("Data");
-			    dto.setDataOfferta(timestamp != null ? timestamp.toLocalDateTime() : null);
+				// Data
+				final java.sql.Timestamp timestamp = rs.getTimestamp("Data");
+				dto.setDataOfferta(timestamp != null ? timestamp.toLocalDateTime() : null);
 
-			    
-			    final BigDecimal importoProposto = rs.getBigDecimal("Prezzo proposto");
-			    dto.setImportoProposto(importoProposto != null ? importoProposto : BigDecimal.ZERO);
+				// Prezzo proposto
+				final BigDecimal importoProposto = rs.getBigDecimal("Prezzo proposto");
+				dto.setImportoProposto(importoProposto != null ? importoProposto : BigDecimal.ZERO);
 
-			   
-			    dto.setStato(rs.getString("Stato"));
+				// Stato
+				dto.setStato(rs.getString("Stato"));
 
-			    risultati.add(dto);
+				risultati.add(dto);
 			}
-
 		} catch (SQLException e) {
-			String msg = TITOLO_ERRORE_STORICO + " per utente: " + emailUtente;
-			LOGGER.log(Level.SEVERE, msg, e);
-
-			
-			throw new IllegalStateException("Impossibile recuperare lo storico offerte per: " + emailUtente, e);
-
+			e.printStackTrace();
+			throw new RuntimeException("Errore nel recupero storico offerte per: " + emailUtente, e);
 		}
-
 
 		return risultati;
 	}
@@ -331,79 +315,77 @@ public class ImmobileDAO {
 	 * @see ImmobileInVendita
 	 */
 	public Immobile getImmobileById(long idimmobile) throws SQLException {
-	    final String sqlBase = "SELECT * FROM \"Immobile\" WHERE \"idImmobile\" = ?";
-	    Immobile immobile = null;
+		final String sqlBase = "SELECT * FROM \"Immobile\" WHERE \"idImmobile\" = ?";
+		Immobile immobile = null;
 
-	    try (PreparedStatement stmt = connection.prepareStatement(sqlBase)) {
-	        stmt.setLong(1, idimmobile);
-	        try (ResultSet rs = stmt.executeQuery()) {
-	            if (!rs.next()) return null;
+		try (PreparedStatement stmt = connection.prepareStatement(sqlBase)) {
+			stmt.setLong(1, idimmobile);
+			final ResultSet rs = stmt.executeQuery();
 
-	            // Tipo immobile
-	            final String tipo = rs.getString("tipologia");
-	            if (AFFITTO_IMMOBILE.equalsIgnoreCase(tipo)) {
-	                immobile = new ImmobileInAffitto();
-	            } else if (VENDITA_IMMOBILE.equalsIgnoreCase(tipo)) {
-	                immobile = new ImmobileInVendita();
-	            } else {
-	                immobile = new Immobile();
-	            }
+			if (rs.next()) {
+				final String tipo = rs.getString("tipologia"); // tipo: "Affitto" o "Vendita"
 
-	            // Campi generali
-	            immobile.setId(rs.getLong(ID_IMMOBILE));
-	            immobile.setTitolo(rs.getString("titolo"));
-	            immobile.setIndirizzo(rs.getString("indirizzo"));
-	            immobile.setDimensione(rs.getInt("dimensione"));
-	            immobile.setDescrizione(rs.getString("descrizione"));
-	            immobile.setLocalita(rs.getString("localita"));
-	            immobile.setTipologia(tipo);
-	            immobile.setAgenteAssociato(rs.getString("agenteAssociato"));
+				if ("Affitto".equalsIgnoreCase(tipo)) {
+					immobile = new ImmobileInAffitto();
+				} else if ("Vendita".equalsIgnoreCase(tipo)) {
+					immobile = new ImmobileInVendita();
+				} else {
+					immobile = new Immobile(); // fallback
+				}
 
-	            // Filtri
-	            final String filtriJson = rs.getString("filtri");
-	            if (filtriJson != null && !filtriJson.isEmpty()) {
-	                immobile.setFiltriFromJson(new JSONObject(filtriJson));
-	            }
+				immobile.setId(rs.getLong("idImmobile"));
+				immobile.setTitolo(rs.getString("titolo"));
+				immobile.setIndirizzo(rs.getString("indirizzo"));
+				immobile.setDimensione(rs.getInt("dimensione"));
+				immobile.setDescrizione(rs.getString("descrizione"));
+				immobile.setLocalita(rs.getString("localita"));
+				immobile.setTipologia(rs.getString("tipologia"));
+				immobile.setAgenteAssociato(rs.getString("agenteAssociato"));
+				final String filtriJsonString = rs.getString("filtri");
+				if (filtriJsonString != null && !filtriJsonString.isEmpty()) {
+					final JSONObject filtri = new JSONObject(filtriJsonString);
+					immobile.setFiltriFromJson(filtri);
+				}
 
-	            // Immagini
-	            final String immaginiJson = rs.getString("immagini");
-	            List<byte[]> immaginiBytes = new ArrayList<>();
-	            if (immaginiJson != null && !immaginiJson.isEmpty()) {
-	                JSONArray jsonArray = new JSONArray(immaginiJson);
-	                for (int i = 0; i < jsonArray.length(); i++) {
-	                    immaginiBytes.add(Base64.getDecoder().decode(jsonArray.getString(i)));
-	                }
-	            }
-	            immobile.setImmagini(immaginiBytes);
+				// Recupero immagini da JSONB (array di stringhe Base64)
+				final String immaginiJson = rs.getString("immagini");
+				if (immaginiJson != null && !immaginiJson.isEmpty()) {
+					final JSONArray jsonArray = new JSONArray(immaginiJson);
+					final List<byte[]> immaginiBytes = new ArrayList<>();
+					for (int i = 0; i < jsonArray.length(); i++) {
+						final String base64img = jsonArray.getString(i);
+						final byte[] bytes = Base64.getDecoder().decode(base64img);
+						immaginiBytes.add(bytes);
+					}
+					immobile.setImmagini(immaginiBytes);
+				} else {
+					immobile.setImmagini(new ArrayList<>());
+				}
 
-	            // Prezzo specifico senza helper
-	            if (immobile instanceof ImmobileInAffitto) {
-	                final String sqlPrezzo = "SELECT \"prezzoMensile\" FROM \"ImmobileInAffitto\" WHERE \"idImmobile\" = ?";
-	                try (PreparedStatement ps = connection.prepareStatement(sqlPrezzo)) {
-	                    ps.setLong(1, idimmobile);
-	                    try (ResultSet rsPrezzo = ps.executeQuery()) {
-	                        if (rsPrezzo.next()) {
-	                            ((ImmobileInAffitto) immobile).setPrezzoMensile(rsPrezzo.getInt("prezzoMensile"));
-	                        }
-	                    }
-	                }
-	            } else if (immobile instanceof ImmobileInVendita) {
-	                final String sqlPrezzo = "SELECT \"prezzoTotale\" FROM \"ImmobileInVendita\" WHERE \"idImmobile\" = ?";
-	                try (PreparedStatement ps = connection.prepareStatement(sqlPrezzo)) {
-	                    ps.setLong(1, idimmobile);
-	                    try (ResultSet rsPrezzo = ps.executeQuery()) {
-	                        if (rsPrezzo.next()) {
-	                            ((ImmobileInVendita) immobile).setPrezzoTotale(rsPrezzo.getInt("prezzoTotale"));
-	                        }
-	                    }
-	                }
-	            }
-	        }
-	    }
-
-	    return immobile;
+				// Recupera prezzo specifico
+				if (immobile instanceof ImmobileInAffitto) {
+					final String sqlPrezzoAffitto = "SELECT \"prezzoMensile\" FROM \"ImmobileInAffitto\" WHERE \"idImmobile\" = ?";
+					try (PreparedStatement psPrezzo = connection.prepareStatement(sqlPrezzoAffitto)) {
+						psPrezzo.setLong(1, idimmobile);
+						final ResultSet rsPrezzo = psPrezzo.executeQuery();
+						if (rsPrezzo.next()) {
+							((ImmobileInAffitto) immobile).setPrezzoMensile(rsPrezzo.getInt("prezzoMensile"));
+						}
+					}
+				} else if (immobile instanceof ImmobileInVendita) {
+					final String sqlPrezzoVendita = "SELECT \"prezzoTotale\" FROM \"ImmobileInVendita\" WHERE \"idImmobile\" = ?";
+					try (PreparedStatement psPrezzo = connection.prepareStatement(sqlPrezzoVendita)) {
+						psPrezzo.setLong(1, idimmobile);
+						final ResultSet rsPrezzo = psPrezzo.executeQuery();
+						if (rsPrezzo.next()) {
+							((ImmobileInVendita) immobile).setPrezzoTotale(rsPrezzo.getInt("prezzoTotale"));
+						}
+					}
+				}
+			}
+		}
+		return immobile;
 	}
-
 
 	/**
 	 * Costruisce la query base per la ricerca di immobili.
@@ -419,7 +401,7 @@ public class ImmobileDAO {
 	private String costruisciQueryBase(String tipologia, RicercaDTO ricercaDTO) {
 		String query = "";
 
-		if (AFFITTO_IMMOBILE.equals(tipologia)) {
+		if ("Affitto".equals(tipologia)) {
 			query = "SELECT i.\"idImmobile\", i.\"immagini\" \"Immagini\", i.\"titolo\" \"Tipologia\", "
 					+ "i.\"descrizione\" \"Descrizione\", a.\"prezzoMensile\" \"Prezzo Mensile\" "
 					+ "FROM \"Immobile\" i JOIN \"ImmobileInAffitto\" a " + "ON i.\"idImmobile\" = a.\"idImmobile\" "
@@ -454,27 +436,50 @@ public class ImmobileDAO {
 	 * @see Filtri
 	 */
 	private String aggiungiFiltriQuery(String query, Filtri filtri, String tipologia) {
-	    if (filtri == null) return query;
+		if (filtri == null) {
+			return query;
+		}
 
-	    // Prefisso per il campo prezzo
-	    final String prezzoField = AFFITTO_IMMOBILE.equals(tipologia) ? "a.\"prezzoMensile\"" : "v.\"prezzoTotale\"";
+		if (filtri.prezzoMin != null) {
+			if ("Affitto".equals(tipologia)) {
+				query += " AND a.\"prezzoMensile\" >= ?";
+			} else {
+				query += " AND v.\"prezzoTotale\" >= ?";
+			}
+		}
+		if (filtri.prezzoMax != null) {
+			if ("Affitto".equals(tipologia)) {
+				query += " AND a.\"prezzoMensile\" <= ?";
+			} else {
+				query += " AND v.\"prezzoTotale\" <= ?";
+			}
+		}
+		if (filtri.superficieMin != null) {
+			query += " AND i.\"dimensione\" >= ?";
+		}
+		if (filtri.superficieMax != null) {
+			query += " AND i.\"dimensione\" <= ?";
+		}
+		if (filtri.piano != null && !filtri.piano.equals("Indifferente")) {
+			query += " AND (i.\"filtri\"->>'piano')::int = ?";
+		}
+		if (filtri.numLocali != null) {
+			query += " AND (i.\"filtri\"->>'numeroLocali')::int = ?";
+		}
+		if (filtri.numBagni != null) {
+			query += " AND (i.\"filtri\"->>'numeroBagni')::int = ?";
+		}
+		if (filtri.ascensore != null) {
+			query += " AND (i.\"filtri\"->>'ascensore')::boolean = ?";
+		}
+		if (filtri.portineria != null) {
+			query += " AND (i.\"filtri\"->>'portineria')::boolean = ?";
+		}
+		if (filtri.climatizzazione != null) {
+			query += " AND (i.\"filtri\"->>'climatizzazione')::boolean = ?";
+		}
 
-	    if (filtri.prezzoMin != null) query += " AND " + prezzoField + " >= ?";
-	    if (filtri.prezzoMax != null) query += " AND " + prezzoField + " <= ?";
-	    if (filtri.superficieMin != null) query += " AND i.\"dimensione\" >= ?";
-	    if (filtri.superficieMax != null) query += " AND i.\"dimensione\" <= ?";
-
-	    if (filtri.piano != null && !"Indifferente".equals(filtri.piano)) {
-	        query += " AND (i.\"filtri\"->>'piano')::int = ?";
-	    }
-	    if (filtri.numLocali != null) query += " AND (i.\"filtri\"->>'numeroLocali')::int = ?";
-	    if (filtri.numBagni != null) query += " AND (i.\"filtri\"->>'numeroBagni')::int = ?";
-
-	    if (filtri.ascensore != null) query += " AND (i.\"filtri\"->>'ascensore')::boolean = ?";
-	    if (filtri.portineria != null) query += " AND (i.\"filtri\"->>'portineria')::boolean = ?";
-	    if (filtri.climatizzazione != null) query += " AND (i.\"filtri\"->>'climatizzazione')::boolean = ?";
-
-	    return query;
+		return query;
 	}
 
 	/**
@@ -555,8 +560,8 @@ public class ImmobileDAO {
 	public List<ImmobileInAffitto> getImmobiliAffitto(RicercaDTO ricercaDTO) {
 		final List<ImmobileInAffitto> immobili = new ArrayList<>();
 
-		String query = costruisciQueryBase(AFFITTO_IMMOBILE, ricercaDTO);
-		query = aggiungiFiltriQuery(query, ricercaDTO.getFiltri(), AFFITTO_IMMOBILE);
+		String query = costruisciQueryBase("Affitto", ricercaDTO);
+		query = aggiungiFiltriQuery(query, ricercaDTO.getFiltri(), "Affitto");
 		query += " ORDER BY i.\"idImmobile\" DESC ";
 
 		try (PreparedStatement ps = connection.prepareStatement(query)) {
@@ -611,7 +616,7 @@ public class ImmobileDAO {
 			return immobili;
 
 		} catch (SQLException e) {
-			LOGGER.log(Level.SEVERE, TITOLO_ERRORE, e);
+			e.printStackTrace();
 			return Collections.emptyList();
 		}
 	}
@@ -632,8 +637,8 @@ public class ImmobileDAO {
 	public List<ImmobileInVendita> getImmobiliVendita(RicercaDTO ricercaDTO) {
 		final List<ImmobileInVendita> immobili = new ArrayList<>();
 
-		String query = costruisciQueryBase(VENDITA_IMMOBILE, ricercaDTO);
-		query = aggiungiFiltriQuery(query, ricercaDTO.getFiltri(), VENDITA_IMMOBILE);
+		String query = costruisciQueryBase("Vendita", ricercaDTO);
+		query = aggiungiFiltriQuery(query, ricercaDTO.getFiltri(), "Vendita");
 		query += " ORDER BY i.\"idImmobile\" DESC ";
 
 		try (PreparedStatement ps = connection.prepareStatement(query)) {
@@ -688,7 +693,7 @@ public class ImmobileDAO {
 			return immobili;
 
 		} catch (SQLException e) {
-			LOGGER.log(Level.SEVERE, TITOLO_ERRORE, e);
+			e.printStackTrace();
 			return Collections.emptyList();
 		}
 	}
